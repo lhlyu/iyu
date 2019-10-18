@@ -8,7 +8,7 @@ import (
 )
 
 func init(){
-    module.Register(module.CfgModule,module.DbModule,module.RedisModule)
+    module.Register(module.CfgModule)
     module.Init()
 }
 

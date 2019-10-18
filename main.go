@@ -3,10 +3,10 @@ package main
 import (
     "github.com/kataras/golog"
     "github.com/kataras/iris"
-    "github.com/kataras/iris/middleware/logger"
     "github.com/kataras/iris/middleware/recover"
     "github.com/lhlyu/iyu/common"
     "github.com/lhlyu/iyu/module"
+    "github.com/lhlyu/iyu/router"
 )
 
 func init(){
@@ -17,7 +17,10 @@ func init(){
 func main() {
     app := iris.New()
     app.Use(recover.New())
-    app.Use(logger.New())
     golog.SetLevel("debug")
+
+    router.SetRouter(app)
+
     app.Run(iris.Addr(":" + common.Cfg.GetString("server.port")))
 }
+

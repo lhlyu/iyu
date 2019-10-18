@@ -18,7 +18,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/kataras/golog v0.0.9
-	github.com/kataras/iris v11.1.1+incompatible // indirect
+	github.com/kataras/iris v11.1.1+incompatible
 	github.com/klauspost/compress v1.8.6 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect

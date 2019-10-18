@@ -31,7 +31,6 @@ type redisConf struct {
 
 func setRedis(r *redisConf){
 
-	// 判断是否启用redis
     client := redis.NewClient(&redis.Options{
         Addr:     r.Addr,
         Password: r.Password,
