@@ -1,0 +1,28 @@
+version: v1.0
+author: lhlyu
+name: iyu
+env: prod
+
+server:
+  host: localhost
+  port: 8080
+
+redis:
+  addr: 127.0.0.1:6379
+  password: 123456
+  database: 0
+  maxActive: 50
+  idleTimeout: 60
+
+db:
+  db_wr:
+    user: root
+    password:
+    host: 127.0.0.1
+    port: 3306
+    database: demo
+    charset: utf8
+    parseTime: true
+    maxOpenConns: 1
+    maxIdleConns: 3
+    connMaxLifetime: 30
