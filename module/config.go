@@ -1,55 +1,54 @@
 package module
 
 import (
-    "github.com/lhlyu/iyu/common"
-    "github.com/lhlyu/iyu/util"
-    "github.com/spf13/viper"
-    "log"
-    "os"
-    "path"
+	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/util"
+	"github.com/spf13/viper"
+	"log"
+	"os"
+	"path"
 )
 
-const Deve_ConfigFilePath  = "conf/dev.yaml"
-const Prod_ConfigFilePath  = "conf/config.yaml"
+const Deve_ConfigFilePath = "conf/dev.yaml"
+const Prod_ConfigFilePath = "conf/config.yaml"
 
-
-type Config struct {
-
+type config struct {
 }
 
-func (Config) SetUp(){
-    cfg := viper.New()
-    cfg.SetConfigFile(getConfigFilePath())
-    err := cfg.ReadInConfig()
-    if err != nil {
-        log.Fatalln("Read config fail: " + err.Error())
-    }
-    common.Cfg = cfg
-    if common.Cfg == nil{
-        log.Fatalln("config file not found")
-    }
+func (config) SetUp() {
+	cfg := viper.New()
+	cfg.SetConfigFile(getConfigFilePath())
+	err := cfg.ReadInConfig()
+	if err != nil {
+		log.Fatalln("Read config fail: " + err.Error())
+	}
+	common.Cfg = cfg
+	if common.Cfg == nil {
+		log.Fatalln("config file not found")
+	}
 }
+
+// 读取配置模块
+var CfgModule = config{}
 
 // 获取配置文件地址
-func getConfigFilePath() string{
-    configFile := getConfigFileByEnv()
-    for i := 0;i < 5;i ++{
-        if util.PathExists(configFile){
-            log.Println("read config file:",configFile)
-            return configFile
-        }
-        configFile = path.Join("..",configFile)
-    }
-    log.Fatal("config file not found")
-    return ""
+func getConfigFilePath() string {
+	configFile := getConfigFileByEnv()
+	for i := 0; i < 5; i++ {
+		if util.PathExists(configFile) {
+			log.Println("read config file:", configFile)
+			return configFile
+		}
+		configFile = path.Join("..", configFile)
+	}
+	log.Fatal("config file not found")
+	return ""
 }
 
 // 根据开发环境获取配置文件
-func getConfigFileByEnv() string{
-    if os.Getenv("DEV") == "1"{
-        return Deve_ConfigFilePath
-    }
-    return Prod_ConfigFilePath
+func getConfigFileByEnv() string {
+	if os.Getenv("DEV") == "1" {
+		return Deve_ConfigFilePath
+	}
+	return Prod_ConfigFilePath
 }
-
-var CfgModule = Config{}
