@@ -13,7 +13,7 @@ type timer struct {
 func (timer) SetUp() {
 	c := cron.New()
 
-	c.AddFunc("0 0/1 * * * *", task)
+	c.AddFunc("0 0/5 * * * *", task)
 
 	c.Start()
 	log.Println("timer is running...")
