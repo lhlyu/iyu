@@ -11,7 +11,7 @@ import (
 
 func init() {
 	module.Register(module.CfgModule, // 读取配置
-		//module.DbModule,    // 连接数据库
+		module.DbModule,    // 连接数据库
 		module.TimerModule) // 启用定时任务
 	module.Init()
 }

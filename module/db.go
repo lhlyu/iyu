@@ -18,7 +18,7 @@ func (db) SetUp() {
 		log.Fatal("db setup is err:", err)
 	}
 
-	setDb(common.DB, c)
+	setDb(c)
 }
 
 // 数据库连接模块
@@ -37,7 +37,7 @@ type dbConf struct {
 	ConnMaxLifetime int    `json:"connMaxLifetime"`
 }
 
-func setDb(d *sqlx.DB, c *dbConf) {
+func setDb(c *dbConf) {
 
 	path := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%t", c.User,
 		c.Password,
@@ -62,5 +62,5 @@ func setDb(d *sqlx.DB, c *dbConf) {
 	if err != nil {
 		panic(err)
 	}
-	d = db
+	common.DB = db
 }
