@@ -10,7 +10,9 @@ import (
 )
 
 func init() {
-	module.Register(module.CfgModule)
+	module.Register(module.CfgModule, // 读取配置
+		module.DbModule,    // 连接数据库
+		module.TimerModule) // 启用定时任务
 	module.Init()
 }
 
@@ -21,5 +23,5 @@ func main() {
 
 	router.SetRouter(app)
 
-	app.Run(iris.Addr(":" + common.Cfg.GetString("server.port")))
+	app.Run(iris.Addr("localhost:" + common.Cfg.GetString("server.port")))
 }
