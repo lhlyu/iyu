@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bytes"
+	"github.com/lhlyu/iyu/errcode"
 	"reflect"
 	"strings"
 )
@@ -69,4 +70,10 @@ func (*dao) IntConvertToInterface(slice []int) []interface{} {
 		params[i] = v
 	}
 	return params
+}
+
+func (*dao) Sy() repositoryError {
+	sql := "select * from demo where id = ?"
+	params := []interface{}{1}
+	return NewRepositoryError("repository.Sy", sql, errcode.EMPTY_DATA, params)
 }

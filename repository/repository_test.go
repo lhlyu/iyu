@@ -12,6 +12,15 @@ func init() {
 	module.Init()
 }
 
+func TestSy(t *testing.T) {
+	if common.DB == nil {
+		return
+	}
+	d := NewDao()
+
+	fmt.Println(d.Sy().GetErrCode().IsSuccess())
+}
+
 func TestRepository(t *testing.T) {
 	if common.DB == nil {
 		return
