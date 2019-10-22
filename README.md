@@ -1,6 +1,10 @@
 # iyu
 iris blog server
 
+## 项目进度
+
+- 正在开发...
+- 开发分支: develop
 
 ## 项目目录结构
 
