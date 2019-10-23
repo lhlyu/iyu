@@ -1,25 +1,25 @@
 package module
 
 type Module interface {
-    SetUp()
+	SetUp()
 }
 
 type module struct {
-    mi  Module
+	mi Module
 }
 
 var mods []*module
 
 func Register(mi ...Module) {
-   for _,m := range mi{
-       mod := new(module)
-       mod.mi = m
-       mods = append(mods, mod)
-   }
+	for _, m := range mi {
+		mod := new(module)
+		mod.mi = m
+		mods = append(mods, mod)
+	}
 }
 
-func Init(){
-    for _,m := range mods{
-        m.mi.SetUp()
-    }
+func Init() {
+	for _, m := range mods {
+		m.mi.SetUp()
+	}
 }
