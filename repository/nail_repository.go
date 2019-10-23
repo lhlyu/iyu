@@ -35,7 +35,7 @@ func (*dao) AddNailOne(nail *model.YuNail) *repositoryError {
 	// 存在
 	newNail := newNails[0]
 	if newNail.IsDelete == 1 {
-		sql = "update yu_nail set color = ?,is_delete = 0,updated_at = now() where name = ?"
+		sql = "update yu_nail set color = ?,is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, nail.Color, nail.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("AddNailOne", sql, errcode.ERROR, err, rollerr)
@@ -67,7 +67,7 @@ func (*dao) UpdateNailOne(nail *model.YuNail) *repositoryError {
 	}
 	if len(newNails) == 0 {
 		// 不存在，修改
-		sql = "update yu_nail set name = ?,color = ?,is_delete = 0,updated_at = now() where id = ?"
+		sql = "update yu_nail set name = ?,color = ?,is_delete = 1,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, nail.Name, nail.Color, nail.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateNailOne", sql, errcode.ERROR, err, rollerr)
@@ -75,13 +75,13 @@ func (*dao) UpdateNailOne(nail *model.YuNail) *repositoryError {
 		return nil
 	}
 	newNail := newNails[0]
-	if newNail.IsDelete == 1 {
-		sql = "update yu_nail set color = ?,is_delete = 0,updated_at = now() where name = ?"
+	if newNail.IsDelete == 2 {
+		sql = "update yu_nail set color = ?,is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, nail.Color, nail.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateNailOne", sql, errcode.ERROR, err, rollerr)
 		}
-		sql = "update yu_nail set is_delete = 1,updated_at = now() where id = ?"
+		sql = "update yu_nail set is_delete = 2,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, nail.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateNailOne", sql, errcode.ERROR, err, rollerr)
@@ -93,7 +93,7 @@ func (*dao) UpdateNailOne(nail *model.YuNail) *repositoryError {
 
 // 查询所有nail
 func (*dao) QueryNail() ([]*model.YuNail, *repositoryError) {
-	sql := "select * from yu_nail where is_delete = 0 order by updated_at desc,created_at desc"
+	sql := "select * from yu_nail where is_delete = 1 order by updated_at desc,created_at desc"
 	nails := []*model.YuNail{}
 	if err := common.DB.Select(&nails, sql); err != nil {
 		return nil, NewRepositoryError("QueryNail", sql, errcode.ERROR, err)

@@ -34,8 +34,8 @@ func (*dao) AddLabelOne(label *model.YuLabel) *repositoryError {
 	}
 	// 存在
 	newLabel := newLabels[0]
-	if newLabel.IsDelete == 1 {
-		sql = "update yu_label set is_delete = 0,updated_at = now() where name = ?"
+	if newLabel.IsDelete == 2 {
+		sql = "update yu_label set is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, label.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("AddLabelOne", sql, errcode.ERROR, err, rollerr)
@@ -67,7 +67,7 @@ func (*dao) UpdateLabelOne(label *model.YuLabel) *repositoryError {
 	}
 	if len(newLabels) == 0 {
 		// 不存在，修改
-		sql = "update yu_label set name = ?,is_delete = 0,updated_at = now() where id = ?"
+		sql = "update yu_label set name = ?,is_delete = 1,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, label.Name, label.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err, rollerr)
@@ -75,13 +75,13 @@ func (*dao) UpdateLabelOne(label *model.YuLabel) *repositoryError {
 		return nil
 	}
 	newLabel := newLabels[0]
-	if newLabel.IsDelete == 1 {
-		sql = "update yu_label set is_delete = 0,updated_at = now() where name = ?"
+	if newLabel.IsDelete == 2 {
+		sql = "update yu_label set is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, label.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err, rollerr)
 		}
-		sql = "update yu_label set is_delete = 1,updated_at = now() where id = ?"
+		sql = "update yu_label set is_delete = 2,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, label.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err, rollerr)
@@ -93,7 +93,7 @@ func (*dao) UpdateLabelOne(label *model.YuLabel) *repositoryError {
 
 // 查询所有label
 func (*dao) QueryLabel() ([]*model.YuLabel, *repositoryError) {
-	sql := "select * from yu_label where is_delete = 0 order by updated_at desc,created_at desc"
+	sql := "select * from yu_label where is_delete = 1 order by updated_at desc,created_at desc"
 	labels := []*model.YuLabel{}
 	if err := common.DB.Select(&labels, sql); err != nil {
 		return nil, NewRepositoryError("QueryLabel", sql, errcode.ERROR, err)

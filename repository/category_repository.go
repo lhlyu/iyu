@@ -34,8 +34,8 @@ func (*dao) AddCategoryOne(category *model.YuCategory) *repositoryError {
 	}
 	// 存在
 	newCategory := newCategorys[0]
-	if newCategory.IsDelete == 1 {
-		sql = "update yu_category set is_delete = 0,updated_at = now() where name = ?"
+	if newCategory.IsDelete == 2 {
+		sql = "update yu_category set is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, category.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("AddCategoryOne", sql, errcode.ERROR, err, rollerr)
@@ -67,7 +67,7 @@ func (*dao) UpdateCategoryOne(category *model.YuCategory) *repositoryError {
 	}
 	if len(newCategorys) == 0 {
 		// 不存在，修改
-		sql = "update yu_category set name = ?,is_delete = 0,updated_at = now() where id = ?"
+		sql = "update yu_category set name = ?,is_delete = 1,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, category.Name, category.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateCategoryOne", sql, errcode.ERROR, err, rollerr)
@@ -75,13 +75,13 @@ func (*dao) UpdateCategoryOne(category *model.YuCategory) *repositoryError {
 		return nil
 	}
 	newCategory := newCategorys[0]
-	if newCategory.IsDelete == 1 {
-		sql = "update yu_category set is_delete = 0,updated_at = now() where name = ?"
+	if newCategory.IsDelete == 2 {
+		sql = "update yu_category set is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, category.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateCategoryOne", sql, errcode.ERROR, err, rollerr)
 		}
-		sql = "update yu_category set is_delete = 1,updated_at = now() where id = ?"
+		sql = "update yu_category set is_delete = 2,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, category.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateCategoryOne", sql, errcode.ERROR, err, rollerr)
@@ -93,7 +93,7 @@ func (*dao) UpdateCategoryOne(category *model.YuCategory) *repositoryError {
 
 // 查询所有category
 func (*dao) QueryCategory() ([]*model.YuCategory, *repositoryError) {
-	sql := "select * from yu_category where is_delete = 0 order by updated_at desc,created_at desc"
+	sql := "select * from yu_category where is_delete = 1 order by updated_at desc,created_at desc"
 	categorys := []*model.YuCategory{}
 	if err := common.DB.Select(&categorys, sql); err != nil {
 		return nil, NewRepositoryError("QueryCategory", sql, errcode.ERROR, err)
