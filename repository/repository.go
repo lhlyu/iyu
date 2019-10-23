@@ -2,7 +2,6 @@ package repository
 
 import (
 	"bytes"
-	"github.com/lhlyu/iyu/errcode"
 	"reflect"
 	"strings"
 )
@@ -17,7 +16,9 @@ func NewDao() *dao {
 // Benchmark-4   	10000000	       161 ns/op  - 10
 // Benchmark-4   	 3000000	       448 ns/op  - 100
 // Benchmark-4   	 1000000	      1371 ns/op  - 1000
-func (*dao) CreateQuestionMarks(length int) string {
+// 可以使用sqlx.In()代替
+// Benchmark-4   	 2000000	       782 ns/op  - 10    sqlx.In()
+func (*dao) createQuestionMarks(length int) string {
 	if length == 0 {
 		return ""
 	}
@@ -32,7 +33,7 @@ func (*dao) CreateQuestionMarks(length int) string {
 // BenchmarkSprintf-4   	 2000000	       604 ns/op - 10
 
 // BenchmarkSprintf-4   	 5000000	       289 ns/op - 10  not reflect
-func (*dao) ConvertToInterface(slice interface{}) []interface{} {
+func (*dao) convertToInterface(slice interface{}) []interface{} {
 	val := reflect.ValueOf(slice)
 	if val.Kind() != reflect.Slice {
 		return nil
@@ -49,7 +50,7 @@ func (*dao) ConvertToInterface(slice interface{}) []interface{} {
 }
 
 // string slice convert to interface slice
-func (*dao) StrConvertToInterface(slice []string) []interface{} {
+func (*dao) strConvertToInterface(slice []string) []interface{} {
 	if len(slice) == 0 {
 		return nil
 	}
@@ -61,7 +62,7 @@ func (*dao) StrConvertToInterface(slice []string) []interface{} {
 }
 
 // int slice convert to interface slice
-func (*dao) IntConvertToInterface(slice []int) []interface{} {
+func (*dao) intConvertToInterface(slice []int) []interface{} {
 	if len(slice) == 0 {
 		return nil
 	}
@@ -70,10 +71,4 @@ func (*dao) IntConvertToInterface(slice []int) []interface{} {
 		params[i] = v
 	}
 	return params
-}
-
-func (*dao) Sy() repositoryError {
-	sql := "select * from demo where id = ?"
-	params := []interface{}{1}
-	return NewRepositoryError("repository.Sy", sql, errcode.EMPTY_DATA, params)
 }
