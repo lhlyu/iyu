@@ -17,6 +17,7 @@ func init() {
 }
 
 func main() {
+
 	app := iris.New()
 	app.Use(recover.New())
 	golog.SetLevel("debug")

@@ -30,10 +30,10 @@ CREATE TABLE `yu_article` (
   `bg` varchar(200) NOT NULL DEFAULT '' COMMENT '头背景',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
   `content` text NOT NULL COMMENT '内容',
-  `is_top` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否置顶:0-不置顶;1-置顶',
+  `is_top` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否置顶:1-不置顶;2-置顶',
   `nail_id` int(11) NOT NULL DEFAULT '0' COMMENT '钉子ID',
-  `kind` tinyint(1) NOT NULL DEFAULT '0' COMMENT '文章类型:0-普通文章;1-特殊文章',
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已删除:0-未删除;1-已删除',
+  `kind` tinyint(1) NOT NULL DEFAULT '1' COMMENT '文章类型:1-普通文章;2-特殊文章',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -47,7 +47,7 @@ CREATE TABLE `yu_article_catalog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `article_id` int(11) NOT NULL DEFAULT '0',
   `catalog_id` int(11) NOT NULL,
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除: 0-未删除；1-已删除',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='文章分类关联表';
 
@@ -59,7 +59,7 @@ CREATE TABLE `yu_article_label` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `article_id` int(11) NOT NULL DEFAULT '0',
   `label_id` int(11) NOT NULL,
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除: 0-未删除；1-已删除',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='文章标签关联表';
 
@@ -70,7 +70,7 @@ DROP TABLE IF EXISTS `yu_category`;
 CREATE TABLE `yu_category` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '分类ID',
   `name` varchar(16) NOT NULL DEFAULT '' COMMENT '分类名字',
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除:0-未删除;1-已删除',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`),
@@ -89,8 +89,8 @@ CREATE TABLE `yu_comment` (
   `content` text COLLATE utf8_bin NOT NULL COMMENT '评论内容',
   `like` int(11) NOT NULL DEFAULT '0' COMMENT '赞',
   `unlike` int(11) NOT NULL DEFAULT '0' COMMENT '踩',
-  `is_check` tinyint(1) NOT NULL DEFAULT '0' COMMENT '评论是否已审核:0-未审核;1-已审核',
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '评论是否已被删除:0-未删除;1-已删除',
+  `is_check` tinyint(1) NOT NULL DEFAULT '1' COMMENT '评论是否已审核:1-未审核;2-已审核',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '评论是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '修改时间',
   PRIMARY KEY (`id`)
@@ -103,7 +103,7 @@ DROP TABLE IF EXISTS `yu_label`;
 CREATE TABLE `yu_label` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '标签ID',
   `name` varchar(16) NOT NULL DEFAULT '' COMMENT '标签名字',
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除: 0-未删除；1-已删除',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '修改时间',
   PRIMARY KEY (`id`),
@@ -118,12 +118,12 @@ CREATE TABLE `yu_nail` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '钉子ID',
   `name` varchar(16) NOT NULL DEFAULT '' COMMENT '钉子名字',
   `color` varchar(7) NOT NULL DEFAULT '' COMMENT '钉子颜色',
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除: 0-未删除；1-已删除',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '修改时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='钉子';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='钉子';
 
 /*Table structure for table `yu_post` */
 
@@ -139,8 +139,8 @@ CREATE TABLE `yu_post` (
   `content` text COLLATE utf8_bin NOT NULL COMMENT '评论内容',
   `like` int(11) NOT NULL DEFAULT '0' COMMENT '赞',
   `unlike` int(11) NOT NULL DEFAULT '0' COMMENT '踩',
-  `is_check` tinyint(1) NOT NULL DEFAULT '0' COMMENT '评论是否已审核:0-未审核;1-已审核',
-  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '评论是否已被删除:0-未删除;1-已删除',
+  `is_check` tinyint(1) NOT NULL DEFAULT '1' COMMENT '评论是否已审核:1-未审核;2-已审核',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '评论是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '修改时间',
   PRIMARY KEY (`id`)
@@ -155,7 +155,7 @@ CREATE TABLE `yu_quanta` (
   `key` varchar(20) NOT NULL DEFAULT '' COMMENT 'key值',
   `value` varchar(200) NOT NULL DEFAULT '' COMMENT 'value值',
   `desc` varchar(200) NOT NULL DEFAULT '' COMMENT '描述',
-  `is_enable` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否启用:0-启用;1-不启用',
+  `is_enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用:1-启用;2-不启用',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`),
@@ -169,9 +169,9 @@ DROP TABLE IF EXISTS `yu_user`;
 CREATE TABLE `yu_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '用户id',
   `third_id` int(11) NOT NULL DEFAULT '0' COMMENT '第三方登录返回的ID',
-  `is_admin` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否是管理员:0-普通;1-观察者;9-管理员',
+  `is_admin` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否是管理员:1-普通;2-观察者;9-管理员',
   `from` int(2) NOT NULL DEFAULT '0' COMMENT '来源:1-github;2-gitee',
-  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '用户状态:0-正常;1-已删除;2-黑名单',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '用户状态:1-正常;2-已删除;3-黑名单',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)

@@ -1,12 +1,20 @@
 package router
 
 import (
+	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
+	"github.com/lhlyu/iyu/repository"
 )
 
 func SetRouter(app *iris.Application) {
+	// only a test
 	app.Get("/", func(ctx context.Context) {
-		ctx.Write([]byte("<a href='http://lhlyu.com'>lhlyu</a>"))
+		d := repository.NewDao()
+		data, e := d.QueryNail()
+		if e != nil {
+			fmt.Println(e)
+		}
+		ctx.JSON(data)
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/module"
+	model "github.com/lhlyu/iyu/repository/po"
 	"testing"
 )
 
@@ -12,13 +13,40 @@ func init() {
 	module.Init()
 }
 
-func TestSy(t *testing.T) {
-	if common.DB == nil {
+// 测试 添加一个nail
+func TestDao_AddNailOne(t *testing.T) {
+	d := NewDao()
+	nail := &model.YuNail{
+		Color: "#0f0f0f",
+		Name:  "置顶",
+	}
+	e := d.AddNailOne(nail)
+	fmt.Println(e)
+}
+
+// 测试 更新一个nail
+func TestDao_UpdateNailOne(t *testing.T) {
+	d := NewDao()
+	nail := &model.YuNail{
+		Id:    1,
+		Color: "#0f0f0f",
+		Name:  "TOP10",
+	}
+	e := d.UpdateNailOne(nail)
+	fmt.Println(e)
+}
+
+// 测试 查询所有nail
+func TestDao_QueryNailRepository(t *testing.T) {
+	d := NewDao()
+	nails, e := d.QueryNail()
+	if e != nil {
+		fmt.Println(e)
 		return
 	}
-	d := NewDao()
-
-	fmt.Println(d.Sy().GetErrCode().IsSuccess())
+	for _, v := range nails {
+		fmt.Println(v)
+	}
 }
 
 func TestRepository(t *testing.T) {
@@ -27,14 +55,13 @@ func TestRepository(t *testing.T) {
 	}
 	d := NewDao()
 	//d.AddNailOne("置顶", "#0000ff")
-	a := d.ConvertToInterface([]int{1, 2, 3, 4, 5})
+	a := d.convertToInterface([]int{1, 2, 3, 4, 5})
 	fmt.Println(a...)
 }
 
 func BenchmarkSprintf(b *testing.B) {
-	d := NewDao()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		d.IntConvertToInterface([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
+
 	}
 }
