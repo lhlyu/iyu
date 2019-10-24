@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/module"
-	model "github.com/lhlyu/iyu/repository/po"
+	po "github.com/lhlyu/iyu/repository/po"
 	"testing"
 )
 
@@ -16,7 +16,7 @@ func init() {
 // 测试 添加一个nail
 func TestDao_AddNailOne(t *testing.T) {
 	d := NewDao()
-	nail := &model.YuNail{
+	nail := &po.YuNail{
 		Color: "#0f0f0f",
 		Name:  "置顶",
 	}
@@ -27,7 +27,7 @@ func TestDao_AddNailOne(t *testing.T) {
 // 测试 更新一个nail
 func TestDao_UpdateNailOne(t *testing.T) {
 	d := NewDao()
-	nail := &model.YuNail{
+	nail := &po.YuNail{
 		Id:    1,
 		Color: "#0f0f0f",
 		Name:  "TOP10",

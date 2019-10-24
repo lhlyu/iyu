@@ -12,13 +12,13 @@ import (
 2. 如果已被删除，重新改为启用
 3. 如果不存在，添加
 */
-func (*dao) AddCategoryOne(category *model.YuCategory) *repositoryError {
+func (*dao) AddCategoryOne(category *po.YuCategory) *repositoryError {
 	tx, err := common.DB.Beginx()
 	if err != nil {
 		return NewRepositoryError("AddCategoryOne", "", errcode.ERROR, err)
 	}
 	defer tx.Commit()
-	newCategorys := []*model.YuCategory{}
+	newCategorys := []*po.YuCategory{}
 	sql := "select * from yu_category where name = ? limit 1"
 	if err = tx.Select(&newCategorys, sql, category.Name); err != nil {
 		return NewRepositoryError("AddCategoryOne", sql, errcode.ERROR, err)
@@ -54,13 +54,13 @@ func (*dao) AddCategoryOne(category *model.YuCategory) *repositoryError {
            - 不存在 -> 修改
 ps: sqlx的Get方法，不存在就报错，所以还是采用Select放到切片
 */
-func (*dao) UpdateCategoryOne(category *model.YuCategory) *repositoryError {
+func (*dao) UpdateCategoryOne(category *po.YuCategory) *repositoryError {
 	tx, err := common.DB.Beginx()
 	if err != nil {
 		return NewRepositoryError("UpdateCategoryOne", "", errcode.ERROR, err)
 	}
 	defer tx.Commit()
-	newCategorys := []*model.YuCategory{}
+	newCategorys := []*po.YuCategory{}
 	sql := "select * from yu_category where name = ? limit 1"
 	if err = tx.Select(&newCategorys, sql, category.Name); err != nil {
 		return NewRepositoryError("UpdateCategoryOne", sql, errcode.ERROR, err)
@@ -92,9 +92,9 @@ func (*dao) UpdateCategoryOne(category *model.YuCategory) *repositoryError {
 }
 
 // 查询所有category
-func (*dao) QueryCategory() ([]*model.YuCategory, *repositoryError) {
+func (*dao) QueryCategory() ([]*po.YuCategory, *repositoryError) {
 	sql := "select * from yu_category where is_delete = 1 order by updated_at desc,created_at desc"
-	categorys := []*model.YuCategory{}
+	categorys := []*po.YuCategory{}
 	if err := common.DB.Select(&categorys, sql); err != nil {
 		return nil, NewRepositoryError("QueryCategory", sql, errcode.ERROR, err)
 	}
