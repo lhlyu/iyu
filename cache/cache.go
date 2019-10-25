@@ -6,8 +6,9 @@ import (
 
 /**
 LHLYU-BLOG:AUTHOR  -  存放作者信息【string】
-LHLYU-BLOG:CATALOG   -   分类【list】
-LHLYU-BLOG:TAGS    -   标签【list】
+LHLYU-BLOG:CATALOG   -   分类【Hash】
+LHLYU-BLOG:TAGS    -   标签【Hash】
+LHLYU-BLOG:NAIL    -   钉子【Hash】
 
 
 LHLYU-BLOG:ARTICLE:LIST - 文章列表【list】

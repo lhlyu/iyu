@@ -12,13 +12,13 @@ import (
 2. 如果已被删除，重新改为启用
 3. 如果不存在，添加
 */
-func (*dao) AddLabelOne(label *model.YuLabel) *repositoryError {
+func (*dao) AddLabelOne(label *po.YuLabel) *repositoryError {
 	tx, err := common.DB.Beginx()
 	if err != nil {
 		return NewRepositoryError("AddLabelOne", "", errcode.ERROR, err)
 	}
 	defer tx.Commit()
-	newLabels := []*model.YuLabel{}
+	newLabels := []*po.YuLabel{}
 	sql := "select * from yu_label where name = ? limit 1"
 	if err = tx.Select(&newLabels, sql, label.Name); err != nil {
 		return NewRepositoryError("AddLabelOne", sql, errcode.ERROR, err)
@@ -34,8 +34,8 @@ func (*dao) AddLabelOne(label *model.YuLabel) *repositoryError {
 	}
 	// 存在
 	newLabel := newLabels[0]
-	if newLabel.IsDelete == 1 {
-		sql = "update yu_label set is_delete = 0,updated_at = now() where name = ?"
+	if newLabel.IsDelete == 2 {
+		sql = "update yu_label set is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, label.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("AddLabelOne", sql, errcode.ERROR, err, rollerr)
@@ -54,20 +54,20 @@ func (*dao) AddLabelOne(label *model.YuLabel) *repositoryError {
            - 不存在 -> 修改
 ps: sqlx的Get方法，不存在就报错，所以还是采用Select放到切片
 */
-func (*dao) UpdateLabelOne(label *model.YuLabel) *repositoryError {
+func (*dao) UpdateLabelOne(label *po.YuLabel) *repositoryError {
 	tx, err := common.DB.Beginx()
 	if err != nil {
 		return NewRepositoryError("UpdateLabelOne", "", errcode.ERROR, err)
 	}
 	defer tx.Commit()
-	newLabels := []*model.YuLabel{}
+	newLabels := []*po.YuLabel{}
 	sql := "select * from yu_label where name = ? limit 1"
 	if err = tx.Select(&newLabels, sql, label.Name); err != nil {
 		return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err)
 	}
 	if len(newLabels) == 0 {
 		// 不存在，修改
-		sql = "update yu_label set name = ?,is_delete = 0,updated_at = now() where id = ?"
+		sql = "update yu_label set name = ?,is_delete = 1,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, label.Name, label.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err, rollerr)
@@ -75,13 +75,13 @@ func (*dao) UpdateLabelOne(label *model.YuLabel) *repositoryError {
 		return nil
 	}
 	newLabel := newLabels[0]
-	if newLabel.IsDelete == 1 {
-		sql = "update yu_label set is_delete = 0,updated_at = now() where name = ?"
+	if newLabel.IsDelete == 2 {
+		sql = "update yu_label set is_delete = 1,updated_at = now() where name = ?"
 		if _, err = tx.Exec(sql, label.Name); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err, rollerr)
 		}
-		sql = "update yu_label set is_delete = 1,updated_at = now() where id = ?"
+		sql = "update yu_label set is_delete = 2,updated_at = now() where id = ?"
 		if _, err = tx.Exec(sql, label.Id); err != nil {
 			rollerr := tx.Rollback()
 			return NewRepositoryError("UpdateLabelOne", sql, errcode.ERROR, err, rollerr)
@@ -92,9 +92,9 @@ func (*dao) UpdateLabelOne(label *model.YuLabel) *repositoryError {
 }
 
 // 查询所有label
-func (*dao) QueryLabel() ([]*model.YuLabel, *repositoryError) {
-	sql := "select * from yu_label where is_delete = 0 order by updated_at desc,created_at desc"
-	labels := []*model.YuLabel{}
+func (*dao) QueryLabel() ([]*po.YuLabel, *repositoryError) {
+	sql := "select * from yu_label where is_delete = 1 order by updated_at desc,created_at desc"
+	labels := []*po.YuLabel{}
 	if err := common.DB.Select(&labels, sql); err != nil {
 		return nil, NewRepositoryError("QueryLabel", sql, errcode.ERROR, err)
 	}

@@ -31,25 +31,14 @@ CREATE TABLE `yu_article` (
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
   `content` text NOT NULL COMMENT '内容',
   `is_top` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否置顶:1-不置顶;2-置顶',
+  `category_id` int(11) NOT NULL DEFAULT '0' COMMENT '分类ID',
   `nail_id` int(11) NOT NULL DEFAULT '0' COMMENT '钉子ID',
   `kind` tinyint(1) NOT NULL DEFAULT '1' COMMENT '文章类型:1-普通文章;2-特殊文章',
   `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='文章';
-
-/*Table structure for table `yu_article_catalog` */
-
-DROP TABLE IF EXISTS `yu_article_catalog`;
-
-CREATE TABLE `yu_article_catalog` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `article_id` int(11) NOT NULL DEFAULT '0',
-  `catalog_id` int(11) NOT NULL,
-  `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='文章分类关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='文章';
 
 /*Table structure for table `yu_article_label` */
 
@@ -61,7 +50,7 @@ CREATE TABLE `yu_article_label` (
   `label_id` int(11) NOT NULL,
   `is_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否已删除:1-未删除;2-已删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='文章标签关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='文章标签关联表';
 
 /*Table structure for table `yu_category` */
 
@@ -75,7 +64,7 @@ CREATE TABLE `yu_category` (
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='分类';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='分类';
 
 /*Table structure for table `yu_comment` */
 
@@ -108,7 +97,7 @@ CREATE TABLE `yu_label` (
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '修改时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='标签';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='标签';
 
 /*Table structure for table `yu_nail` */
 
@@ -172,28 +161,15 @@ CREATE TABLE `yu_user` (
   `is_admin` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否是管理员:1-普通;2-观察者;9-管理员',
   `from` int(2) NOT NULL DEFAULT '0' COMMENT '来源:1-github;2-gitee',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '用户状态:1-正常;2-已删除;3-黑名单',
+  `avatar_url` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '用户头像',
+  `user_url` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '用户地址',
+  `user_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '用户名字',
+  `bio` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '个性签名',
+  `ip` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '0.0.0.0' COMMENT 'ip',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-
-/*Table structure for table `yu_user_info` */
-
-DROP TABLE IF EXISTS `yu_user_info`;
-
-CREATE TABLE `yu_user_info` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户ID',
-  `avatar_url` varchar(200) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '用户头像',
-  `user_url` varchar(200) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '用户地址',
-  `user_name` varchar(50) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '用户名字',
-  `bio` varchar(200) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '个性签名',
-  `ip` varchar(50) COLLATE utf8_bin NOT NULL DEFAULT '0.0.0.0' COMMENT 'ip',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UNIQUE` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='用户详情表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

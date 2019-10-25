@@ -3,13 +3,13 @@ package repository
 import (
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/errcode"
-	model "github.com/lhlyu/iyu/repository/po"
+	"github.com/lhlyu/iyu/repository/po"
 )
 
 // 查询全部
-func (*dao) QueryQuanta() ([]*model.YuQuanta, *repositoryError) {
+func (*dao) QueryQuanta() ([]*po.YuQuanta, *repositoryError) {
 	sql := "select * from yu_quanta"
-	quantas := []*model.YuQuanta{}
+	quantas := []*po.YuQuanta{}
 	if err := common.DB.Select(&quantas, sql); err != nil {
 		return nil, NewRepositoryError("QueryQuanta", sql, errcode.ERROR, err)
 	}
@@ -20,13 +20,13 @@ func (*dao) QueryQuanta() ([]*model.YuQuanta, *repositoryError) {
 }
 
 // 修改
-func (*dao) UpdateQuantaOne(quanta *model.YuQuanta) *repositoryError {
+func (*dao) UpdateQuantaOne(quanta *po.YuQuanta) *repositoryError {
 	tx, err := common.DB.Beginx()
 	if err != nil {
 		return NewRepositoryError("UpdateQuantaOne", "", errcode.ERROR, err)
 	}
 	defer tx.Commit()
-	newQuantas := []*model.YuQuanta{}
+	newQuantas := []*po.YuQuanta{}
 	sql := "select * from yu_quanta where id = ? limit 1"
 	if err = tx.Select(&newQuantas, sql, quanta.Id); err != nil {
 		return NewRepositoryError("UpdateQuantaOne", sql, errcode.ERROR, err)
