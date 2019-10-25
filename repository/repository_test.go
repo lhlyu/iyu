@@ -49,6 +49,57 @@ func TestDao_QueryNailRepository(t *testing.T) {
 	}
 }
 
+// test add one user
+func TestDao_AddUserOne(t *testing.T) {
+	d := NewDao()
+	e := d.AddUserOne(&po.YuUser{
+		ThirdId:   123,
+		IsAdmin:   1,
+		From:      2,
+		Status:    1,
+		AvatarUrl: "http://xx.png",
+		UserUrl:   "http://xx.com",
+		UserName:  "lhlyu",
+		Bio:       "AASADADASDASDADA ASD A",
+		Ip:        "0.0.0.0",
+	})
+	if e != nil {
+		fmt.Println(e)
+	}
+}
+
+// test query users
+func TestDao_QueryUser(t *testing.T) {
+	d := NewDao()
+	page := &common.Page{
+		PageNum:  1,
+		PageSize: 10,
+	}
+	users, e := d.QueryUser(nil, page)
+	if e != nil {
+		fmt.Println(e)
+		return
+	}
+	fmt.Printf("%+v\n", page)
+	for _, u := range users {
+		fmt.Println(u)
+	}
+
+}
+
+// test get a user
+func TestDao_GetUser(t *testing.T) {
+	d := NewDao()
+	user, e := d.GetUser(&po.YuUser{
+		Id: 1,
+	})
+	if e != nil {
+		fmt.Println(e)
+		return
+	}
+	fmt.Printf("%+v\n", user)
+}
+
 func TestRepository(t *testing.T) {
 	if common.DB == nil {
 		return
