@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository/po"
+	"strconv"
 )
 
 /**
@@ -102,4 +104,66 @@ func (*dao) QueryLabel() ([]*po.YuLabel, *repositoryError) {
 		return nil, NewRepositoryError("QueryLabel", sql, errcode.EMPTY_DATA, nil)
 	}
 	return labels, nil
+}
+
+// query all labels by article id
+func (*dao) QueryLabelByArticleId(articleId int) ([]*po.YuArticleLabel, *repositoryError) {
+	sql := "select * from yu_article_label where article_id = ? order by updated_at desc,created_at desc"
+	labels := []*po.YuArticleLabel{}
+	if err := common.DB.Select(&labels, sql, articleId); err != nil {
+		return nil, NewRepositoryError("QueryLabelByArticleId", sql, errcode.ERROR, err)
+	}
+	if len(labels) == 0 {
+		return nil, NewRepositoryError("QueryLabelByArticleId", sql, errcode.EMPTY_DATA, nil)
+	}
+	return labels, nil
+}
+
+// update article's labels
+func (d *dao) UpdateArticleLabel(articleId int, labels []int) *repositoryError {
+	articleArticles, err := d.QueryLabelByArticleId(articleId)
+	if err != nil {
+		return err
+	}
+	// add  update  delete
+	tx, e := common.DB.Beginx()
+	if e != nil {
+		return NewRepositoryError("UpdateArticleLabel", "", errcode.ERROR, e)
+	}
+	defer tx.Commit()
+	sql := "update yu_article_label set is_delete = 2 where article_id = ?"
+	if _, e := tx.Exec(sql, articleId); err != nil {
+		tx.Rollback()
+		return NewRepositoryError("UpdateArticleLabel", sql, errcode.ERROR, e)
+	}
+	labelMap := make(map[int]bool)
+	for _, v := range articleArticles {
+		labelMap[v.LabelId] = true
+	}
+	var newLabels []int
+	for _, v := range labels {
+		if _, has := labelMap[v]; !has {
+			newLabels = append(newLabels, v)
+		}
+	}
+	if len(newLabels) > 0 {
+		sql = "INSERT INTO yu_article_label(article_id,label_id) VALUES(" + strconv.Itoa(articleId) + ",?)"
+		params := []interface{}{newLabels[0]}
+		for _, v := range newLabels[1:] {
+			sql += fmt.Sprintf(",(%d,?)", articleId)
+			params = append(params, v)
+		}
+		_, e = tx.Exec(sql, params...)
+		if e != nil {
+			tx.Rollback()
+			return NewRepositoryError("UpdateArticleLabel", sql, errcode.ERROR, params, e)
+		}
+	}
+	sql = fmt.Sprintf("update yu_article_label set is_delete = 1 where is_delete = 2 and  article_id in (%s)", d.createQuestionMarks(len(labels)))
+	_, e = tx.Exec(sql, d.intConvertToInterface(labels)...)
+	if e != nil {
+		tx.Rollback()
+		return NewRepositoryError("UpdateArticleLabel", sql, errcode.ERROR, labels, e)
+	}
+	return nil
 }
