@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/errcode"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
@@ -10,7 +11,7 @@ var validate = validator.New()
 type controller struct {
 }
 
-func (*controller) GetParams(ctx iris.Context, v interface{}, check bool) {
+func (*controller) GetParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {
 	// 根据方法获取参数
 	// GET  -   query params
 	// POST/PUT/DELETE  - body param
@@ -22,10 +23,10 @@ func (*controller) GetParams(ctx iris.Context, v interface{}, check bool) {
 		ctx.ReadJSON(v)
 	}
 	if !check {
-		return
+		return nil
 	}
 	if err := validate.Struct(v); err != nil {
-		return
+		return errcode.IllegalParam
 	}
-
+	return nil
 }

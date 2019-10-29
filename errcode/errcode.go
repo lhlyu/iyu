@@ -43,6 +43,7 @@ const (
 	EMPTY_DATA = iota + 1000
 	EXISTS_DATA
 	NO_EXISTS_DATA
+	ILLEGAL_PARAM
 )
 
 // 常用
@@ -53,6 +54,7 @@ var (
 	EmptyData    = NewErrcode(EMPTY_DATA, nil)
 	ExsistData   = NewErrcode(EXISTS_DATA, nil)
 	NoExsistData = NewErrcode(NO_EXISTS_DATA, nil)
+	IllegalParam = NewErrcode(ILLEGAL_PARAM, nil)
 )
 
 var errCodeMap = map[int]string{
@@ -62,4 +64,5 @@ var errCodeMap = map[int]string{
 	EMPTY_DATA:     "数据为空",
 	EXISTS_DATA:    "数据已存在",
 	NO_EXISTS_DATA: "数据不存在",
+	ILLEGAL_PARAM:  "参数不合法",
 }
