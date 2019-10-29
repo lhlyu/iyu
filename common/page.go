@@ -35,7 +35,7 @@ func (p *Page) SetTotal(total int) {
 	} else {
 		p.hasPrePage = true
 	}
-	if p.NextPage > p.PageMax {
+	if p.NextPage >= p.PageMax {
 		p.hasNextPage = false
 	} else {
 		p.hasNextPage = true
