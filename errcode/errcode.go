@@ -25,6 +25,16 @@ func (e *ErrCode) GetErrCode() *ErrCode {
 	return e
 }
 
+func (e *ErrCode) WithData(data interface{}) *ErrCode {
+	e.Data = data
+	return e
+}
+
+func (e *ErrCode) AddMsg(msg ...interface{}) *ErrCode {
+	e.Msg += ":" + fmt.Sprint(msg...)
+	return e
+}
+
 func NewErrcode(code int, data interface{}) *ErrCode {
 	return &ErrCode{
 		Code: code,
