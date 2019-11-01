@@ -47,5 +47,5 @@ func main() {
 	})
 	router.SetRouter(app)
 
-	app.Run(iris.Addr("localhost:" + common.Cfg.GetString("server.port")))
+	app.Run(iris.Addr(common.Cfg.GetString("server.host") + ":" + common.Cfg.GetString("server.port")))
 }

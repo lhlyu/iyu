@@ -10,4 +10,5 @@ var (
 	Cfg   *viper.Viper
 	DB    *sqlx.DB
 	Redis *redis.Client
+	Email *yuEmail
 )

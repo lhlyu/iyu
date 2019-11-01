@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"github.com/kataras/golog"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 	"github.com/lhlyu/iyu/repository"
@@ -10,6 +11,7 @@ import (
 func SetRouter(app *iris.Application) {
 	// only a test
 	app.Get("/", func(ctx context.Context) {
+		golog.Debug(ctx.String())
 		d := repository.NewDao()
 		data, e := d.QueryNail()
 		if e != nil {

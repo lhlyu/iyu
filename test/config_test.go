@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	module.Register(module.CfgModule, module.RedisModule)
+	module.Register(module.CfgModule, module.EmailModule)
 	module.Init()
 }
 
