@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/fsnotify/fsnotify"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/util"
 	"github.com/spf13/viper"
@@ -25,6 +26,11 @@ func (config) SetUp() {
 	common.Cfg = cfg
 	if common.Cfg == nil {
 		log.Fatalln("config file not found")
+	} else {
+		common.Cfg.WatchConfig()
+		common.Cfg.OnConfigChange(func(e fsnotify.Event) {
+			log.Print("config change")
+		})
 	}
 }
 
