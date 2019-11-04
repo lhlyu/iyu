@@ -5,15 +5,18 @@ import (
 	"encoding/json"
 )
 
+// []byte to base64 string
 func Base64Encode(bytes []byte) string {
 	result := base64.StdEncoding.EncodeToString(bytes)
 	return result
 }
 
+// string to base64 string
 func Base64EncodeString(data string) string {
 	return Base64Encode([]byte(data))
 }
 
+// object to base64 string
 func Base64EncodeObj(v interface{}) string {
 	bytes, _ := json.Marshal(v)
 	return Base64Encode(bytes)
