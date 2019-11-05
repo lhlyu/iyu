@@ -3,6 +3,9 @@ author: lhlyu
 name: iyu
 env: prod
 
+jwt:
+  secret: 3.14159265358979323
+
 server:
   host: localhost
   port: 8080

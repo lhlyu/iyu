@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/CloudyKit/fastprinter v0.0.0-20170127035650-74b38d55f37a // indirect
 	github.com/ajg/form v1.5.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
@@ -39,5 +40,5 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	google.golang.org/appengine v1.6.5 // indirect
-	gopkg.in/go-playground/validator.v9 v9.30.0 // indirect
+	gopkg.in/go-playground/validator.v9 v9.30.0
 )

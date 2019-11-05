@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/errcode"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -11,7 +13,7 @@ var validate = validator.New()
 type controller struct {
 }
 
-func (controller) GetParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {
+func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {
 	// 根据方法获取参数
 	// GET  -   query params
 	// POST/PUT/DELETE  - body param
@@ -33,4 +35,10 @@ func (controller) GetParams(ctx iris.Context, v interface{}, check bool) *errcod
 		return errcode.IllegalParam
 	}
 	return nil
+}
+
+func (controller) getToken(m map[string]interface{}) string {
+	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
+	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
+	return tokenString
 }

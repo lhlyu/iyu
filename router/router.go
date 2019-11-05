@@ -1,11 +1,10 @@
 package router
 
 import (
-	"fmt"
-	"github.com/kataras/golog"
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/controller"
 	"github.com/lhlyu/iyu/errcode"
-	"github.com/lhlyu/iyu/repository"
+	"github.com/lhlyu/iyu/middleware"
 )
 
 func SetRouter(app *iris.Application) {
@@ -15,14 +14,11 @@ func SetRouter(app *iris.Application) {
 		ctx.JSON(errcode.Error.AddMsg("not found resources"))
 	})
 
-	// only a test
-	app.Get("/", func(ctx iris.Context) {
-		golog.Debug(ctx.String())
-		d := repository.NewDao()
-		data, e := d.QueryNail()
-		if e != nil {
-			fmt.Println(e)
-		}
-		ctx.JSON(data)
-	})
+	api := app.Party("/api")
+	{
+		userController := controller.UserController{}
+
+		api.Get("/", userController.GetToken)
+		api.Get("/p", middleware.Jwt(), userController.GetToken2)
+	}
 }
