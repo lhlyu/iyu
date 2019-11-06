@@ -14,7 +14,7 @@ func (email) seq() int {
 }
 
 func (email) SetUp() {
-	log.Println("email setting ...")
+	log.Println("init email module ->")
 	m := gomail.NewMessage()
 	m.SetHeader("From", common.Cfg.GetString("email.from"))
 	m.SetHeader("To", common.Cfg.GetString("email.to"))

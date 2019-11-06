@@ -21,7 +21,7 @@ func (config) seq() int {
 }
 
 func (config) SetUp() {
-	log.Println("load config ....")
+	log.Println("init config module ->")
 	cfg := viper.New()
 	cfg.SetConfigFile(getConfigFilePath())
 	err := cfg.ReadInConfig()

@@ -15,7 +15,7 @@ func (timer) seq() int {
 }
 
 func (timer) SetUp() {
-	log.Println("timer start ...")
+	log.Println("init timer module ->")
 	c := cron.New()
 
 	c.AddFunc("0 0/5 * * * *", task)

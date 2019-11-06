@@ -15,7 +15,7 @@ func (rds) seq() int {
 }
 
 func (rds) SetUp() {
-	log.Println("redis connect ....")
+	log.Println("init redis module ->")
 	c := &redisConf{}
 	if err := common.Cfg.UnmarshalKey("redis", c); err != nil {
 		log.Fatal("redis setup is err:", err)

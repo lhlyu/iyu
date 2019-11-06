@@ -11,7 +11,7 @@ func (initiate) seq() int {
 }
 
 func (initiate) SetUp() {
-	log.Println("initiate ....")
+	log.Println("init initiate module ->")
 	// 初始化数据
 }
 
