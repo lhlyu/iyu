@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/kataras/golog"
 	"github.com/kataras/iris"
+	"github.com/kataras/iris/middleware/pprof"
 	"github.com/kataras/iris/middleware/recover"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/middleware"
@@ -27,13 +28,9 @@ func main() {
 	app.Use(middleware.Log())
 	app.Use(middleware.Cors())
 
-	// todo
-	//var  j = jwt.New(jwt.Config{
-	//        ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-	//            return []byte("My Secret"), nil
-	//        },
-	//        SigningMethod: jwt.SigningMethodHS256,
-	//})
+	p := pprof.New()
+	app.Any("/debug/pprof", p)
+	app.Any("/debug/pprof/{action:path}", p)
 
 	router.SetRouter(app)
 

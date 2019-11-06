@@ -6,6 +6,7 @@ import (
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/errcode"
 	"gopkg.in/go-playground/validator.v9"
+	"time"
 )
 
 var validate = validator.New()
@@ -38,6 +39,10 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 }
 
 func (controller) getToken(m map[string]interface{}) string {
+	if m == nil {
+		m = make(map[string]interface{})
+	}
+	m["t"] = time.Now().Unix()
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
 	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
 	return tokenString
