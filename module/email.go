@@ -3,12 +3,18 @@ package module
 import (
 	"github.com/go-gomail/gomail"
 	"github.com/lhlyu/iyu/common"
+	"log"
 )
 
 type email struct {
 }
 
+func (email) seq() int {
+	return 1 << 2
+}
+
 func (email) SetUp() {
+	log.Println("email setting ...")
 	m := gomail.NewMessage()
 	m.SetHeader("From", common.Cfg.GetString("email.from"))
 	m.SetHeader("To", common.Cfg.GetString("email.to"))

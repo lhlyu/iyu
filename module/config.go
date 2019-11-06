@@ -16,7 +16,12 @@ const Prod_ConfigFilePath = "conf/config.yaml"
 type config struct {
 }
 
+func (config) seq() int {
+	return 0
+}
+
 func (config) SetUp() {
+	log.Println("load config ....")
 	cfg := viper.New()
 	cfg.SetConfigFile(getConfigFilePath())
 	err := cfg.ReadInConfig()

@@ -10,10 +10,15 @@ import (
 type rds struct {
 }
 
+func (rds) seq() int {
+	return 1 << 0
+}
+
 func (rds) SetUp() {
+	log.Println("redis connect ....")
 	c := &redisConf{}
 	if err := common.Cfg.UnmarshalKey("redis", c); err != nil {
-		log.Fatal("db setup is err:", err)
+		log.Fatal("redis setup is err:", err)
 	}
 	setRedis(c)
 }

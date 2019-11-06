@@ -12,7 +12,12 @@ import (
 type db struct {
 }
 
+func (db) seq() int {
+	return 1 << 1
+}
+
 func (db) SetUp() {
+	log.Println("db connect ....")
 	c := &dbConf{}
 	if err := common.Cfg.UnmarshalKey("db.db_wr", c); err != nil {
 		log.Fatal("db setup is err:", err)

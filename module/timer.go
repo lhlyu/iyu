@@ -10,7 +10,12 @@ import (
 type timer struct {
 }
 
+func (timer) seq() int {
+	return 1 << 4
+}
+
 func (timer) SetUp() {
+	log.Println("timer start ...")
 	c := cron.New()
 
 	c.AddFunc("0 0/5 * * * *", task)
