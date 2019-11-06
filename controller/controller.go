@@ -47,3 +47,7 @@ func (controller) getToken(m map[string]interface{}) string {
 	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
 	return tokenString
 }
+
+type Controller struct {
+	userController
+}

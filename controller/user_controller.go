@@ -5,11 +5,11 @@ import (
 	"github.com/kataras/iris"
 )
 
-type UserController struct {
+type userController struct {
 	controller
 }
 
-func (c *UserController) GetToken(ctx iris.Context) {
+func (c *userController) GetToken(ctx iris.Context) {
 	m := map[string]interface{}{
 		"a": 1,
 		"b": 2,
@@ -18,7 +18,7 @@ func (c *UserController) GetToken(ctx iris.Context) {
 	ctx.JSON(c.getToken(m))
 }
 
-func (c *UserController) GetToken2(ctx iris.Context) {
+func (c *userController) GetToken2(ctx iris.Context) {
 	user, ok := ctx.Values().Get("jwt").(*jwt.Token)
 	if ok {
 		ctx.WriteString("error")
