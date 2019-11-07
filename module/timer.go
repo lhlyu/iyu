@@ -11,7 +11,7 @@ type timer struct {
 }
 
 func (timer) seq() int {
-	return 1 << 4
+	return 1 << 5
 }
 
 func (timer) SetUp() {

@@ -10,7 +10,7 @@ type email struct {
 }
 
 func (email) seq() int {
-	return 1 << 2
+	return 1 << 3
 }
 
 func (email) SetUp() {

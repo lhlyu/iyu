@@ -13,7 +13,7 @@ type db struct {
 }
 
 func (db) seq() int {
-	return 1 << 1
+	return 1 << 2
 }
 
 func (db) SetUp() {

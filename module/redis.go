@@ -11,7 +11,7 @@ type rds struct {
 }
 
 func (rds) seq() int {
-	return 1 << 0
+	return 1 << 1
 }
 
 func (rds) SetUp() {

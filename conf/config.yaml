@@ -10,6 +10,12 @@ server:
   host: localhost
   port: 8080
 
+log:
+  level: debug
+  timeFormat: 2006-01-02 15:04:05
+  outFile:          # 输出文件
+  outWay: normal    # normal  /  json
+
 redis:
   addr: 127.0.0.1:6379
   password: 123456

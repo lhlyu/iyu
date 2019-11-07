@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/kataras/golog"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
+	"github.com/lhlyu/iyu/common"
 	"time"
 )
 
@@ -13,6 +13,6 @@ func Log() context.Handler {
 		start := time.Now()
 		ctx.Next()
 		reqInfo := fmt.Sprintf("%s,cost = %fs", ctx.String(), time.Now().Sub(start).Seconds())
-		golog.Debug(reqInfo)
+		common.Ylog.Debug(reqInfo)
 	}
 }
