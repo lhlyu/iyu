@@ -16,9 +16,16 @@ func SetRouter(app *iris.Application) {
 
 	api := app.Party("/api")
 	{
-		ctr := controller.Controller{}
+		ctr := &controller.Controller{}
 
 		api.Get("/", ctr.GetToken)
 		api.Get("/p", middleware.Jwt(), ctr.GetToken2)
+
+		api.Get("/articles", ctr.GetArticles)
+		api.Get("/articles/{id:int}", ctr.GetArticleById)
+		//api.Get("/author")
+		//api.Get("/website")
+		//api.Get("/categorys")
+		//api.Get("/tags")
 	}
 }

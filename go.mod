@@ -20,6 +20,7 @@ require (
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/golog v0.0.0-20190624001437-99c81de45f40
 	github.com/kataras/iris v0.0.0-20190816162725-d466f8cd92e1
+	github.com/kataras/pio v0.0.0-20190103105442-ea782b38602d
 	github.com/klauspost/compress v1.8.6 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect

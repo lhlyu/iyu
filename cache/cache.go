@@ -58,5 +58,4 @@ func (c *cache) AddCatalogList(key string, v []interface{}) {
 	if c.hasRedis() {
 		common.Redis.RPush(key, v...)
 	}
-
 }

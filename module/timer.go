@@ -18,7 +18,7 @@ func (timer) SetUp() {
 	log.Println("init timer module ->")
 	c := cron.New()
 
-	c.AddFunc("0 0/5 * * * *", task)
+	//c.AddFunc("0 0/5 * * * *", task)
 
 	c.Start()
 	log.Println("timer is running...")

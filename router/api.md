@@ -104,7 +104,7 @@ GET /api/articles/:id
 - 请求
 
 ```text
-GET /api/author/info
+GET /api/author
 ```
 
 - 返回示例
@@ -136,7 +136,7 @@ GET /api/author/info
 - 请求
 
 ```text
-GET /api/website/info
+GET /api/website
 ```
 
 - 返回示例

@@ -34,6 +34,7 @@ func NewYlog(level, timeFormat, outFile, outWay string) *ylog {
 	g := golog.New()
 	yg := &ylog{
 		timeFormat: _timeFormat,
+		g:          g,
 	}
 	if level != "" {
 		g.SetLevel(level)
@@ -73,6 +74,6 @@ func (y *ylog) Debug(v ...interface{}) {
 		bytes, _ := json.Marshal(lgJson)
 		y.g.Print(string(bytes))
 	} else {
-		y.g.Debugf("| %v | %v | %v\n", lgJson.Id, lgJson.P, lgJson.C)
+		y.g.Debugf("| %v | %v | %v", lgJson.Id, lgJson.P, lgJson.C)
 	}
 }

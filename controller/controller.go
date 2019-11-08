@@ -50,4 +50,5 @@ func (controller) getToken(m map[string]interface{}) string {
 
 type Controller struct {
 	userController
+	articleController
 }
