@@ -3,6 +3,7 @@ package cache
 import (
 	"github.com/lhlyu/iyu/common"
 	"log"
+	"strings"
 )
 
 /**
@@ -37,6 +38,10 @@ func (*cache) hasRedis() bool {
 		return false
 	}
 	return true
+}
+
+func (c *cache) JoinSep(key ...string) string {
+	return strings.Join(key, ":")
 }
 
 // regex clear cache

@@ -2,6 +2,7 @@ package module
 
 import (
 	"github.com/lhlyu/iyu/cache"
+	"github.com/lhlyu/iyu/common"
 	"log"
 )
 
@@ -19,7 +20,8 @@ func (initiate) SetUp() {
 
 	// clear all cache
 	che := cache.NewCache()
-	che.ClearCache("*")
+	keys := che.JoinSep(common.Cfg.GetString("redis_key.iyu"), "*")
+	che.ClearCache(keys)
 	// init data
 
 }

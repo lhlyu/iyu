@@ -13,6 +13,7 @@ import (
 
 const _json = "json"
 const _timeFormat = "2006-01-02 15:04:05"
+const _debug = "debug"
 
 type ylog struct {
 	g          *golog.Logger
@@ -23,6 +24,7 @@ type ylog struct {
 
 type logJson struct {
 	Id uint64 `json:"gid"`
+	L  string `json:"level"`
 	T  string `json:"time"`
 	P  string `json:"position"`
 	C  string `json:"content"`
@@ -55,10 +57,14 @@ func NewYlog(level, timeFormat, outFile, outWay string) *ylog {
 }
 
 func (y *ylog) Debug(v ...interface{}) {
+	if y.level != _debug {
+		return
+	}
 	gid := util.GetGID()
 	funcName, fileName, line := util.CurrentInfo(2)
 	lgJson := logJson{
 		Id: gid,
+		L:  y.level,
 		T:  time.Now().Format(y.timeFormat),
 		P:  strings.Join([]string{funcName, fileName, strconv.Itoa(line)}, " "),
 		C:  fmt.Sprint(v),
