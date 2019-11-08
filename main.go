@@ -25,12 +25,15 @@ func main() {
 	app := iris.New()
 
 	app.Use(recover.New())
+	app.Use(middleware.Limiter()) // 限制每秒访问数量
 	app.Use(middleware.Log())
 	app.Use(middleware.Cors())
 
 	p := pprof.New()
 	app.Any("/debug/pprof", p)
 	app.Any("/debug/pprof/{action:path}", p)
+
 	router.SetRouter(app)
+
 	app.Run(iris.Addr(common.Cfg.GetString("server.host") + ":" + common.Cfg.GetString("server.port")))
 }
