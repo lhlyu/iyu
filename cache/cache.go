@@ -2,6 +2,8 @@ package cache
 
 import (
 	"github.com/lhlyu/iyu/common"
+	"log"
+	"strings"
 )
 
 /**
@@ -23,19 +25,37 @@ LHLYU-BLOG:IVEAW      - 全站浏览量【string】
 -- LHLYU-BLOG:IVEAW:KEY  【string】 =》 LHLYU-BLOG:IVEAW
 */
 
-type Cache struct {
+type cache struct {
 }
 
-func (*Cache) hasRedis() bool {
+func NewCache() *cache {
+	return &cache{}
+}
+
+func (*cache) hasRedis() bool {
 	if common.Redis == nil {
+		log.Println("redis is not initialized")
 		return false
 	}
 	return true
 }
 
-func (c *Cache) AddCatalogList(key string, v []interface{}) {
+func (c *cache) JoinSep(key ...string) string {
+	return strings.Join(key, ":")
+}
+
+// regex clear cache
+func (c *cache) ClearCache(key string) {
+	if c.hasRedis() {
+		keys := common.Redis.Keys(key).Val()
+		for _, k := range keys {
+			common.Redis.Del(k)
+		}
+	}
+}
+
+func (c *cache) AddCatalogList(key string, v []interface{}) {
 	if c.hasRedis() {
 		common.Redis.RPush(key, v...)
 	}
-
 }

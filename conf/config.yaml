@@ -3,9 +3,19 @@ author: lhlyu
 name: iyu
 env: prod
 
+jwt:
+  secret: 3.14159265358979323
+
 server:
   host: localhost
   port: 8080
+  limit: 5   # 每秒最多允许五个请求
+
+log:
+  level: debug
+  timeFormat: 2006-01-02 15:04:05
+  outFile:          # 输出文件
+  outWay: normal    # normal  /  json
 
 redis:
   addr: 127.0.0.1:6379
@@ -13,6 +23,9 @@ redis:
   database: 0
   maxActive: 50
   idleTimeout: 60
+
+redis_key:
+  iyu: "IYU"
 
 db:
   db_wr:

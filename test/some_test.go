@@ -1,8 +1,8 @@
 package test
 
 import (
-	"encoding/json"
 	"fmt"
+	"net"
 	"testing"
 )
 
@@ -11,9 +11,23 @@ type A struct {
 }
 
 func TestSome(t *testing.T) {
-	a := &A{
-		List: nil,
+	fmt.Println(getMacAddrs())
+}
+
+func getMacAddrs() (macAddrs []string) {
+	netInterfaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Printf("fail to get net interfaces: %v", err)
+		return macAddrs
 	}
-	bytes, _ := json.Marshal(a)
-	fmt.Println(string(bytes))
+
+	for _, netInterface := range netInterfaces {
+		macAddr := netInterface.HardwareAddr.String()
+		if len(macAddr) == 0 {
+			continue
+		}
+
+		macAddrs = append(macAddrs, macAddr)
+	}
+	return macAddrs
 }

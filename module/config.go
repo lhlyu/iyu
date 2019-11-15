@@ -1,6 +1,7 @@
 package module
 
 import (
+	"github.com/fsnotify/fsnotify"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/util"
 	"github.com/spf13/viper"
@@ -15,7 +16,13 @@ const Prod_ConfigFilePath = "conf/config.yaml"
 type config struct {
 }
 
+func (config) seq() int {
+	return 0
+}
+
 func (config) SetUp() {
+	log.Println("init config module ->")
+
 	cfg := viper.New()
 	cfg.SetConfigFile(getConfigFilePath())
 	err := cfg.ReadInConfig()
@@ -25,6 +32,11 @@ func (config) SetUp() {
 	common.Cfg = cfg
 	if common.Cfg == nil {
 		log.Fatalln("config file not found")
+	} else {
+		common.Cfg.WatchConfig()
+		common.Cfg.OnConfigChange(func(e fsnotify.Event) {
+			log.Print("config change")
+		})
 	}
 }
 

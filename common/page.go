@@ -4,7 +4,7 @@ import "math"
 
 type Page struct {
 	PageNum     int  `json:"pageNum" validate:"required,gt=0"`
-	PageSize    int  `json:"pageNum" validate:"required,gt=0"`
+	PageSize    int  `json:"pageSize" validate:"required,gt=0"`
 	Total       int  `json:"total"`
 	PageMax     int  `json:"pageMax"`
 	PrePage     int  `json:"prePage"`

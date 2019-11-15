@@ -11,4 +11,5 @@ var (
 	DB    *sqlx.DB
 	Redis *redis.Client
 	Email *yuEmail
+	Ylog  *ylog
 )

@@ -10,10 +10,15 @@ import (
 type timer struct {
 }
 
+func (timer) seq() int {
+	return 1 << 5
+}
+
 func (timer) SetUp() {
+	log.Println("init timer module ->")
 	c := cron.New()
 
-	c.AddFunc("0 0/5 * * * *", task)
+	//c.AddFunc("0 0/5 * * * *", task)
 
 	c.Start()
 	log.Println("timer is running...")

@@ -1,22 +1,31 @@
 package router
 
 import (
-	"fmt"
-	"github.com/kataras/golog"
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
-	"github.com/lhlyu/iyu/repository"
+	"github.com/lhlyu/iyu/controller"
+	"github.com/lhlyu/iyu/errcode"
+	"github.com/lhlyu/iyu/middleware"
 )
 
 func SetRouter(app *iris.Application) {
-	// only a test
-	app.Get("/", func(ctx context.Context) {
-		golog.Debug(ctx.String())
-		d := repository.NewDao()
-		data, e := d.QueryNail()
-		if e != nil {
-			fmt.Println(e)
-		}
-		ctx.JSON(data)
+
+	app.AllowMethods(iris.MethodOptions)
+	app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
+		ctx.JSON(errcode.Error.AddMsg("not found resources"))
 	})
+
+	api := app.Party("/api")
+	{
+		ctr := &controller.Controller{}
+
+		api.Get("/", ctr.GetToken)
+		api.Get("/p", middleware.Jwt(), ctr.GetToken2)
+
+		api.Get("/articles", ctr.GetArticles)
+		api.Get("/articles/{id:int}", ctr.GetArticleById)
+		//api.Get("/author")
+		//api.Get("/website")
+		//api.Get("/categorys")
+		//api.Get("/tags")
+	}
 }

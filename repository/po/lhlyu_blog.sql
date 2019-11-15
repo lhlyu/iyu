@@ -25,9 +25,9 @@ CREATE TABLE `yu_article` (
   `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户ID',
   `like` int(11) NOT NULL DEFAULT '0' COMMENT '赞',
   `unlike` int(11) NOT NULL DEFAULT '0' COMMENT '踩',
-  `view` int(11) NOT NULL DEFAULT '0' COMMENT '浏览量',
-  `comments_number` int(11) NOT NULL DEFAULT '0' COMMENT '评论数量',
-  `bg` varchar(200) NOT NULL DEFAULT '' COMMENT '头背景',
+  `fire` int(11) NOT NULL DEFAULT '0' COMMENT '浏览量',
+  `comment_number` int(11) NOT NULL DEFAULT '0' COMMENT '评论数量',
+  `wraper` varchar(200) NOT NULL DEFAULT '' COMMENT '头背景',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
   `content` text NOT NULL COMMENT '内容',
   `is_top` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否置顶:1-不置顶;2-置顶',
@@ -169,7 +169,7 @@ CREATE TABLE `yu_user` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
