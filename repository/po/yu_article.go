@@ -5,8 +5,6 @@ type YuArticle struct {
 	UserId        int    `db:"user_id"`        // 用户ID
 	Like          int    `db:"like"`           // 赞
 	Unlike        int    `db:"unlike"`         // 踩
-	Fire          int    `db:"fire"`           // 浏览量
-	CommentNumber int    `db:"comment_number"` // 评论数量
 	Wraper        string `db:"wraper"`         // 头背景
 	Title         string `db:"title"`          // 标题
 	Content       string `db:"content"`        // 内容
