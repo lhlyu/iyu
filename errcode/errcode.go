@@ -56,6 +56,13 @@ const (
 	ILLEGAL_PARAM
 )
 
+const (
+	QUERY_ERROR = iota + 10000
+	UPDATE_ERROR
+	INSERT_ERROR
+	DELETE_ERROR
+)
+
 // 常用
 var (
 	Error        = NewErrcode(ERROR, nil)
@@ -65,6 +72,11 @@ var (
 	ExsistData   = NewErrcode(EXISTS_DATA, nil)
 	NoExsistData = NewErrcode(NO_EXISTS_DATA, nil)
 	IllegalParam = NewErrcode(ILLEGAL_PARAM, nil)
+
+	QueryError  = NewErrcode(QUERY_ERROR, nil)
+	UpdateError = NewErrcode(UPDATE_ERROR, nil)
+	InsertError = NewErrcode(INSERT_ERROR, nil)
+	DeleteError = NewErrcode(DELETE_ERROR, nil)
 )
 
 var errCodeMap = map[int]string{
@@ -75,4 +87,9 @@ var errCodeMap = map[int]string{
 	EXISTS_DATA:    "数据已存在",
 	NO_EXISTS_DATA: "数据不存在",
 	ILLEGAL_PARAM:  "参数不合法",
+
+	QUERY_ERROR:  "查询错误",
+	UPDATE_ERROR: "更新错误",
+	INSERT_ERROR: "添加错误",
+	DELETE_ERROR: "删除错误",
 }

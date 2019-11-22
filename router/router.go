@@ -26,8 +26,8 @@ func SetRouter(app *iris.Application) {
 		//api.Get("/author")
 		//api.Get("/website")
 		//api.Get("/categorys")
-		//api.Get("/tags")
+		api.Get("/tags", ctr.GetTagAll)
 
-		api.Post("/x",ctr.X)
+		api.Post("/x", ctr.X)
 	}
 }

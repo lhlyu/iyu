@@ -4,6 +4,7 @@ import (
 	"github.com/lhlyu/iyu/common"
 	"log"
 	"strings"
+	"time"
 )
 
 /**
@@ -24,6 +25,13 @@ LHLYU-BLOG:ARTICLE:IVEAW:id  - 文章浏览量【string】
 LHLYU-BLOG:IVEAW      - 全站浏览量【string】
 -- LHLYU-BLOG:IVEAW:KEY  【string】 =》 LHLYU-BLOG:IVEAW
 */
+
+const (
+	_ONE_HOUR  = time.Hour
+	_ONE_DAY   = _ONE_HOUR * 24
+	_ONE_WEEK  = _ONE_DAY * 7
+	_ONE_MONTH = _ONE_DAY * 30
+)
 
 type cache struct {
 }
