@@ -55,6 +55,20 @@ func (controller) getToken(m map[string]interface{}) string {
 	return tokenString
 }
 
+func (controller) checkUInt(v int) *errcode.ErrCode {
+	if v <= 0 {
+		return errcode.IllegalParam
+	}
+	return nil
+}
+
+func (controller) checkEmpty(v string) *errcode.ErrCode {
+	if v == "" {
+		return errcode.IllegalParam
+	}
+	return nil
+}
+
 type Controller struct {
 	userController
 	articleController

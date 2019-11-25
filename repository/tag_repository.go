@@ -20,7 +20,17 @@ func (d *dao) GetTagAll() []*po.YuTag {
 func (d *dao) GetTagByName(name string) *po.YuTag {
 	sql := "SELECT * FROM yu_tag WHERE `name` = ? limit 1"
 	value := &po.YuTag{}
-	if err := common.DB.Select(&value, sql, name); err != nil {
+	if err := common.DB.Get(value, sql, name); err != nil {
+		common.Ylog.Debug(err)
+		return nil
+	}
+	return value
+}
+
+func (d *dao) GetTagById(id int) *po.YuTag {
+	sql := "SELECT * FROM yu_tag WHERE id = ? limit 1"
+	value := &po.YuTag{}
+	if err := common.DB.Get(value, sql, id); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}
@@ -29,7 +39,7 @@ func (d *dao) GetTagByName(name string) *po.YuTag {
 
 // update tag
 func (d *dao) UpdateTag(id, status int, name string) error {
-	sql := "UPDATE yu_tag SET is_delete=?,`name` = ? WHERE id = ?"
+	sql := "UPDATE yu_tag SET is_delete=?,`name` = ?,updated_at = NOW() WHERE id = ?"
 	if _, err := common.DB.Exec(sql, status, name, id); err != nil {
 		common.Ylog.Debug(err)
 		return err

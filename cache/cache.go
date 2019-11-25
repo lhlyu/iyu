@@ -3,6 +3,7 @@ package cache
 import (
 	"github.com/lhlyu/iyu/common"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -27,6 +28,11 @@ LHLYU-BLOG:IVEAW      - 全站浏览量【string】
 */
 
 const (
+	_MAP  = ":MAP"
+	_LIST = ":LIST"
+)
+
+const (
 	_ONE_HOUR  = time.Hour
 	_ONE_DAY   = _ONE_HOUR * 24
 	_ONE_WEEK  = _ONE_DAY * 7
@@ -40,8 +46,8 @@ func NewCache() *cache {
 	return &cache{}
 }
 
-func (*cache) hasRedis() bool {
-	if common.Redis == nil {
+func (c *cache) hasRedis() bool {
+	if common.Redis == nil || c == nil {
 		log.Println("redis is not initialized")
 		return false
 	}
@@ -50,6 +56,10 @@ func (*cache) hasRedis() bool {
 
 func (c *cache) JoinSep(key ...string) string {
 	return strings.Join(key, ":")
+}
+
+func (c *cache) getTimestamp() string {
+	return ":" + strconv.FormatInt(time.Now().Unix(), 10)
 }
 
 // regex clear cache
@@ -66,4 +76,13 @@ func (c *cache) AddCatalogList(key string, v []interface{}) {
 	if c.hasRedis() {
 		common.Redis.RPush(key, v...)
 	}
+}
+
+func (c *cache) mutexHandler(key string, f func()) {
+	keyMutex := key + ":MUTEX"
+	if rs, _ := common.Redis.SetNX(keyMutex, 1, time.Second*5).Result(); !rs {
+		return
+	}
+	f()
+	common.Redis.Del(keyMutex)
 }

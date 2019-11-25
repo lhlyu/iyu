@@ -17,6 +17,14 @@ func (e *ErrCode) IsSuccess() bool {
 	return false
 }
 
+func (e *ErrCode) new() *ErrCode {
+	return &ErrCode{
+		Code: e.Code,
+		Data: e.Data,
+		Msg:  errCodeMap[e.Code],
+	}
+}
+
 func (e *ErrCode) String() string {
 	return fmt.Sprintf("code=%d,msg=%s,data=%v", e.Code, e.Msg, e.Data)
 }
@@ -26,13 +34,15 @@ func (e *ErrCode) GetErrCode() *ErrCode {
 }
 
 func (e *ErrCode) WithData(data interface{}) *ErrCode {
-	e.Data = data
-	return e
+	ne := e.new()
+	ne.Data = data
+	return ne
 }
 
 func (e *ErrCode) AddMsg(msg ...interface{}) *ErrCode {
-	e.Msg += ":" + fmt.Sprint(msg...)
-	return e
+	ne := e.new()
+	ne.Msg += ":" + fmt.Sprint(msg...)
+	return ne
 }
 
 func NewErrcode(code int, data interface{}) *ErrCode {

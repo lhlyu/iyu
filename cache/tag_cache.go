@@ -13,7 +13,12 @@ func (c cache) GetTagAll() []*bo.Tag {
 		if key == "" {
 			return nil
 		}
-		m := common.Redis.HGetAll(key).Val()
+		listKey := key + _LIST
+		targetListKey := common.Redis.Get(listKey).Val()
+		if targetListKey == "" {
+			return nil
+		}
+		m := common.Redis.LRange(targetListKey, 0, -1).Val()
 		if len(m) == 0 {
 			return nil
 		}
@@ -30,37 +35,38 @@ func (c cache) GetTagAll() []*bo.Tag {
 	return nil
 }
 
-func (c cache) GetTags(ids ...int) []*bo.Tag {
-	if c.hasRedis() {
-		key := common.Cfg.GetString("redis_key.tag")
-		if key == "" {
-			return nil
-		}
-		idStr := util.IntSlinceToStringSlince(ids)
-		m := common.Redis.HMGet(key, idStr...).Val()
-		if len(m) == 0 {
-			return nil
-		}
-		var arr []*bo.Tag
-		for _, v := range m {
-			a := v.(*bo.Tag)
-			arr = append(arr, a)
-		}
-		return arr
-	}
-	return nil
-}
-
-func (c cache) LoadTags(tags []*bo.Tag) {
+func (c cache) LoadTags(tags ...*bo.Tag) {
 	if c.hasRedis() {
 		key := common.Cfg.GetString("redis_key.tag")
 		if key == "" {
 			return
 		}
-		for _, v := range tags {
-			common.Redis.HSet(key, strconv.Itoa(v.Id), util.ObjToJsonStr(v))
-		}
-		common.Redis.Expire(key, _ONE_MONTH)
-	}
+		mapKey := key + _MAP
+		targetMapKey := mapKey + c.getTimestamp()
+		listKey := key + _LIST
+		targetListKey := listKey + c.getTimestamp()
+		c.mutexHandler(mapKey, func() {
+			var arr []interface{}
+			for _, v := range tags {
+				value := util.ObjToJsonStr(v)
+				common.Redis.HSet(targetMapKey, strconv.Itoa(v.Id), value)
+				arr = append(arr, value)
+			}
+			common.Redis.Expire(targetMapKey, _ONE_WEEK)
+			oldTargetMapKey := common.Redis.Get(mapKey).Val()
+			common.Redis.Set(mapKey, targetMapKey, _ONE_WEEK)
+			if oldTargetMapKey != "" {
+				common.Redis.Del(oldTargetMapKey)
+			}
+			if len(arr) > 0 {
+				common.Redis.RPush(targetListKey, arr...)
+			}
+			oldTargetListKey := common.Redis.Get(listKey).Val()
+			common.Redis.Set(listKey, targetListKey, _ONE_WEEK)
+			if oldTargetListKey != "" {
+				common.Redis.Del(oldTargetListKey)
+			}
+		})
 
+	}
 }

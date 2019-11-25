@@ -16,27 +16,27 @@ func NewTagService() *tagService {
 }
 
 // get all tags
-func (*tagService) GetTagAll() *errcode.ErrCode {
-	// from cache
+func (*tagService) GetAll(reload bool) *errcode.ErrCode {
 	c := cache.NewCache()
-	tags := c.GetTagAll()
-	if len(tags) == 0 {
-		// from database
-		datas := repository.NewDao().GetTagAll()
-		if len(datas) == 0 {
-			return errcode.EmptyData
-		}
-		for _, v := range datas {
-			tags = append(tags, &bo.Tag{v.Id, v.Name, v.IsDelete})
-		}
+	var tags []*bo.Tag
+	if !reload {
+		tags = c.GetTagAll()
 	}
-	// load to cache
-	c.LoadTags(tags)
+	if len(tags) != 0 {
+		return errcode.Success.WithData(tags)
+	}
+	datas := repository.NewDao().GetTagAll()
+	if len(datas) == 0 {
+		return errcode.EmptyData
+	}
+	for _, v := range datas {
+		tags = append(tags, &bo.Tag{v.Id, v.Name, v.IsDelete})
+	}
+	go c.LoadTags(tags...)
 	return errcode.Success.WithData(tags)
 }
 
-func (*tagService) InsertTag(name string) *errcode.ErrCode {
-	// if exists
+func (s *tagService) Insert(name string) *errcode.ErrCode {
 	dao := repository.NewDao()
 	data := dao.GetTagByName(name)
 	if data == nil {
@@ -51,19 +51,44 @@ func (*tagService) InsertTag(name string) *errcode.ErrCode {
 			return errcode.InsertError.AddMsg(1)
 		}
 	}
+	s.GetAll(true)
 	return errcode.Success
 }
 
-func (*tagService) UpdateTag(id, status int, name string) *errcode.ErrCode {
-	// if exists
+func (s *tagService) Update(id, status int, name string) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetTagByName(name)
+	data := dao.GetTagById(id)
 	if data == nil {
-		if err := dao.UpdateTag(id, status, name); err != nil {
-			return errcode.UpdateError
-		}
-	} else {
+		return errcode.NoExsistData
+	}
+	other := dao.GetTagByName(name)
+	if other != nil {
 		return errcode.ExsistData
 	}
+	if err := dao.UpdateTag(data.Id, status, name); err != nil {
+		return errcode.UpdateError
+	}
+	go s.GetAll(true)
+	return errcode.Success
+}
+
+// if real == 1 then delete from database
+func (s *tagService) Delete(id, real int) *errcode.ErrCode {
+	dao := repository.NewDao()
+	data := dao.GetTagById(id)
+	if data == nil {
+		return errcode.NoExsistData
+	}
+	if real == 1 {
+		if err := dao.DeleteTagById(data.Id); err != nil {
+			return errcode.DeleteError
+		}
+		s.GetAll(true)
+		return errcode.Success
+	}
+	if err := dao.UpdateTag(data.Id, common.TWO, data.Name); err != nil {
+		return errcode.UpdateError
+	}
+	go s.GetAll(true)
 	return errcode.Success
 }
