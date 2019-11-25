@@ -13,3 +13,12 @@ func StringSlinceToIntSlince(ss []string) []int {
 	}
 	return slince
 }
+
+func IntSlinceToStringSlince(ss []int) []string {
+	var slince []string
+	for _, s := range ss {
+		i := strconv.Itoa(s)
+		slince = append(slince, i)
+	}
+	return slince
+}

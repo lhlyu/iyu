@@ -23,7 +23,6 @@ type ylog struct {
 }
 
 type logJson struct {
-	Id uint64 `json:"gid"`
 	L  string `json:"level"`
 	T  string `json:"time"`
 	P  string `json:"position"`
@@ -61,10 +60,8 @@ func (y *ylog) Debug(v ...interface{}) {
 	if y.level != _debug {
 		return
 	}
-	gid := util.GetGID()
 	funcName, fileName, line := util.CurrentInfo(2)
 	lgJson := logJson{
-		Id: gid,
 		L:  y.level,
 		T:  time.Now().Format(y.timeFormat),
 		P:  strings.Join([]string{funcName, fileName, strconv.Itoa(line)}, " "),
@@ -74,6 +71,6 @@ func (y *ylog) Debug(v ...interface{}) {
 		bytes, _ := json.Marshal(lgJson)
 		y.g.Print(string(bytes))
 	} else {
-		y.g.Debugf("| %v | %v | %v", lgJson.Id, lgJson.P, lgJson.C)
+		y.g.Debugf("| %v | %v", lgJson.P, lgJson.C)
 	}
 }

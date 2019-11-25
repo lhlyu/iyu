@@ -11,9 +11,10 @@ import (
 func Log() context.Handler {
 	return func(ctx iris.Context) {
 		start := time.Now()
-		fmt.Println(ctx.RemoteAddr())
 		ctx.Next()
 		reqInfo := fmt.Sprintf("%s,cost = %fs", ctx.String(), time.Now().Sub(start).Seconds())
-		common.Ylog.Debug(reqInfo)
+		if common.Ylog != nil{
+            common.Ylog.Debug(reqInfo)
+        }
 	}
 }

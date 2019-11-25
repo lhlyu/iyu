@@ -14,18 +14,22 @@ func SetRouter(app *iris.Application) {
 		ctx.JSON(errcode.Error.AddMsg("not found resources"))
 	})
 
+	ctr := &controller.Controller{}
+
 	api := app.Party("/api")
 	{
-		ctr := &controller.Controller{}
 
 		api.Get("/", ctr.GetToken)
 		api.Get("/p", middleware.Jwt(), ctr.GetToken2)
 
 		api.Get("/articles", ctr.GetArticles)
 		api.Get("/articles/{id:int}", ctr.GetArticleById)
-		//api.Get("/author")
-		//api.Get("/website")
-		//api.Get("/categorys")
-		//api.Get("/tags")
+
+		api.Post("/tag", ctr.InsertTag)
+		api.Delete("/tag", ctr.DeleteTag)
+		api.Put("/tag", ctr.UpdateTag)
+		api.Get("/tag", ctr.GetTagAll)
+
+		api.Post("/x", ctr.X)
 	}
 }

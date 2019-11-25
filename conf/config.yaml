@@ -26,6 +26,7 @@ redis:
 
 redis_key:
   iyu: "IYU"
+  tag: "IYU:TAG:MAP"
 
 db:
   db_wr:

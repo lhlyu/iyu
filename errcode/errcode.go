@@ -17,6 +17,14 @@ func (e *ErrCode) IsSuccess() bool {
 	return false
 }
 
+func (e *ErrCode) new() *ErrCode {
+	return &ErrCode{
+		Code: e.Code,
+		Data: e.Data,
+		Msg:  errCodeMap[e.Code],
+	}
+}
+
 func (e *ErrCode) String() string {
 	return fmt.Sprintf("code=%d,msg=%s,data=%v", e.Code, e.Msg, e.Data)
 }
@@ -26,13 +34,15 @@ func (e *ErrCode) GetErrCode() *ErrCode {
 }
 
 func (e *ErrCode) WithData(data interface{}) *ErrCode {
-	e.Data = data
-	return e
+	ne := e.new()
+	ne.Data = data
+	return ne
 }
 
 func (e *ErrCode) AddMsg(msg ...interface{}) *ErrCode {
-	e.Msg += ":" + fmt.Sprint(msg...)
-	return e
+	ne := e.new()
+	ne.Msg += ":" + fmt.Sprint(msg...)
+	return ne
 }
 
 func NewErrcode(code int, data interface{}) *ErrCode {
@@ -56,6 +66,13 @@ const (
 	ILLEGAL_PARAM
 )
 
+const (
+	QUERY_ERROR = iota + 10000
+	UPDATE_ERROR
+	INSERT_ERROR
+	DELETE_ERROR
+)
+
 // 常用
 var (
 	Error        = NewErrcode(ERROR, nil)
@@ -65,6 +82,11 @@ var (
 	ExsistData   = NewErrcode(EXISTS_DATA, nil)
 	NoExsistData = NewErrcode(NO_EXISTS_DATA, nil)
 	IllegalParam = NewErrcode(ILLEGAL_PARAM, nil)
+
+	QueryError  = NewErrcode(QUERY_ERROR, nil)
+	UpdateError = NewErrcode(UPDATE_ERROR, nil)
+	InsertError = NewErrcode(INSERT_ERROR, nil)
+	DeleteError = NewErrcode(DELETE_ERROR, nil)
 )
 
 var errCodeMap = map[int]string{
@@ -75,4 +97,9 @@ var errCodeMap = map[int]string{
 	EXISTS_DATA:    "数据已存在",
 	NO_EXISTS_DATA: "数据不存在",
 	ILLEGAL_PARAM:  "参数不合法",
+
+	QUERY_ERROR:  "查询错误",
+	UPDATE_ERROR: "更新错误",
+	INSERT_ERROR: "添加错误",
+	DELETE_ERROR: "删除错误",
 }

@@ -25,8 +25,15 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 		}
 	} else if method == "POST" || method == "PUT" || method == "DELETE" {
 		// application/json
-		if err := ctx.ReadJSON(v); err != nil {
-			return errcode.IllegalParam
+		contentType := ctx.GetHeader("Content-Type")
+		if contentType == "application/json" {
+			if err := ctx.ReadJSON(v); err != nil {
+				return errcode.IllegalParam
+			}
+		} else if contentType == "application/x-www-form-urlencoded" {
+			if err := ctx.ReadForm(v); err != nil {
+				return errcode.IllegalParam
+			}
 		}
 	}
 	if !check {
@@ -48,7 +55,22 @@ func (controller) getToken(m map[string]interface{}) string {
 	return tokenString
 }
 
+func (controller) checkUInt(v int) *errcode.ErrCode {
+	if v <= 0 {
+		return errcode.IllegalParam
+	}
+	return nil
+}
+
+func (controller) checkEmpty(v string) *errcode.ErrCode {
+	if v == "" {
+		return errcode.IllegalParam
+	}
+	return nil
+}
+
 type Controller struct {
 	userController
 	articleController
+	tagController
 }
