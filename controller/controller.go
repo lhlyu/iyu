@@ -73,4 +73,7 @@ type Controller struct {
 	userController
 	articleController
 	tagController
+	nailController
+	categoryController
+	quantaController
 }

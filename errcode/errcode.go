@@ -2,6 +2,7 @@ package errcode
 
 import (
 	"fmt"
+	"github.com/lhlyu/iyu/common"
 )
 
 type ErrCode struct {
@@ -36,6 +37,15 @@ func (e *ErrCode) GetErrCode() *ErrCode {
 func (e *ErrCode) WithData(data interface{}) *ErrCode {
 	ne := e.new()
 	ne.Data = data
+	return ne
+}
+
+func (e *ErrCode) WithPage(page *common.Page, data interface{}) *ErrCode {
+	ne := e.new()
+	ne.Data = map[string]interface{}{
+		"page": page,
+		"list": data,
+	}
 	return ne
 }
 

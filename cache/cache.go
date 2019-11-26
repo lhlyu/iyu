@@ -2,6 +2,7 @@ package cache
 
 import (
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/util"
 	"log"
 	"strconv"
 	"strings"
@@ -72,12 +73,6 @@ func (c *cache) ClearCache(key string) {
 	}
 }
 
-func (c *cache) AddCatalogList(key string, v []interface{}) {
-	if c.hasRedis() {
-		common.Redis.RPush(key, v...)
-	}
-}
-
 func (c *cache) mutexHandler(key string, f func()) {
 	keyMutex := key + ":MUTEX"
 	if rs, _ := common.Redis.SetNX(keyMutex, 1, time.Second*5).Result(); !rs {
@@ -85,4 +80,80 @@ func (c *cache) mutexHandler(key string, f func()) {
 	}
 	f()
 	common.Redis.Del(keyMutex)
+}
+
+// load data to map and list
+func (c *cache) LoadMapAndList(keyName string, vm map[string]interface{}) {
+	if c.hasRedis() {
+		key := common.Cfg.GetString(keyName)
+		if key == "" {
+			return
+		}
+		mapKey := key + _MAP
+		targetMapKey := mapKey + c.getTimestamp()
+		listKey := key + _LIST
+		targetListKey := listKey + c.getTimestamp()
+		c.mutexHandler(mapKey, func() {
+			var arr []interface{}
+			for k, v := range vm {
+				value := util.ObjToJsonStr(v)
+				common.Redis.HSet(targetMapKey, k, value)
+				arr = append(arr, value)
+			}
+			common.Redis.Expire(targetMapKey, _ONE_WEEK)
+			oldTargetMapKey := common.Redis.Get(mapKey).Val()
+			common.Redis.Set(mapKey, targetMapKey, _ONE_WEEK)
+			if oldTargetMapKey != "" {
+				common.Redis.Del(oldTargetMapKey)
+			}
+			if len(arr) > 0 {
+				common.Redis.RPush(targetListKey, arr...)
+			}
+			oldTargetListKey := common.Redis.Get(listKey).Val()
+			common.Redis.Set(listKey, targetListKey, _ONE_WEEK)
+			common.Redis.Expire(targetListKey, _ONE_WEEK)
+			if oldTargetListKey != "" {
+				common.Redis.Del(oldTargetListKey)
+			}
+		})
+	}
+}
+
+// get data from list
+func (c *cache) GetListData(keyName string) []string {
+	if c.hasRedis() {
+		key := common.Cfg.GetString(keyName)
+		if key == "" {
+			return nil
+		}
+		listKey := key + _LIST
+		targetListKey := common.Redis.Get(listKey).Val()
+		if targetListKey == "" {
+			return nil
+		}
+		return common.Redis.LRange(targetListKey, 0, -1).Val()
+	}
+	return nil
+}
+
+// get data from list page
+func (c *cache) GetListDataPage(keyName string, page *common.Page) []string {
+	if c.hasRedis() {
+		key := common.Cfg.GetString(keyName)
+		if key == "" {
+			return nil
+		}
+		listKey := key + _LIST
+		targetListKey := common.Redis.Get(listKey).Val()
+		if targetListKey == "" {
+			return nil
+		}
+		total := common.Redis.LLen(targetListKey).Val()
+		if total == 0 {
+			return nil
+		}
+		page.SetTotal(int(total))
+		return common.Redis.LRange(targetListKey, int64(page.StartRow), int64(page.StopRow)).Val()
+	}
+	return nil
 }

@@ -17,10 +17,10 @@ func (d *dao) GetTagAll() []*po.YuTag {
 }
 
 // get tag by name
-func (d *dao) GetTagByName(name string) *po.YuTag {
-	sql := "SELECT * FROM yu_tag WHERE `name` = ? limit 1"
+func (d *dao) GetTagByName(id int, name string) *po.YuTag {
+	sql := "SELECT * FROM yu_tag WHERE `name` = ? and id <> ? limit 1"
 	value := &po.YuTag{}
-	if err := common.DB.Get(value, sql, name); err != nil {
+	if err := common.DB.Get(value, sql, name, id); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}

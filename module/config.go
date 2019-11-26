@@ -1,13 +1,13 @@
 package module
 
 import (
-    "github.com/fsnotify/fsnotify"
-    "github.com/lhlyu/iyu/common"
-    "github.com/lhlyu/iyu/util"
-    "github.com/spf13/viper"
-    "log"
-    "os"
-    "path"
+	"github.com/fsnotify/fsnotify"
+	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/util"
+	"github.com/spf13/viper"
+	"log"
+	"os"
+	"path"
 )
 
 const Deve_ConfigFilePath = "conf/dev.yaml"

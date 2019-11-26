@@ -13,8 +13,8 @@ func Log() context.Handler {
 		start := time.Now()
 		ctx.Next()
 		reqInfo := fmt.Sprintf("%s,cost = %fs", ctx.String(), time.Now().Sub(start).Seconds())
-		if common.Ylog != nil{
-            common.Ylog.Debug(reqInfo)
-        }
+		if common.Ylog != nil {
+			common.Ylog.Debug(reqInfo)
+		}
 	}
 }
