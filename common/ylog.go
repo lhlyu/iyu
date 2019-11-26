@@ -23,10 +23,10 @@ type ylog struct {
 }
 
 type logJson struct {
-	L  string `json:"level"`
-	T  string `json:"time"`
-	P  string `json:"position"`
-	C  string `json:"content"`
+	L string `json:"level"`
+	T string `json:"time"`
+	P string `json:"position"`
+	C string `json:"content"`
 }
 
 func NewYlog(level, timeFormat, outFile, outWay string) *ylog {
@@ -62,10 +62,10 @@ func (y *ylog) Debug(v ...interface{}) {
 	}
 	funcName, fileName, line := util.CurrentInfo(2)
 	lgJson := logJson{
-		L:  y.level,
-		T:  time.Now().Format(y.timeFormat),
-		P:  strings.Join([]string{funcName, fileName, strconv.Itoa(line)}, " "),
-		C:  fmt.Sprint(v),
+		L: y.level,
+		T: time.Now().Format(y.timeFormat),
+		P: strings.Join([]string{funcName, fileName, strconv.Itoa(line)}, " "),
+		C: fmt.Sprint(v),
 	}
 	if y.outWay == _json {
 		bytes, _ := json.Marshal(lgJson)

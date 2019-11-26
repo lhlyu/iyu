@@ -6,16 +6,10 @@ import (
 	"testing"
 )
 
-var rq request.IRequest
-
-func init() {
-	rq = request.NewRequest()
-	rq.SetBaseUrl("http://localhost:8080/api")
-}
-
-func TestGetAllTag(t *testing.T) {
-	rq.SetUrl("/tag").
+func TestGetAllQuanta(t *testing.T) {
+	rq.SetUrl("/quanta").
 		SetMethod(request.GET).
+		SetParam("pageNum=1&pageSize=10").
 		DoHttp().
 		OnSuccess(func(resp request.IResponse) {
 			fmt.Println("success:", resp.GetBody())
@@ -25,10 +19,10 @@ func TestGetAllTag(t *testing.T) {
 		})
 }
 
-func TestInsertTag(t *testing.T) {
-	rq.SetUrl("/tag").
-		SetData("name:WAZ").
+func TestInsertQuanta(t *testing.T) {
+	rq.SetUrl("/quanta").
 		SetMethod(request.POST).
+		SetData(`{"key":"admin.test","value":"1"}`).
 		DoHttp().
 		OnSuccess(func(resp request.IResponse) {
 			fmt.Println("success:", resp.GetBody())
@@ -38,10 +32,10 @@ func TestInsertTag(t *testing.T) {
 		})
 }
 
-func TestUpdateTag(t *testing.T) {
-	rq.SetUrl("/tag").
-		SetData(`{"id":15,"name":"8888"}`).
+func TestUpdateQuanta(t *testing.T) {
+	rq.SetUrl("/quanta").
 		SetMethod(request.PUT).
+		SetData(`{"id":3,"key":"admin.pass","value":"3"}`).
 		DoHttp().
 		OnSuccess(func(resp request.IResponse) {
 			fmt.Println("success:", resp.GetBody())
@@ -51,10 +45,10 @@ func TestUpdateTag(t *testing.T) {
 		})
 }
 
-func TestDeleteTag(t *testing.T) {
-	rq.SetUrl("/tag").
-		SetData(`{"id":16,"real":1}`).
+func TestDeleteQuanta(t *testing.T) {
+	rq.SetUrl("/quanta").
 		SetMethod(request.DELETE).
+		SetData(`{"id":3,"real":1}`).
 		DoHttp().
 		OnSuccess(func(resp request.IResponse) {
 			fmt.Println("success:", resp.GetBody())

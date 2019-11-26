@@ -38,20 +38,14 @@ func (*tagService) GetAll(reload bool) *errcode.ErrCode {
 
 func (s *tagService) Insert(name string) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetTagByName(name)
-	if data == nil {
-		if err := dao.InsertTag(name); err != nil {
-			return errcode.InsertError
-		}
-	} else {
-		if data.IsDelete == common.ONE {
-			return errcode.ExsistData
-		}
-		if err := dao.UpdateTag(data.Id, common.ONE, data.Name); err != nil {
-			return errcode.InsertError.AddMsg(1)
-		}
+	data := dao.GetTagByName(0, name)
+	if data != nil {
+		return errcode.ExsistData
 	}
-	s.GetAll(true)
+	if err := dao.InsertTag(name); err != nil {
+		return errcode.InsertError
+	}
+	go s.GetAll(true)
 	return errcode.Success
 }
 
@@ -61,7 +55,7 @@ func (s *tagService) Update(id, status int, name string) *errcode.ErrCode {
 	if data == nil {
 		return errcode.NoExsistData
 	}
-	other := dao.GetTagByName(name)
+	other := dao.GetTagByName(id, name)
 	if other != nil {
 		return errcode.ExsistData
 	}
@@ -83,7 +77,7 @@ func (s *tagService) Delete(id, real int) *errcode.ErrCode {
 		if err := dao.DeleteTagById(data.Id); err != nil {
 			return errcode.DeleteError
 		}
-		s.GetAll(true)
+		go s.GetAll(true)
 		return errcode.Success
 	}
 	if err := dao.UpdateTag(data.Id, common.TWO, data.Name); err != nil {

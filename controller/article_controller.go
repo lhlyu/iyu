@@ -1,10 +1,10 @@
 package controller
 
 import (
-    "github.com/kataras/iris"
-    "github.com/lhlyu/iyu/errcode"
-    "github.com/lhlyu/iyu/service"
-    "github.com/lhlyu/iyu/service/bo"
+	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/errcode"
+	"github.com/lhlyu/iyu/service"
+	"github.com/lhlyu/iyu/service/bo"
 )
 
 type articleController struct {
@@ -32,14 +32,14 @@ func (*articleController) GetArticleById(ctx iris.Context) {
 }
 
 type XX struct {
-    A  string  `json:"a" form:"a"`
-    B  int     `json:"b" form:"b"`
+	A string `json:"a" form:"a"`
+	B int    `json:"b" form:"b"`
 }
 
 func (c *articleController) X(ctx iris.Context) {
-    xx := &XX{}
-    if err := c.getParams(ctx,xx,false);err != nil{
-        ctx.JSON(err)
-    }
-    ctx.JSON(xx)
+	xx := &XX{}
+	if err := c.getParams(ctx, xx, false); err != nil {
+		ctx.JSON(err)
+	}
+	ctx.JSON(xx)
 }
