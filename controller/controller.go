@@ -19,23 +19,25 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 	// GET  -   query params
 	// POST/PUT/DELETE  - body param
 	method := ctx.Method()
-	if method == "GET" {
+	switch method {
+	case "GET":
 		if err := ctx.ReadQuery(v); err != nil {
 			return errcode.IllegalParam
 		}
-	} else if method == "POST" || method == "PUT" || method == "DELETE" {
-		// application/json
+	case "POST", "PUT", "DELETE":
 		contentType := ctx.GetHeader("Content-Type")
-		if contentType == "application/json" {
+		switch contentType {
+		case "application/json":
 			if err := ctx.ReadJSON(v); err != nil {
 				return errcode.IllegalParam
 			}
-		} else if contentType == "application/x-www-form-urlencoded" {
+		case "application/x-www-form-urlencoded":
 			if err := ctx.ReadForm(v); err != nil {
 				return errcode.IllegalParam
 			}
 		}
 	}
+
 	if !check {
 		return nil
 	}

@@ -22,8 +22,6 @@ func SetRouter(app *iris.Application) {
 		api.Get("/", ctr.GetToken)
 		api.Get("/p", middleware.Jwt(), ctr.GetToken2)
 
-		api.Get("/articles", ctr.GetArticles)
-		api.Get("/articles/{id:int}", ctr.GetArticleById)
 		// tag
 		api.Post("/tag", ctr.InsertTag)
 		api.Delete("/tag", ctr.DeleteTag)

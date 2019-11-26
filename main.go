@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/middleware/pprof"
 	"github.com/kataras/iris/middleware/recover"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/middleware"
@@ -28,10 +27,6 @@ func main() {
 	app.Use(middleware.Limiter()) // 限制每秒访问数量
 	app.Use(middleware.Log())
 	app.Use(middleware.Cors())
-
-	p := pprof.New()
-	app.Any("/debug/pprof", p)
-	app.Any("/debug/pprof/{action:path}", p)
 
 	router.SetRouter(app)
 
