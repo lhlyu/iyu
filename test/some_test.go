@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"net"
+	"regexp"
 	"testing"
 )
 
@@ -11,7 +12,8 @@ type A struct {
 }
 
 func TestSome(t *testing.T) {
-	fmt.Println(getMacAddrs())
+	regex := `[\P{Han}\W]+`
+	fmt.Println(regexp.MatchString(regex, "汉字"))
 }
 
 func getMacAddrs() (macAddrs []string) {

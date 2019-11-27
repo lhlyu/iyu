@@ -22,8 +22,6 @@ func SetRouter(app *iris.Application) {
 		api.Get("/", ctr.GetToken)
 		api.Get("/p", middleware.Jwt(), ctr.GetToken2)
 
-		api.Get("/articles", ctr.GetArticles)
-		api.Get("/articles/{id:int}", ctr.GetArticleById)
 		// tag
 		api.Post("/tag", ctr.InsertTag)
 		api.Delete("/tag", ctr.DeleteTag)
@@ -45,6 +43,5 @@ func SetRouter(app *iris.Application) {
 		api.Put("/quanta", ctr.UpdateQuanta)
 		api.Get("/quanta", ctr.GetQuantaAll)
 
-		api.Post("/x", ctr.X)
 	}
 }

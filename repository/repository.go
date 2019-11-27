@@ -13,6 +13,20 @@ func NewDao() *dao {
 	return &dao{}
 }
 
+func (*dao) createQuestionMarksForBatch(v ...[]interface{}) {
+	//qNum := len(v)
+	//maxLength := 0
+	//for i := range v {
+	//    length := len(v[i])
+	//    if length > maxLength{
+	//        maxLength = length
+	//    }
+	//}
+	//for i := 0;i < maxLength ;i ++{
+	//
+	//}
+}
+
 // Benchmark-4   	10000000	       161 ns/op  - 10
 // Benchmark-4   	 3000000	       448 ns/op  - 100
 // Benchmark-4   	 1000000	      1371 ns/op  - 1000
