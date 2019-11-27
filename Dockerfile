@@ -1,10 +1,10 @@
 FROM golang:1.12
 MAINTAINER "lhlyu"
-ADD main /go/main
+ADD iyu /go/iyu
 ADD config.yaml /go/conf/config.yaml
 RUN chmod 777 -R /go
 ENV LANG en_US.UTF-8
-CMD ["/bin/bash","-c","/go/main"]
+CMD ["/bin/bash","-c","/go/iyu"]
 
 # 创建镜像
 # docker build -t iyu .

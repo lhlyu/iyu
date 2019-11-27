@@ -9,7 +9,7 @@ jwt:
 server:
   host: localhost
   port: 8080
-  limit: 5   # 每秒最多允许五个请求
+  limit: 15   # 每秒最多允许N个请求
 
 log:
   level: debug

@@ -43,6 +43,5 @@ func SetRouter(app *iris.Application) {
 		api.Put("/quanta", ctr.UpdateQuanta)
 		api.Get("/quanta", ctr.GetQuantaAll)
 
-		api.Post("/x", ctr.X)
 	}
 }
