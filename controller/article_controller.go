@@ -3,10 +3,22 @@ package controller
 import (
 	"github.com/kataras/iris"
 	"github.com/lhlyu/iyu/controller/vo"
+	"github.com/lhlyu/iyu/errcode"
+	"github.com/lhlyu/iyu/service"
 )
 
 type articleController struct {
 	controller
+}
+
+func (c *articleController) GetArticleById(ctx iris.Context) {
+	id := ctx.URLParamIntDefault("id", 0)
+	if id <= 0 {
+		ctx.JSON(errcode.IllegalParam)
+		return
+	}
+	svc := service.NewArticleService()
+	ctx.JSON(svc.GetById(id, false))
 }
 
 func (c *articleController) InsertArticle(ctx iris.Context) {
@@ -15,4 +27,6 @@ func (c *articleController) InsertArticle(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
+	svc := service.NewArticleService()
+	ctx.JSON(svc.Insert(article))
 }

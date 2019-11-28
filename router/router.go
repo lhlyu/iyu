@@ -42,6 +42,9 @@ func SetRouter(app *iris.Application) {
 		api.Delete("/quanta", ctr.DeleteQuanta)
 		api.Put("/quanta", ctr.UpdateQuanta)
 		api.Get("/quanta", ctr.GetQuantaAll)
+		// article
+		api.Get("/article", ctr.GetArticleById)
+		api.Post("/article", ctr.InsertArticle)
 
 	}
 }

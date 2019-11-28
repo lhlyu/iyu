@@ -39,8 +39,8 @@ case $1 in
                 ;;
         [dD]*)
             echo "docker build and run"
-            docker build -t iyu .
-            docker run -itd --name=iyu -p 9876:8080 iyu
+            docker build -t $name .
+            docker run -itd --name=$name -p 9876:8080 $name
             exit
             ;;
 esac
