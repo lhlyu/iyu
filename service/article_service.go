@@ -18,7 +18,7 @@ func NewArticleService() *articleService {
 	return &articleService{}
 }
 
-func (*articleService) GetArticles(param *bo.ArticleParam) *errcode.ErrCode {
+func (*articleService) GetArticles(param *vo.ArticleParam) *errcode.ErrCode {
 
 	return nil
 }
@@ -35,12 +35,12 @@ func (*articleService) GetById(id int, reload bool) *errcode.ErrCode {
 	)
 
 	ch := cache.NewCache()
-	//if !reload{
-	//    articles := ch.GetArticles(id)
-	//    if len(articles) > 0{
-	//        return errcode.Success.WithData(articles[0])
-	//    }
-	//}
+	if !reload {
+		articles := ch.GetArticles(id)
+		if len(articles) > 0 {
+			return errcode.Success.WithData(articles[0])
+		}
+	}
 	dao := repository.NewDao()
 	wg := sync.WaitGroup{}
 	wg.Add(3)
@@ -112,7 +112,8 @@ func (*articleService) GetById(id int, reload bool) *errcode.ErrCode {
 	return errcode.Success.WithData(articleData)
 }
 
-func (*articleService) Insert(param *vo.ArticleVo) *errcode.ErrCode {
+// insert one article
+func (s *articleService) Insert(param *vo.ArticleVo) *errcode.ErrCode {
 	article := &po.YuArticle{
 		UserId:     param.UserId,
 		Wraper:     param.Wraper,
@@ -128,15 +129,55 @@ func (*articleService) Insert(param *vo.ArticleVo) *errcode.ErrCode {
 		return errcode.InsertError
 	}
 	// load map
+	go s.GetById(article.Id, true)
 	return errcode.Success
 }
 
-func (*articleService) Update(param *vo.ArticleVo) *errcode.ErrCode {
-	//dao := repository.NewDao()
-	//article,err := dao.GetArticle(param.Id)
-	//if err != nil{
-	//    return errcode.NoExsistData
-	//}
+// update article
+func (s *articleService) Update(param *vo.ArticleVo) *errcode.ErrCode {
+	dao := repository.NewDao()
+	article, err := dao.GetArticle(param.Id)
+	if err != nil {
+		return errcode.NoExsistData
+	}
+	param.Content = util.Base64EncodeObj(param.Content)
+	util.CompareIntSet(&article.UserId, &param.UserId)
+	util.CompareIntSet(&article.IsDelete, &param.IsDelete)
+	util.CompareIntSet(&article.CategoryId, &param.CategoryId)
+	util.CompareIntSet(&article.NailId, &param.NailId)
+	util.CompareIntSet(&article.IsTop, &param.IsTop)
+	util.CompareIntSet(&article.Kind, &param.Kind)
+	util.CompareStrSet(&article.Title, &param.Title)
+	util.CompareStrSet(&article.Content, &param.Content)
+	util.CompareStrSet(&article.Wraper, &param.Wraper)
 
-	return nil
+	NeedUpdateTag := false
+	if len(param.TagArr) > 0 {
+		if articleTags, err := dao.GetArticleTags(param.Id); err == nil {
+			if len(articleTags) != len(param.TagArr) {
+				NeedUpdateTag = true
+			}
+			if !NeedUpdateTag {
+				for _, v := range articleTags {
+					for _, w := range param.TagArr {
+						if v.TagId != w {
+							NeedUpdateTag = true
+							break
+						}
+					}
+				}
+			}
+		}
+
+	}
+	if NeedUpdateTag {
+		err = dao.UpdateArticle(article, param.TagArr)
+	} else {
+		err = dao.UpdateArticle(article, nil)
+	}
+	if err != nil {
+		return errcode.UpdateError
+	}
+	go s.GetById(param.Id, true)
+	return errcode.Success
 }

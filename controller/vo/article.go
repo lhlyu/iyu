@@ -13,3 +13,13 @@ type ArticleVo struct {
 	Kind       int    `json:"kind"`                        // 文章类型
 	IsDelete   int    `json:"isDelete"`                    // 是否已删除:1-未删除;2-已删除
 }
+
+type ArticleParam struct {
+	PageNum    int    `json:"pageNum" validate:"required,gt=0"`
+	PageSize   int    `json:"pageSize" validate:"required,gt=0"`
+	CategoryId int    `json:"categoryId"`
+	TagId      int    `json:"tagId"`
+	Kind       int    `json:"kind"` // 文章类型
+	KeyWord    string `json:"keyWord"`
+	IsDelete   int    `json:"-"`
+}
