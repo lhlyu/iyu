@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bytes"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -13,18 +14,22 @@ func NewDao() *dao {
 	return &dao{}
 }
 
-func (*dao) createQuestionMarksForBatch(v ...[]interface{}) {
-	//qNum := len(v)
-	//maxLength := 0
-	//for i := range v {
-	//    length := len(v[i])
-	//    if length > maxLength{
-	//        maxLength = length
-	//    }
-	//}
-	//for i := 0;i < maxLength ;i ++{
-	//
-	//}
+func (d *dao) createQuestionMarksForBatch(v ...[]interface{}) (string, []interface{}) {
+	qNum := len(v)
+	maxLength := len(v[0])
+	qm := d.createQuestionMarks(qNum)
+	var params []interface{}
+	buf := bytes.Buffer{}
+	buf.WriteString(fmt.Sprintf(" values(%s)", qm))
+	for i := 0; i < maxLength; i++ {
+		for j := 0; j < qNum; j++ {
+			params = append(params, v[j][i])
+		}
+		buf.WriteString(",(")
+		buf.WriteString(qm)
+		buf.WriteString(")")
+	}
+	return buf.String(), params
 }
 
 // Benchmark-4   	10000000	       161 ns/op  - 10

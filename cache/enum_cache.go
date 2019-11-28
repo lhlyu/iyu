@@ -28,6 +28,22 @@ func (c cache) GetTagAll() []*bo.Tag {
 	return arr
 }
 
+func (c cache) GetTag(fields ...int) []*bo.Tag {
+	m := c.GetMapData(tagKeyName, util.IntSlinceToStringSlince(fields)...)
+	if len(m) == 0 {
+		return nil
+	}
+	var arr []*bo.Tag
+	for _, v := range m {
+		a := &bo.Tag{}
+		if util.JsonStrToObj(v, a) != nil {
+			continue
+		}
+		arr = append(arr, a)
+	}
+	return arr
+}
+
 func (c cache) LoadTags(tags ...*bo.Tag) {
 	vm := make(map[string]interface{})
 	for _, v := range tags {
@@ -52,6 +68,22 @@ func (c cache) GetCategoryAll() []*bo.Category {
 	return arr
 }
 
+func (c cache) GetCategory(fields ...int) []*bo.Category {
+	m := c.GetMapData(categoryKeyName, util.IntSlinceToStringSlince(fields)...)
+	if len(m) == 0 {
+		return nil
+	}
+	var arr []*bo.Category
+	for _, v := range m {
+		a := &bo.Category{}
+		if util.JsonStrToObj(v, a) != nil {
+			continue
+		}
+		arr = append(arr, a)
+	}
+	return arr
+}
+
 func (c cache) LoadCategorys(categories ...*bo.Category) {
 	vm := make(map[string]interface{})
 	for _, v := range categories {
@@ -62,6 +94,22 @@ func (c cache) LoadCategorys(categories ...*bo.Category) {
 
 func (c cache) GetNailAll() []*bo.Nail {
 	m := c.GetListData(nailKeyName)
+	if len(m) == 0 {
+		return nil
+	}
+	var arr []*bo.Nail
+	for _, v := range m {
+		a := &bo.Nail{}
+		if util.JsonStrToObj(v, a) != nil {
+			continue
+		}
+		arr = append(arr, a)
+	}
+	return arr
+}
+
+func (c cache) GetNail(fields ...int) []*bo.Nail {
+	m := c.GetMapData(nailKeyName, util.IntSlinceToStringSlince(fields)...)
 	if len(m) == 0 {
 		return nil
 	}

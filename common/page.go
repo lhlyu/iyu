@@ -24,7 +24,7 @@ func NewPage(pageNum, pageSize int) *Page {
 
 func (p *Page) SetTotal(total int) {
 	if p == nil {
-		p = NewPage(1, 10)
+		return
 	}
 	p.Total = total
 	if p.PageSize <= 0 {

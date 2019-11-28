@@ -12,3 +12,8 @@ type YuRecord struct {
 	CreatedAt    time.Time `db:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at"`
 }
+
+type Stat struct {
+	Action int `db:"action"`
+	Number int `db:"number"`
+}

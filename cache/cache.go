@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/util"
 	"log"
@@ -132,6 +133,27 @@ func (c *cache) GetListData(keyName string) []string {
 			return nil
 		}
 		return common.Redis.LRange(targetListKey, 0, -1).Val()
+	}
+	return nil
+}
+
+func (c *cache) GetMapData(keyName string, fields ...string) []string {
+	if c.hasRedis() {
+		key := common.Cfg.GetString(keyName)
+		if key == "" {
+			return nil
+		}
+		mapKey := key + _MAP
+		targetMapKey := common.Redis.Get(mapKey).Val()
+		if targetMapKey == "" {
+			return nil
+		}
+		interArr := common.Redis.HMGet(targetMapKey, fields...).Val()
+		var strArr []string
+		for _, v := range interArr {
+			strArr = append(strArr, fmt.Sprint(v))
+		}
+		return strArr
 	}
 	return nil
 }

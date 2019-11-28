@@ -19,6 +19,9 @@ func NewQuantaService() *quantaService {
 
 // get all quantas
 func (*quantaService) GetAll(page *common.Page, reload bool) *errcode.ErrCode {
+	if page == nil {
+		page = common.NewPage(1, 10)
+	}
 	c := cache.NewCache()
 	var quantas []*bo.Quanta
 	if !reload {
