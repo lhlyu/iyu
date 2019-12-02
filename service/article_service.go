@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/lhlyu/iyu/cache"
+	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
@@ -18,11 +19,31 @@ func NewArticleService() *articleService {
 	return &articleService{}
 }
 
-func (*articleService) GetArticles(param *vo.ArticleParam) *errcode.ErrCode {
-
-	return nil
+// query articles
+func (*articleService) QueryArticles(param *vo.ArticleParam) *errcode.ErrCode {
+	dao := repository.NewDao()
+	total, err := dao.GetArticleCount(param)
+	if err != nil {
+		return errcode.QueryError
+	}
+	if total == 0 {
+		return errcode.EmptyData
+	}
+	page := common.NewPage(param.PageNum, param.PageSize)
+	page.SetTotal(total)
+	ids, err := dao.QueryArticles(param, page)
+	if err != nil {
+		return errcode.QueryError
+	}
+	ch := cache.NewCache()
+	articles := ch.GetArticles(ids...)
+	if len(articles) > 0 {
+		return errcode.Success.WithData(articles)
+	}
+	return errcode.EmptyData
 }
 
+// get article by id
 func (*articleService) GetById(id int, reload bool) *errcode.ErrCode {
 	// read from cache
 	var (
@@ -92,11 +113,15 @@ func (*articleService) GetById(id int, reload bool) *errcode.ErrCode {
 	if article == nil {
 		return errcode.NoExsistData
 	}
+	updatedAt := int(article.UpdatedAt.Unix())
+	if updatedAt < 0 {
+		updatedAt = int(article.CreatedAt.Unix())
+	}
 	articleData := &bo.ArticleData{
 		ID:        article.Id,
 		Kind:      article.Kind,
 		CreatedAt: int(article.CreatedAt.Unix()),
-		UpdatedAt: int(article.UpdatedAt.Unix()),
+		UpdatedAt: updatedAt,
 		Title:     article.Title,
 		Content:   util.Base64DecodeString(article.Content),
 		Wraper:    article.Wraper,
@@ -180,4 +205,31 @@ func (s *articleService) Update(param *vo.ArticleVo) *errcode.ErrCode {
 	}
 	go s.GetById(param.Id, true)
 	return errcode.Success
+}
+
+// batch delete article
+func (s *articleService) Delete(param *vo.ArticleDeleteParam) *errcode.ErrCode {
+	dao := repository.NewDao()
+	if err := dao.DeleteArticle(param.Real, param.Ids...); err != nil {
+		return errcode.DeleteError
+	}
+	if param.Real {
+		cache.NewCache().DelArticles(param.Ids...)
+	} else {
+		go s.LoadArticles(param.Ids)
+	}
+	return errcode.Success
+}
+
+// load articles
+func (s *articleService) LoadArticles(ids []int) {
+	dao := repository.NewDao()
+	ids, err := dao.QueryAllArticle(ids...)
+	if err != nil {
+		common.Ylog.Debug("load articles is err :", err)
+		return
+	}
+	for _, v := range ids {
+		s.GetById(v, true)
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/kataras/iris/core/errors"
 	"log"
+	"reflect"
 )
 
 func ObjToJsonStr(v interface{}) string {
@@ -19,7 +20,7 @@ func JsonStrToObj(s string, v interface{}) error {
 		return errors.New("v is nil")
 	}
 	if err := json.Unmarshal([]byte(s), v); err != nil {
-		log.Println("JsonStrToObj", s, err)
+		log.Println("JsonStrToObj", s, err, reflect.TypeOf(v))
 		return err
 	}
 	return nil

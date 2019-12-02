@@ -23,3 +23,8 @@ type ArticleParam struct {
 	KeyWord    string `json:"keyWord"`
 	IsDelete   int    `json:"-"`
 }
+
+type ArticleDeleteParam struct {
+	Ids  []int `json:"ids"`
+	Real bool  `json:"real"`
+}

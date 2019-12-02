@@ -30,6 +30,7 @@ redis_key:
   nail: "IYU:NAIL"
   category: "IYU:CATEGORY"
   quanta: "IYU:QUANTA"
+  article: "IYU:ARTICLE"
 
 db:
   db_wr:

@@ -37,6 +37,8 @@ func loadCache() {
 		service.NewTagService().GetAll(true)
 		log.Println("load quanta datas ...")
 		service.NewQuantaService().GetAll(nil, true)
+		log.Println("load article datas ...")
+		service.NewArticleService().LoadArticles(nil)
 	})
 }
 

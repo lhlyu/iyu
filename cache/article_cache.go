@@ -31,6 +31,9 @@ func (c cache) GetArticles(fields ...int) []*bo.ArticleData {
 		interArr := common.Redis.HMGet(key, util.IntSlinceToStringSlince(fields)...).Val()
 		var arr []*bo.ArticleData
 		for _, v := range interArr {
+			if v == nil {
+				continue
+			}
 			a := &bo.ArticleData{}
 			if util.JsonStrToObj(fmt.Sprint(v), a) != nil {
 				continue
@@ -40,4 +43,15 @@ func (c cache) GetArticles(fields ...int) []*bo.ArticleData {
 		return arr
 	}
 	return nil
+}
+
+func (c cache) DelArticles(fields ...int) {
+	if c.hasRedis() {
+		key := common.Cfg.GetString("redis_key.article")
+		if key == "" {
+			return
+		}
+		key += _MAP
+		common.Redis.HDel(key, util.IntSlinceToStringSlince(fields)...).Val()
+	}
 }
