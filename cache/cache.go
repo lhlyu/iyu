@@ -151,6 +151,9 @@ func (c *cache) GetMapData(keyName string, fields ...string) []string {
 		interArr := common.Redis.HMGet(targetMapKey, fields...).Val()
 		var strArr []string
 		for _, v := range interArr {
+			if v == nil {
+				continue
+			}
 			strArr = append(strArr, fmt.Sprint(v))
 		}
 		return strArr

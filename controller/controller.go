@@ -47,10 +47,10 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 	return nil
 }
 
-func (controller) getToken(m map[string]interface{}) string {
-	if m == nil {
-		m = make(map[string]interface{})
-	}
+func (controller) getToken(user *common.XUser) string {
+	m := make(map[string]interface{})
+	m[common.X_ID] = user.Id
+	m[common.X_ROLE] = user.Role
 	m["t"] = time.Now().Unix()
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
 	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
@@ -69,6 +69,10 @@ func (controller) checkEmpty(v string) *errcode.ErrCode {
 		return errcode.IllegalParam
 	}
 	return nil
+}
+
+func (controller) GetUser(ctx iris.Context) *common.XUser {
+	return ctx.Values().Get(common.X_USER).(*common.XUser)
 }
 
 type Controller struct {

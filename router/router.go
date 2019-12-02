@@ -4,7 +4,6 @@ import (
 	"github.com/kataras/iris"
 	"github.com/lhlyu/iyu/controller"
 	"github.com/lhlyu/iyu/errcode"
-	"github.com/lhlyu/iyu/middleware"
 )
 
 func SetRouter(app *iris.Application) {
@@ -18,10 +17,6 @@ func SetRouter(app *iris.Application) {
 
 	api := app.Party("/api")
 	{
-
-		api.Get("/", ctr.GetToken)
-		api.Get("/p", middleware.Jwt(), ctr.GetToken2)
-
 		// tag
 		api.Post("/tag", ctr.InsertTag)
 		api.Delete("/tag", ctr.DeleteTag)
@@ -43,8 +38,11 @@ func SetRouter(app *iris.Application) {
 		api.Put("/quanta", ctr.UpdateQuanta)
 		api.Get("/quanta", ctr.GetQuantaAll)
 		// article
+		api.Get("/articles", ctr.QueryArticles)
 		api.Get("/article", ctr.GetArticleById)
 		api.Post("/article", ctr.InsertArticle)
+		api.Put("/article", ctr.UpdateArticle)
+		api.Delete("/article", ctr.DeleteArticle)
 
 	}
 }
