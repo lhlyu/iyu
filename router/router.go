@@ -56,5 +56,8 @@ func SetRouter(app *iris.Application) {
 		admin.Post("/tag", ctr.InsertTag)
 		admin.Put("/tag", ctr.UpdateTag)
 		admin.Delete("/tag", ctr.DeleteTag)
+
+		admin.Get("/users", ctr.QueryUser)
+		admin.Put("/user", ctr.UpdateUser)
 	}
 }

@@ -11,7 +11,7 @@ const (
 	XRealIP       = "X-Real-IP"
 )
 
-// RemoteIp 返回远程客户端的 IP
+// RemoteIp
 func RemoteIp(req *http.Request) string {
 	remoteAddr := req.RemoteAddr
 	if ip := req.Header.Get(XRealIP); ip != "" {
