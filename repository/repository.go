@@ -15,19 +15,21 @@ func NewDao() *dao {
 }
 
 func (d *dao) createQuestionMarksForBatch(v ...[]interface{}) (string, []interface{}) {
-	qNum := len(v)
-	maxLength := len(v[0])
+	if len(v) == 0 {
+		return "", nil
+	}
+	qNum := len(v[0])
+	maxLength := len(v)
 	qm := d.createQuestionMarks(qNum)
 	var params []interface{}
 	buf := bytes.Buffer{}
 	buf.WriteString(fmt.Sprintf(" values(%s)", qm))
-	for i := 0; i < maxLength; i++ {
-		for j := 0; j < qNum; j++ {
-			params = append(params, v[j][i])
-		}
+	params = append(params, v[0]...)
+	for i := 1; i < maxLength; i++ {
 		buf.WriteString(",(")
 		buf.WriteString(qm)
 		buf.WriteString(")")
+		params = append(params, v[i]...)
 	}
 	return buf.String(), params
 }

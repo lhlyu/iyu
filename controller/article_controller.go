@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/service"
@@ -17,6 +18,12 @@ func (c *articleController) QueryArticles(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
+	if c.IsAdminRouter(ctx) {
+		article.Kind = 0
+	} else {
+		article.Kind = common.ARTICLE_NORMAL
+		article.IsDelete = 1
+	}
 	svc := service.NewArticleService()
 	ctx.JSON(svc.QueryArticles(article))
 }
@@ -26,6 +33,9 @@ func (c *articleController) GetArticleById(ctx iris.Context) {
 	if id <= 0 {
 		ctx.JSON(errcode.IllegalParam)
 		return
+	}
+	if !c.IsAdminRouter(ctx) {
+		go c.Record(ctx, id, common.KIND_ARTICLE, common.ACTION_VISIT)
 	}
 	svc := service.NewArticleService()
 	ctx.JSON(svc.GetById(id, false))

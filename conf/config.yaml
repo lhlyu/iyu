@@ -25,12 +25,13 @@ redis:
   idleTimeout: 60
 
 redis_key:
-  iyu: IYU
-  tag: "IYU:TAG"
-  nail: "IYU:NAIL"
-  category: "IYU:CATEGORY"
-  quanta: "IYU:QUANTA"
-  article: "IYU:ARTICLE"
+  iyu: "iyu"
+  tag: "iyu:tag"
+  nail: "iyu:nail"
+  category: "iyu:category"
+  quanta: "iyu:quanta"
+  article: "iyu:article"
+  user: "iyu:user"
 
 db:
   db_wr:

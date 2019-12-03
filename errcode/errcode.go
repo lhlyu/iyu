@@ -70,6 +70,11 @@ const (
 )
 
 const (
+	NOPERMISSION = 403
+	NOFOUND      = 404
+)
+
+const (
 	EMPTY_DATA = iota + 1000
 	EXISTS_DATA
 	NO_EXISTS_DATA
@@ -85,9 +90,13 @@ const (
 
 // 常用
 var (
-	Error        = NewErrcode(ERROR, nil)
-	Success      = NewErrcode(SUCCESS, nil)
-	Failure      = NewErrcode(FAILURE, nil)
+	Error   = NewErrcode(ERROR, nil)
+	Success = NewErrcode(SUCCESS, nil)
+	Failure = NewErrcode(FAILURE, nil)
+
+	NoPermission = NewErrcode(NOPERMISSION, nil)
+	NofoundError = NewErrcode(NOFOUND, nil)
+
 	EmptyData    = NewErrcode(EMPTY_DATA, nil)
 	ExsistData   = NewErrcode(EXISTS_DATA, nil)
 	NoExsistData = NewErrcode(NO_EXISTS_DATA, nil)
@@ -100,9 +109,13 @@ var (
 )
 
 var errCodeMap = map[int]string{
-	ERROR:          "异常",
-	SUCCESS:        "成功",
-	FAILURE:        "失败",
+	ERROR:   "异常",
+	SUCCESS: "成功",
+	FAILURE: "失败",
+
+	NOPERMISSION: "没有权限",
+	NOFOUND:      "404",
+
 	EMPTY_DATA:     "数据为空",
 	EXISTS_DATA:    "数据已存在",
 	NO_EXISTS_DATA: "数据不存在",

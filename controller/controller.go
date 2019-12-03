@@ -3,8 +3,12 @@ package controller
 import (
 	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/cache"
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
+	"github.com/lhlyu/iyu/service"
+	"github.com/lhlyu/iyu/util"
 	"gopkg.in/go-playground/validator.v9"
 	"time"
 )
@@ -37,7 +41,6 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 			}
 		}
 	}
-
 	if !check {
 		return nil
 	}
@@ -73,6 +76,42 @@ func (controller) checkEmpty(v string) *errcode.ErrCode {
 
 func (controller) GetUser(ctx iris.Context) *common.XUser {
 	return ctx.Values().Get(common.X_USER).(*common.XUser)
+}
+
+// 记录
+func (c controller) Record(ctx iris.Context, BusinessId, BusinessKind, Action int) {
+	user := c.GetUser(ctx)
+	svc := service.NewRecordService()
+	param := &vo.RecordParam{
+		UserId:       user.Id,
+		Ip:           user.Ip,
+		BusinessId:   BusinessId,
+		BusinessKind: BusinessKind,
+		Action:       Action,
+	}
+	if Action == common.ACTION_CMNT {
+		svc.Insert(param)
+		return
+	}
+	key := util.Base64EncodeObj(param)
+	// 限制
+	cache.NewCache().Record(key, func() {
+		svc.Insert(param)
+	})
+}
+
+// 是否是管理员
+func (c controller) IsAdmin(ctx iris.Context) bool {
+	user := c.GetUser(ctx)
+	return user.Role >= common.PERMISSION
+}
+
+func (c controller) IsAdminRouter(ctx iris.Context) bool {
+	admin, ok := ctx.Values().Get(common.ADMIN).(bool)
+	if !ok {
+		return false
+	}
+	return admin
 }
 
 type Controller struct {

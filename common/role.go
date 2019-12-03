@@ -15,6 +15,8 @@ const (
 	LV9 // 系统管理员
 )
 
+const PERMISSION = LV8
+
 const (
 	X_ID   = "i"
 	X_ROLE = "r"
