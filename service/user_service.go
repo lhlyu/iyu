@@ -28,6 +28,9 @@ func (*userService) LoadUsers(id int) {
 	if err != nil {
 		return
 	}
+	if total == 0 {
+		return
+	}
 	page := common.NewPage(param.PageNum, param.PageSize)
 	page.SetTotal(total)
 	for i := 0; i < page.PageMax; i++ {
@@ -74,6 +77,9 @@ func (s *userService) GetById(id int) *errcode.ErrCode {
 	if err != nil {
 		return errcode.QueryError
 	}
+	if user == nil {
+		return errcode.NoExsistData
+	}
 	updatedAt := user.UpdatedAt.Unix()
 	if updatedAt < 0 {
 		updatedAt = user.CreatedAt.Unix()
@@ -101,6 +107,9 @@ func (s *userService) Update(param *vo.UserEditParam) *errcode.ErrCode {
 	user, err := dao.GetUserById(param.Id)
 	if err != nil {
 		return errcode.UpdateError
+	}
+	if user == nil {
+		return errcode.NoExsistData
 	}
 	util.CompareStrSet(&user.UserName, &param.UserName)
 	util.CompareStrSet(&user.AvatarUrl, &param.AvatarUrl)
@@ -131,6 +140,9 @@ func (s *userService) Query(param *vo.UserParam) *errcode.ErrCode {
 	total, err := dao.GetUsersCount(param)
 	if err != nil {
 		return errcode.QueryError
+	}
+	if total == 0 {
+		return errcode.EmptyData
 	}
 	page := common.NewPage(param.PageNum, param.PageSize)
 	page.SetTotal(total)
