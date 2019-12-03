@@ -38,7 +38,7 @@ func (*articleService) QueryArticles(param *vo.ArticleParam) *errcode.ErrCode {
 	ch := cache.NewCache()
 	articles := ch.GetArticles(ids...)
 	if len(articles) > 0 {
-		return errcode.Success.WithData(articles)
+		return errcode.Success.WithPage(page, articles)
 	}
 	return errcode.EmptyData
 }

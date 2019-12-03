@@ -10,28 +10,9 @@ import (
 	"time"
 )
 
-/**
-LHLYU-BLOG:AUTHOR  -  存放作者信息【string】
-LHLYU-BLOG:CATALOG   -   分类【Hash】
-LHLYU-BLOG:TAGS    -   标签【Hash】
-LHLYU-BLOG:NAIL    -   钉子【Hash】
-
-
-LHLYU-BLOG:ARTICLE:LIST - 文章列表【list】
--- LHLYU-BLOG:ARTICLE:LIST:KEY  【string】 =》 LHLYU-BLOG:ARTICLE:LIST
-
-LHLYU-BLOG:ARTICLE:MAP - 文章MAP【hash】
-- field: 文章ID
-
-LHLYU-BLOG:ARTICLE:IVEAW:id  - 文章浏览量【string】
-
-LHLYU-BLOG:IVEAW      - 全站浏览量【string】
--- LHLYU-BLOG:IVEAW:KEY  【string】 =》 LHLYU-BLOG:IVEAW
-*/
-
 const (
-	_MAP  = ":MAP"
-	_LIST = ":LIST"
+	_MAP  = ":map"
+	_LIST = ":list"
 )
 
 const (
@@ -75,7 +56,7 @@ func (c *cache) ClearCache(key string) {
 }
 
 func (c *cache) mutexHandler(key string, f func()) {
-	keyMutex := key + ":MUTEX"
+	keyMutex := key + ":mutex"
 	if rs, _ := common.Redis.SetNX(keyMutex, 1, time.Second*5).Result(); !rs {
 		return
 	}

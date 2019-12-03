@@ -8,34 +8,36 @@ import (
 	"strconv"
 )
 
-func (c cache) LoadArticle(articleData *bo.ArticleData) {
+func (c cache) LoadUser(articleDatas []*bo.UserData) {
 	if c.hasRedis() {
-		key := common.Cfg.GetString("redis_key.article")
+		key := common.Cfg.GetString("redis_key.user")
 		if key == "" {
 			return
 		}
 		key += _MAP
 		c.mutexHandler(key, func() {
-			common.Redis.HSet(key, strconv.Itoa(articleData.ID), util.ObjToJsonStr(articleData))
+			for _, v := range articleDatas {
+				common.Redis.HSet(key, strconv.Itoa(v.Id), util.ObjToJsonStr(v))
+			}
 			common.Redis.Expire(key, _ONE_MONTH)
 		})
 	}
 }
 
-func (c cache) GetArticles(fields ...int) []*bo.ArticleData {
+func (c cache) GetUsers(fields ...int) []*bo.UserData {
 	if c.hasRedis() {
-		key := common.Cfg.GetString("redis_key.article")
+		key := common.Cfg.GetString("redis_key.user")
 		if key == "" {
 			return nil
 		}
 		key += _MAP
 		interArr := common.Redis.HMGet(key, util.IntSlinceToStringSlince(fields)...).Val()
-		var arr []*bo.ArticleData
+		var arr []*bo.UserData
 		for _, v := range interArr {
 			if v == nil {
 				continue
 			}
-			a := &bo.ArticleData{}
+			a := &bo.UserData{}
 			if util.JsonStrToObj(fmt.Sprint(v), a) != nil {
 				continue
 			}
@@ -46,9 +48,9 @@ func (c cache) GetArticles(fields ...int) []*bo.ArticleData {
 	return nil
 }
 
-func (c cache) DelArticles(fields ...int) {
+func (c cache) DelUsers(fields ...int) {
 	if c.hasRedis() {
-		key := common.Cfg.GetString("redis_key.article")
+		key := common.Cfg.GetString("redis_key.user")
 		if key == "" {
 			return
 		}

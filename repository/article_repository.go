@@ -20,7 +20,7 @@ func (d *dao) GetArticleCount(param *vo.ArticleParam) (int, error) {
 		params = append(params, param.Kind)
 	}
 	if param.IsDelete > 0 {
-		sql += " AND is_delete = ?"
+		sql += " AND a.is_delete = ?"
 		params = append(params, param.IsDelete)
 	}
 	if param.TagId > 0 {
@@ -53,7 +53,7 @@ func (d *dao) QueryArticles(param *vo.ArticleParam, page *common.Page) ([]int, e
 		params = append(params, param.Kind)
 	}
 	if param.IsDelete > 0 {
-		sql += " AND is_delete = ?"
+		sql += " AND a.is_delete = ?"
 		params = append(params, param.IsDelete)
 	}
 	if param.TagId > 0 {
@@ -69,6 +69,17 @@ func (d *dao) QueryArticles(param *vo.ArticleParam, page *common.Page) ([]int, e
 	params = append(params, page.StartRow, page.PageSize)
 	var result []int
 	if err := common.DB.Select(&result, sql, params...); err != nil {
+		common.Ylog.Debug(err)
+		return nil, err
+	}
+	return result, nil
+}
+
+// query by kind
+func (d *dao) QueryArticlesByKind(kind int) ([]int, error) {
+	sql := `SELECT id FROM yu_article WHERE kind = ?`
+	var result []int
+	if err := common.DB.Select(&result, sql, kind); err != nil {
 		common.Ylog.Debug(err)
 		return nil, err
 	}
@@ -114,13 +125,13 @@ func (d *dao) InsertArticle(article *po.YuArticle, articleTags []int) error {
 		return nil
 	}
 	article.Id = int(id)
-	var ids []interface{}
-	var tags []interface{}
+	var valueArr [][]interface{}
 	for _, v := range articleTags {
-		ids = append(ids, id)
-		tags = append(tags, v)
+		var values []interface{}
+		values = append(values, article.Id, v)
+		valueArr = append(valueArr, values)
 	}
-	batchSql, params := d.createQuestionMarksForBatch(ids, tags)
+	batchSql, params := d.createQuestionMarksForBatch(valueArr...)
 	sql2 += batchSql
 	_, err = tx.Exec(sql2, params...)
 	if err != nil {
@@ -186,13 +197,13 @@ func (d *dao) UpdateArticle(article *po.YuArticle, articleTags []int) error {
 			return nil
 		}
 		sql = "INSERT INTO yu_article_tag(article_id,tag_id)"
-		var ids []interface{}
-		var tags []interface{}
+		var valueArr [][]interface{}
 		for _, v := range articleTags {
-			ids = append(ids, article.Id)
-			tags = append(tags, v)
+			var values []interface{}
+			values = append(values, article.Id, v)
+			valueArr = append(valueArr, values)
 		}
-		batchSql, params := d.createQuestionMarksForBatch(ids, tags)
+		batchSql, params := d.createQuestionMarksForBatch(valueArr...)
 		sql += batchSql
 		if _, err := tx.Exec(sql, params...); err != nil {
 			common.Ylog.Debug(err)

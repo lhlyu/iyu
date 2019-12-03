@@ -57,6 +57,9 @@ func NewYlog(level, timeFormat, outFile, outWay string) *ylog {
 }
 
 func (y *ylog) Debug(v ...interface{}) {
+	if y == nil {
+		return
+	}
 	if y.level != _debug {
 		return
 	}
