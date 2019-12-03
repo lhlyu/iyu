@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/util"
 )
 
 /**
@@ -14,7 +14,7 @@ Authorization:bearer xxxxxxxxxxx
 func Jwt() context.Handler {
 	return func(ctx iris.Context) {
 		user := &common.XUser{}
-		user.Ip = ctx.RemoteAddr()
+		user.Ip = util.RemoteIp(ctx.Request())
 		var err error
 		if err = jwt.New(jwt.Config{
 			ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
@@ -27,7 +27,6 @@ func Jwt() context.Handler {
 			user.Id = int(tokenMap[common.X_ID].(float64))
 			user.Role = int(tokenMap[common.X_ROLE].(float64))
 		}
-		fmt.Println("jwt.err = ", err)
 		ctx.Values().Set(common.X_USER, user)
 		ctx.Next()
 	}
