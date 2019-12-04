@@ -37,10 +37,4 @@ case $1 in
                 esac
                 exit
                 ;;
-        [dD]*)
-            echo "docker build and run"
-            docker build -t $name .
-            docker run -itd --name=$name -p 9876:8080 $name
-            exit
-            ;;
 esac

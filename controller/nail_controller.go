@@ -11,8 +11,6 @@ type nailController struct {
 	controller
 }
 
-const _color = "#000000"
-
 func (*nailController) GetNailAll(ctx iris.Context) {
 	svc := service.NewNailService()
 	ctx.JSON(svc.GetAll(false))
@@ -36,7 +34,7 @@ func (c *nailController) UpdateNail(ctx iris.Context) {
 		param.IsDelete = common.UNDELETED
 	}
 	if err := c.checkEmpty(param.Color); err != nil {
-		param.Color = _color
+		param.Color = common.COLOR
 	}
 	svc := service.NewNailService()
 	ctx.JSON(svc.Update(param))
@@ -53,7 +51,7 @@ func (c *nailController) InsertNail(ctx iris.Context) {
 		return
 	}
 	if err := c.checkEmpty(param.Color); err != nil {
-		param.Color = _color
+		param.Color = common.COLOR
 	}
 	svc := service.NewNailService()
 	ctx.JSON(svc.Insert(param))

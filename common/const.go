@@ -36,6 +36,8 @@ const (
 	ARTICLE_NOTE
 )
 
-const ADMIN = "admin"
-
-const ITV = 3600 * 24
+const (
+	ADMIN = "admin"
+	COLOR = "#000000"
+	ITV   = 3600 * 24
+)

@@ -18,7 +18,6 @@ func Jwt() context.Handler {
 		user := &common.XUser{}
 		user.Ip = util.RemoteIp(ctx.Request())
 		var err error
-
 		if err = jwt.New(jwt.Config{
 			ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 				return []byte(common.Cfg.GetString("jwt.secret")), nil

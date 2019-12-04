@@ -9,4 +9,4 @@ CMD ["/bin/bash","-c","/go/iyu"]
 # 创建镜像
 # docker build -t iyu .
 # 创建容器运行
-# docker run -itd --name=iyu -p 8080:8080 iyu
+# docker run -itd --network iyu-bridge -p 9876:8080 iyu
