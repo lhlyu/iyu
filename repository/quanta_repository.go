@@ -17,10 +17,10 @@ func (d *dao) GetQuantaAll() []*po.YuQuanta {
 }
 
 // get quanta by key
-func (d *dao) GetQuantaByKey(id int, key string) *po.YuQuanta {
-	sql := "SELECT * FROM yu_quanta WHERE `key` = ? and id <> ? limit 1"
+func (d *dao) GetQuantaByKey(key string) *po.YuQuanta {
+	sql := "SELECT * FROM yu_quanta WHERE `key` = ? limit 1"
 	value := &po.YuQuanta{}
-	if err := common.DB.Get(value, sql, key, id); err != nil {
+	if err := common.DB.Get(value, sql, key); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}

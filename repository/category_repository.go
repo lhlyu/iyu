@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/repository/po"
 )
 
@@ -17,10 +18,10 @@ func (d *dao) GetCategoryAll() []*po.YuCategory {
 }
 
 // get category by name
-func (d *dao) GetCategoryByName(id int, name string) *po.YuCategory {
-	sql := "SELECT * FROM yu_category WHERE `name` = ? and id <> ? limit 1"
+func (d *dao) GetCategoryByName(name string) *po.YuCategory {
+	sql := "SELECT * FROM yu_category WHERE `name` = ? limit 1"
 	value := &po.YuCategory{}
-	if err := common.DB.Get(value, sql, name, id); err != nil {
+	if err := common.DB.Get(value, sql, name); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}
@@ -38,9 +39,9 @@ func (d *dao) GetCategoryById(id int) *po.YuCategory {
 }
 
 // update category
-func (d *dao) UpdateCategory(id, status int, name string) error {
+func (d *dao) UpdateCategory(param *vo.CategoryVo) error {
 	sql := "UPDATE yu_category SET is_delete=?,`name` = ?,updated_at = NOW() WHERE id = ?"
-	if _, err := common.DB.Exec(sql, status, name, id); err != nil {
+	if _, err := common.DB.Exec(sql, param.IsDelete, param.Name, param.Id); err != nil {
 		common.Ylog.Debug(err)
 		return err
 	}
@@ -58,9 +59,9 @@ func (d *dao) DeleteCategoryById(id int) error {
 }
 
 // add category
-func (d *dao) InsertCategory(name string) error {
+func (d *dao) InsertCategory(param *vo.CategoryVo) error {
 	sql := "INSERT INTO yu_category(`name`) VALUES(?)"
-	if _, err := common.DB.Exec(sql, name); err != nil {
+	if _, err := common.DB.Exec(sql, param.Name); err != nil {
 		common.Ylog.Debug(err)
 		return err
 	}

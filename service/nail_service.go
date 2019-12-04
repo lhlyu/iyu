@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/lhlyu/iyu/cache"
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
 	"github.com/lhlyu/iyu/service/bo"
@@ -36,30 +37,30 @@ func (*nailService) GetAll(reload bool) *errcode.ErrCode {
 	return errcode.Success.WithData(nails)
 }
 
-func (s *nailService) Insert(name, color string) *errcode.ErrCode {
+func (s *nailService) Insert(param *vo.NailVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetNailByName(0, name)
+	data := dao.GetNailByName(param.Name)
 	if data != nil {
 		return errcode.ExsistData
 	}
-	if err := dao.InsertNail(name, color); err != nil {
+	if err := dao.InsertNail(param); err != nil {
 		return errcode.InsertError
 	}
 	go s.GetAll(true)
 	return errcode.Success
 }
 
-func (s *nailService) Update(id, status int, name, color string) *errcode.ErrCode {
+func (s *nailService) Update(param *vo.NailVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetNailById(id)
+	data := dao.GetNailById(param.Id)
 	if data == nil {
 		return errcode.NoExsistData
 	}
-	other := dao.GetNailByName(id, name)
-	if other != nil {
+	other := dao.GetNailByName(param.Name)
+	if other != nil && other.Id != param.Id {
 		return errcode.ExsistData
 	}
-	if err := dao.UpdateNail(data.Id, status, name, color); err != nil {
+	if err := dao.UpdateNail(param); err != nil {
 		return errcode.UpdateError
 	}
 	go s.GetAll(true)
@@ -67,20 +68,20 @@ func (s *nailService) Update(id, status int, name, color string) *errcode.ErrCod
 }
 
 // if real == 1 then delete from database
-func (s *nailService) Delete(id, real int) *errcode.ErrCode {
+func (s *nailService) Delete(param *vo.NailVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetNailById(id)
+	data := dao.GetNailById(param.Id)
 	if data == nil {
 		return errcode.NoExsistData
 	}
-	if real == 1 {
+	if param.Real == common.ONE {
 		if err := dao.DeleteNailById(data.Id); err != nil {
 			return errcode.DeleteError
 		}
 		go s.GetAll(true)
 		return errcode.Success
 	}
-	if err := dao.UpdateNail(data.Id, common.TWO, data.Name, data.Color); err != nil {
+	if err := dao.UpdateNail(param); err != nil {
 		return errcode.UpdateError
 	}
 	go s.GetAll(true)

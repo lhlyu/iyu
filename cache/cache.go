@@ -49,9 +49,7 @@ func (c *cache) getTimestamp() string {
 func (c *cache) ClearCache(key string) {
 	if c.hasRedis() {
 		keys := common.Redis.Keys(key).Val()
-		for _, k := range keys {
-			common.Redis.Del(k)
-		}
+		common.Redis.Del(keys...)
 	}
 }
 

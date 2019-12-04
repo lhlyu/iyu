@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/lhlyu/iyu/cache"
-	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
 	"github.com/lhlyu/iyu/service/bo"
@@ -36,30 +36,30 @@ func (*tagService) GetAll(reload bool) *errcode.ErrCode {
 	return errcode.Success.WithData(tags)
 }
 
-func (s *tagService) Insert(name string) *errcode.ErrCode {
+func (s *tagService) Insert(param *vo.TagVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetTagByName(0, name)
+	data := dao.GetTagByName(param.Name)
 	if data != nil {
 		return errcode.ExsistData
 	}
-	if err := dao.InsertTag(name); err != nil {
+	if err := dao.InsertTag(param); err != nil {
 		return errcode.InsertError
 	}
 	go s.GetAll(true)
 	return errcode.Success
 }
 
-func (s *tagService) Update(id, status int, name string) *errcode.ErrCode {
+func (s *tagService) Update(param *vo.TagVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetTagById(id)
+	data := dao.GetTagById(param.Id)
 	if data == nil {
 		return errcode.NoExsistData
 	}
-	other := dao.GetTagByName(id, name)
-	if other != nil {
+	other := dao.GetTagByName(param.Name)
+	if other != nil && other.Id != param.Id {
 		return errcode.ExsistData
 	}
-	if err := dao.UpdateTag(data.Id, status, name); err != nil {
+	if err := dao.UpdateTag(param); err != nil {
 		return errcode.UpdateError
 	}
 	go s.GetAll(true)
@@ -67,20 +67,20 @@ func (s *tagService) Update(id, status int, name string) *errcode.ErrCode {
 }
 
 // if real == 1 then delete from database
-func (s *tagService) Delete(id, real int) *errcode.ErrCode {
+func (s *tagService) Delete(param *vo.TagVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetTagById(id)
+	data := dao.GetTagById(param.Id)
 	if data == nil {
 		return errcode.NoExsistData
 	}
-	if real == 1 {
+	if param.Real == 1 {
 		if err := dao.DeleteTagById(data.Id); err != nil {
 			return errcode.DeleteError
 		}
 		go s.GetAll(true)
 		return errcode.Success
 	}
-	if err := dao.UpdateTag(data.Id, common.TWO, data.Name); err != nil {
+	if err := dao.UpdateTag(param); err != nil {
 		return errcode.UpdateError
 	}
 	go s.GetAll(true)

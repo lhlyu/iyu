@@ -47,7 +47,7 @@ func (*quantaService) GetAll(page *common.Page, reload bool) *errcode.ErrCode {
 
 func (s *quantaService) Insert(param *vo.QuantaVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetQuantaByKey(0, param.Key)
+	data := dao.GetQuantaByKey(param.Key)
 	if data != nil {
 		return errcode.ExsistData
 	}
@@ -70,8 +70,8 @@ func (s *quantaService) Update(param *vo.QuantaVo) *errcode.ErrCode {
 	if data == nil {
 		return errcode.NoExsistData
 	}
-	other := dao.GetQuantaByKey(param.Id, param.Key)
-	if other != nil {
+	other := dao.GetQuantaByKey(param.Key)
+	if other != nil && other.Id != param.Id {
 		return errcode.ExsistData
 	}
 	p := &po.YuQuanta{

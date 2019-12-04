@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/repository/po"
 )
 
@@ -17,10 +18,10 @@ func (d *dao) GetNailAll() []*po.YuNail {
 }
 
 // get nail by name
-func (d *dao) GetNailByName(id int, name string) *po.YuNail {
-	sql := "SELECT * FROM yu_nail WHERE `name` = ? and id <> ? limit 1"
+func (d *dao) GetNailByName(name string) *po.YuNail {
+	sql := "SELECT * FROM yu_nail WHERE `name` = ? limit 1"
 	value := &po.YuNail{}
-	if err := common.DB.Get(value, sql, name, id); err != nil {
+	if err := common.DB.Get(value, sql, name); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}
@@ -38,9 +39,9 @@ func (d *dao) GetNailById(id int) *po.YuNail {
 }
 
 // update nail
-func (d *dao) UpdateNail(id, status int, name, color string) error {
+func (d *dao) UpdateNail(param *vo.NailVo) error {
 	sql := "UPDATE yu_nail SET is_delete=?,`name` = ?,color = ?,updated_at = NOW() WHERE id = ?"
-	if _, err := common.DB.Exec(sql, status, name, color, id); err != nil {
+	if _, err := common.DB.Exec(sql, param.IsDelete, param.Name, param.Color, param.Id); err != nil {
 		common.Ylog.Debug(err)
 		return err
 	}
@@ -58,9 +59,9 @@ func (d *dao) DeleteNailById(id int) error {
 }
 
 // add nail
-func (d *dao) InsertNail(name, color string) error {
+func (d *dao) InsertNail(param *vo.NailVo) error {
 	sql := "INSERT INTO yu_nail(`name`,color) VALUES(?)"
-	if _, err := common.DB.Exec(sql, name, color); err != nil {
+	if _, err := common.DB.Exec(sql, param.Name, param.Color); err != nil {
 		common.Ylog.Debug(err)
 		return err
 	}

@@ -1,6 +1,8 @@
 package module
 
 import (
+	"github.com/lhlyu/iyu/cache"
+	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/service"
 	"log"
 	"time"
@@ -18,11 +20,9 @@ func (initiate) SetUp() {
 	log.Println("init initiate module ->")
 	// 初始化数据
 
-	// clear all cache
-	//che := cache.NewCache()
-	//keys := che.JoinSep(common.Cfg.GetString("redis_key.iyu"), "*")
-	//che.ClearCache(keys)
-	// init data
+	che := cache.NewCache()
+	keys := che.JoinSep(common.Cfg.GetString("redis_key.iyu"), "*")
+	che.ClearCache(keys)
 
 	go loadCache()
 }

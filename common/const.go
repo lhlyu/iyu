@@ -6,6 +6,12 @@ const (
 	TWO
 )
 
+const (
+	_         = iota
+	UNDELETED // 未删除
+	DELETED   // 已删除
+)
+
 // action kind
 const (
 	KIND_GLOBAL = iota
@@ -31,3 +37,5 @@ const (
 )
 
 const ADMIN = "admin"
+
+const ITV = 3600 * 24
