@@ -41,7 +41,7 @@ func (d *dao) GetArticleCount(param *vo.ArticleParam) (int, error) {
 }
 
 // 查询
-func (d *dao) QueryArticles(param *vo.ArticleParam, page *common.Page) ([]int, error) {
+func (d *dao) QueryArticlePage(param *vo.ArticleParam, page *common.Page) ([]int, error) {
 	sql := `SELECT DISTINCT a.id FROM yu_article a LEFT JOIN yu_article_tag t ON t.article_id = a.id WHERE 1=1`
 	var params []interface{}
 	if param.CategoryId > 0 {
@@ -75,58 +75,29 @@ func (d *dao) QueryArticles(param *vo.ArticleParam, page *common.Page) ([]int, e
 	return result, nil
 }
 
-// query by kind
-func (d *dao) QueryArticlesByKind(kind int) ([]int, error) {
-	sql := `SELECT id FROM yu_article WHERE kind = ?`
-	var result []int
-	if err := common.DB.Select(&result, sql, kind); err != nil {
-		common.Ylog.Debug(err)
-		return nil, err
-	}
-	return result, nil
-}
-
-// 查询All
-func (d *dao) QueryAllArticle(ids ...int) ([]int, error) {
-	sql := `SELECT id FROM yu_article WHERE 1=1 `
-	var params []interface{}
-	if len(ids) > 0 {
-		sql += " and id in (%s)"
-		marks := d.createQuestionMarks(len(ids))
-		params = d.intConvertToInterface(ids)
-		sql = fmt.Sprintf(sql, marks)
-	}
-	var result []int
-	if err := common.DB.Select(&result, sql, params...); err != nil {
-		common.Ylog.Debug(err)
-		return nil, err
-	}
-	return result, nil
-}
-
 // 插入
-func (d *dao) InsertArticle(article *po.YuArticle, articleTags []int) error {
+func (d *dao) InsertArticle(article *vo.ArticleVo) (int, error) {
 	sql1 := "INSERT INTO yu_article(user_id,wraper,title,content,is_top,category_id,nail_id,kind,is_delete,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,NOW(),NOW());"
 	sql2 := "INSERT INTO yu_article_tag(article_id,tag_id)"
 	tx, _ := common.DB.Beginx()
-	rs, err := tx.Exec(sql1, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsDelete, article.CreatedAt, article.UpdatedAt)
+	rs, err := tx.Exec(sql1, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsDelete)
 	if err != nil {
 		common.Ylog.Debug(err)
 		tx.Rollback()
-		return nil
+		return 0, nil
 	}
 	id, err := rs.LastInsertId()
 	if err != nil {
 		common.Ylog.Debug(err)
 		tx.Rollback()
-		return nil
+		return 0, nil
 	}
-	if len(articleTags) == 0 {
-		return nil
+	if len(article.TagArr) == 0 {
+		return 0, nil
 	}
 	article.Id = int(id)
 	var valueArr [][]interface{}
-	for _, v := range articleTags {
+	for _, v := range article.TagArr {
 		var values []interface{}
 		values = append(values, article.Id, v)
 		valueArr = append(valueArr, values)
@@ -137,18 +108,18 @@ func (d *dao) InsertArticle(article *po.YuArticle, articleTags []int) error {
 	if err != nil {
 		common.Ylog.Debug(err)
 		tx.Rollback()
-		return nil
+		return 0, nil
 	}
 	if err = tx.Commit(); err != nil {
 		common.Ylog.Debug(err)
 		tx.Rollback()
-		return nil
+		return 0, nil
 	}
-	return nil
+	return int(id), nil
 }
 
 // 获取单篇
-func (d *dao) GetArticle(id int) (*po.YuArticle, error) {
+func (d *dao) GetArticleById(id int) (*po.YuArticle, error) {
 	sql := "select * from yu_article where id = ?"
 	article := &po.YuArticle{}
 	if err := common.DB.Get(article, sql, id); err != nil {
@@ -159,10 +130,17 @@ func (d *dao) GetArticle(id int) (*po.YuArticle, error) {
 }
 
 // 获取标签
-func (d *dao) GetArticleTags(id int) ([]*po.YuArticleTag, error) {
-	sql := "select * from yu_article_tag where article_id = ? AND is_delete = 1"
-	var articleTags []*po.YuArticleTag
-	if err := common.DB.Select(&articleTags, sql, id); err != nil {
+func (d *dao) GetArticleTags(ids ...int) ([]*po.YuArticleTagV2, error) {
+	sql := "SELECT article_id,GROUP_CONCAT(tag_id) as tags FROM yu_article_tag WHERE is_delete = 1"
+	if len(ids) > 0 {
+		sql += " AND article_id IN (%s)"
+		marks := d.createQuestionMarks(len(ids))
+		sql = fmt.Sprintf(sql, marks)
+	}
+	sql += " GROUP BY article_id"
+	params := d.intConvertToInterface(ids)
+	var articleTags []*po.YuArticleTagV2
+	if err := common.DB.Select(&articleTags, sql, params...); err != nil {
 		common.Ylog.Debug(err)
 		return nil, err
 	}
@@ -170,10 +148,17 @@ func (d *dao) GetArticleTags(id int) ([]*po.YuArticleTag, error) {
 }
 
 // 获取统计数据
-func (d *dao) GetArticleStat(id int) ([]*po.Stat, error) {
-	sql := "SELECT `action`,COUNT(`action`) number FROM yu_record  where business_id = ? and business_kind = 1 GROUP BY `action`"
+func (d *dao) GetArticleStat(ids ...int) ([]*po.Stat, error) {
+	sql := "SELECT business_id,`action`,COUNT(`action`) number FROM yu_record WHERE business_kind = 1"
+	if len(ids) > 0 {
+		sql += " AND business_id IN (%v)"
+		marks := d.createQuestionMarks(len(ids))
+		sql = fmt.Sprintf(sql, marks)
+	}
+	sql += " GROUP BY business_id,`action` ORDER BY business_id,`action`"
+	params := d.intConvertToInterface(ids)
 	var stats []*po.Stat
-	if err := common.DB.Select(&stats, sql, id); err != nil {
+	if err := common.DB.Select(&stats, sql, params...); err != nil {
 		common.Ylog.Debug(err)
 		return nil, err
 	}
@@ -234,4 +219,21 @@ func (d *dao) DeleteArticle(real bool, ids ...int) error {
 		return err
 	}
 	return nil
+}
+
+func (d *dao) QueryArticle(ids ...int) ([]*po.YuArticle, error) {
+	sql := `SELECT * FROM yu_article WHERE 1=1 `
+	var params []interface{}
+	if len(ids) > 0 {
+		sql += " and id in (%s)"
+		marks := d.createQuestionMarks(len(ids))
+		params = d.intConvertToInterface(ids)
+		sql = fmt.Sprintf(sql, marks)
+	}
+	var result []*po.YuArticle
+	if err := common.DB.Select(&result, sql, params...); err != nil {
+		common.Ylog.Debug(err)
+		return nil, err
+	}
+	return result, nil
 }

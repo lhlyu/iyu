@@ -2,10 +2,11 @@ package service
 
 import (
 	"github.com/lhlyu/iyu/cache"
-	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
 	"github.com/lhlyu/iyu/service/bo"
+	"github.com/lhlyu/iyu/util"
 )
 
 type tagService struct {
@@ -15,74 +16,54 @@ func NewTagService() *tagService {
 	return &tagService{}
 }
 
-// get all tags
-func (*tagService) GetAll(reload bool) *errcode.ErrCode {
+func (s *tagService) Query(reload bool, id ...int) *errcode.ErrCode {
 	c := cache.NewCache()
-	var tags []*bo.Tag
+	var values []*bo.Tag
 	if !reload {
-		tags = c.GetTagAll()
+		values = c.GetTag(id...)
 	}
-	if len(tags) != 0 {
-		return errcode.Success.WithData(tags)
+	if len(values) > 0 {
+		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().GetTagAll()
+	datas := repository.NewDao().QueryTag(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
 	for _, v := range datas {
-		tags = append(tags, &bo.Tag{v.Id, v.Name, v.IsDelete})
+		values = append(values, &bo.Tag{v.Id, v.Name, v.IsDelete})
 	}
-	go c.LoadTags(tags...)
-	return errcode.Success.WithData(tags)
+	go c.SetTag(values...)
+	return errcode.Success.WithData(values)
 }
 
-func (s *tagService) Insert(name string) *errcode.ErrCode {
+// add update
+func (s *tagService) Edit(param *vo.TagVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetTagByName(0, name)
-	if data != nil {
-		return errcode.ExsistData
-	}
-	if err := dao.InsertTag(name); err != nil {
-		return errcode.InsertError
-	}
-	go s.GetAll(true)
-	return errcode.Success
-}
-
-func (s *tagService) Update(id, status int, name string) *errcode.ErrCode {
-	dao := repository.NewDao()
-	data := dao.GetTagById(id)
-	if data == nil {
-		return errcode.NoExsistData
-	}
-	other := dao.GetTagByName(id, name)
-	if other != nil {
-		return errcode.ExsistData
-	}
-	if err := dao.UpdateTag(data.Id, status, name); err != nil {
-		return errcode.UpdateError
-	}
-	go s.GetAll(true)
-	return errcode.Success
-}
-
-// if real == 1 then delete from database
-func (s *tagService) Delete(id, real int) *errcode.ErrCode {
-	dao := repository.NewDao()
-	data := dao.GetTagById(id)
-	if data == nil {
-		return errcode.NoExsistData
-	}
-	if real == 1 {
-		if err := dao.DeleteTagById(data.Id); err != nil {
-			return errcode.DeleteError
+	if param.Id == 0 {
+		data := dao.GetTagByName(param.Name)
+		if data != nil {
+			return errcode.ExsistData
 		}
-		go s.GetAll(true)
+		id, err := dao.InsertTag(param)
+		if err != nil {
+			return errcode.InsertError
+		}
+		go s.Query(true, id)
 		return errcode.Success
 	}
-	if err := dao.UpdateTag(data.Id, common.TWO, data.Name); err != nil {
+	data := dao.GetTagById(param.Id)
+	if data == nil {
+		return errcode.NoExsistData
+	}
+	other := dao.GetTagByName(param.Name)
+	if other != nil && other.Id != data.Id {
+		return errcode.ExsistData
+	}
+	util.CompareIntSet(&data.IsDelete, &param.IsDelete)
+	util.CompareStrSet(&data.Name, &param.Name)
+	if err := dao.UpdateTag(data); err != nil {
 		return errcode.UpdateError
 	}
-	go s.GetAll(true)
+	go s.Query(true, data.Id)
 	return errcode.Success
 }

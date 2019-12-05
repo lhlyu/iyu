@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/service"
 )
@@ -12,7 +13,7 @@ type categoryController struct {
 
 func (*categoryController) GetCategoryAll(ctx iris.Context) {
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.GetAll(false))
+	ctx.JSON(svc.Query(false))
 }
 
 func (c *categoryController) UpdateCategory(ctx iris.Context) {
@@ -25,15 +26,15 @@ func (c *categoryController) UpdateCategory(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
-	if err := c.checkUInt(param.Status); err != nil {
-		param.Status = 1
+	if err := c.checkUInt(param.IsDelete); err != nil {
+		param.IsDelete = common.UNDELETED
 	}
 	if err := c.checkEmpty(param.Name); err != nil {
 		ctx.JSON(err)
 		return
 	}
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.Update(param.Id, param.Status, param.Name))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *categoryController) InsertCategory(ctx iris.Context) {
@@ -47,7 +48,7 @@ func (c *categoryController) InsertCategory(ctx iris.Context) {
 		return
 	}
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.Insert(param.Name))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *categoryController) DeleteCategory(ctx iris.Context) {
@@ -60,6 +61,7 @@ func (c *categoryController) DeleteCategory(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
+	param.IsDelete = common.DELETED
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.Delete(param.Id, param.Real))
+	ctx.JSON(svc.Edit(param))
 }

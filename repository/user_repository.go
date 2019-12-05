@@ -1,10 +1,27 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/repository/po"
 )
+
+func (d *dao) QueryUser(id ...int) []*po.YuUser {
+	sql := "SELECT * FROM yu_user"
+	var params []interface{}
+	if len(id) > 0 {
+		marks := d.createQuestionMarks(len(id))
+		params = d.intConvertToInterface(id)
+		sql += fmt.Sprintf(" where id in (%s)", marks)
+	}
+	var values []*po.YuUser
+	if err := common.DB.Select(&values, sql, params...); err != nil {
+		common.Ylog.Debug(err)
+		return nil
+	}
+	return values
+}
 
 func (*dao) InsertUser(user *vo.UserEditParam) (int, error) {
 	sql := "INSERT INTO yu_user (third_id,`from`,avatar_url,user_url,user_name,bio,ip) VALUES(?,?,?,?,?,?,?)"
@@ -60,8 +77,8 @@ func (*dao) GetUsersCount(param *vo.UserParam) (int, error) {
 	return result, nil
 }
 
-func (*dao) QueryUser(param *vo.UserParam, page *common.Page) ([]*po.YuUser, error) {
-	sql := "SELECT * FROM yu_user WHERE 1 = 1"
+func (*dao) QueryUserPage(param *vo.UserParam, page *common.Page) ([]int, error) {
+	sql := "SELECT id FROM yu_user WHERE 1 = 1"
 	var params []interface{}
 	if param.KeyWord != "" {
 		keyWord := "%" + param.KeyWord + "%"
@@ -74,7 +91,7 @@ func (*dao) QueryUser(param *vo.UserParam, page *common.Page) ([]*po.YuUser, err
 	}
 	sql += " order by `status`,created_at desc limit ?,?"
 	params = append(params, page.StartRow, page.PageSize)
-	var result []*po.YuUser
+	var result []int
 	if err := common.DB.Select(&result, sql, params...); err != nil {
 		common.Ylog.Debug(err)
 		return nil, err

@@ -5,6 +5,7 @@ env: prod
 
 jwt:
   secret: 3.14159265358979323
+  itv: 86400 # jwt有效时长，单位秒
 
 server:
   host: localhost
@@ -25,13 +26,14 @@ redis:
   idleTimeout: 60
 
 redis_key:
-  iyu: "iyu"
+  iyu: "iyu:"
   tag: "iyu:tag"
   nail: "iyu:nail"
   category: "iyu:category"
   quanta: "iyu:quanta"
   article: "iyu:article"
   user: "iyu:user"
+  token: "iyu:token:"
 
 db:
   db_wr:

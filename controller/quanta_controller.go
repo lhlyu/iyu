@@ -18,7 +18,7 @@ func (c *quantaController) GetQuantaAll(ctx iris.Context) {
 		return
 	}
 	svc := service.NewQuantaService()
-	ctx.JSON(svc.GetAll(page, false))
+	ctx.JSON(svc.QueryPage(page))
 }
 
 func (c *quantaController) UpdateQuanta(ctx iris.Context) {
@@ -43,7 +43,7 @@ func (c *quantaController) UpdateQuanta(ctx iris.Context) {
 		param.IsEnable = 1
 	}
 	svc := service.NewQuantaService()
-	ctx.JSON(svc.Update(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *quantaController) InsertQuanta(ctx iris.Context) {
@@ -64,7 +64,7 @@ func (c *quantaController) InsertQuanta(ctx iris.Context) {
 		param.IsEnable = 1
 	}
 	svc := service.NewQuantaService()
-	ctx.JSON(svc.Insert(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *quantaController) DeleteQuanta(ctx iris.Context) {
@@ -77,6 +77,7 @@ func (c *quantaController) DeleteQuanta(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
+	param.IsEnable = common.DELETED
 	svc := service.NewQuantaService()
-	ctx.JSON(svc.Delete(param))
+	ctx.JSON(svc.Edit(param))
 }

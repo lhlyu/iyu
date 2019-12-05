@@ -6,6 +6,7 @@ import (
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/service"
+	"github.com/lhlyu/iyu/service/bo"
 )
 
 type articleController struct {
@@ -25,7 +26,7 @@ func (c *articleController) QueryArticles(ctx iris.Context) {
 		article.IsDelete = 1
 	}
 	svc := service.NewArticleService()
-	ctx.JSON(svc.QueryArticles(article))
+	ctx.JSON(svc.QueryArticlePage(article))
 }
 
 func (c *articleController) GetArticleById(ctx iris.Context) {
@@ -38,7 +39,13 @@ func (c *articleController) GetArticleById(ctx iris.Context) {
 		go c.Record(ctx, id, common.KIND_ARTICLE, common.ACTION_VISIT)
 	}
 	svc := service.NewArticleService()
-	ctx.JSON(svc.GetById(id, false))
+	result := svc.Query(false, id)
+	if !result.IsSuccess() {
+		ctx.JSON(result)
+		return
+	}
+	datas := result.Data.([]*bo.Article)
+	ctx.JSON(errcode.Success.WithData(datas[0]))
 }
 
 func (c *articleController) InsertArticle(ctx iris.Context) {
@@ -48,7 +55,7 @@ func (c *articleController) InsertArticle(ctx iris.Context) {
 		return
 	}
 	svc := service.NewArticleService()
-	ctx.JSON(svc.Insert(article))
+	ctx.JSON(svc.Edit(article))
 }
 
 func (c *articleController) UpdateArticle(ctx iris.Context) {
@@ -58,15 +65,16 @@ func (c *articleController) UpdateArticle(ctx iris.Context) {
 		return
 	}
 	svc := service.NewArticleService()
-	ctx.JSON(svc.Update(article))
+	ctx.JSON(svc.Edit(article))
 }
 
 func (c *articleController) DeleteArticle(ctx iris.Context) {
-	article := &vo.ArticleDeleteParam{}
+	article := &vo.ArticleVo{}
 	if err := c.getParams(ctx, article, false); err != nil {
 		ctx.JSON(err)
 		return
 	}
+	article.IsDelete = common.DELETED
 	svc := service.NewArticleService()
-	ctx.JSON(svc.Delete(article))
+	ctx.JSON(svc.Edit(article))
 }

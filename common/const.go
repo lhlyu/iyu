@@ -6,6 +6,12 @@ const (
 	TWO
 )
 
+const (
+	_         = iota
+	UNDELETED // 未删除
+	DELETED   // 已删除
+)
+
 // action kind
 const (
 	KIND_GLOBAL = iota
@@ -30,4 +36,8 @@ const (
 	ARTICLE_NOTE
 )
 
-const ADMIN = "admin"
+const (
+	ADMIN = "admin"
+	COLOR = "#000000"
+	ITV   = 3600 * 24
+)

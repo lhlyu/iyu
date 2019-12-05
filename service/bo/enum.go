@@ -2,8 +2,11 @@ package bo
 
 // action
 const (
-	FIRE = iota + 1
+	NONE = iota
+	FIRE
 	CMNT
 	LIKE
 	UNLIKE
 )
+
+var Stat = []int{NONE, FIRE, CMNT, LIKE, UNLIKE}

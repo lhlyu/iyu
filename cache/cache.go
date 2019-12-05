@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/util"
 	"log"
@@ -11,8 +10,9 @@ import (
 )
 
 const (
-	_MAP  = ":map"
-	_LIST = ":list"
+	_MAP   = ":map"
+	_LIST  = ":list"
+	_MUTEX = ":mutex"
 )
 
 const (
@@ -49,14 +49,12 @@ func (c *cache) getTimestamp() string {
 func (c *cache) ClearCache(key string) {
 	if c.hasRedis() {
 		keys := common.Redis.Keys(key).Val()
-		for _, k := range keys {
-			common.Redis.Del(k)
-		}
+		common.Redis.Del(keys...)
 	}
 }
 
 func (c *cache) mutexHandler(key string, f func()) {
-	keyMutex := key + ":mutex"
+	keyMutex := key + _MUTEX
 	if rs, _ := common.Redis.SetNX(keyMutex, 1, time.Second*5).Result(); !rs {
 		return
 	}
@@ -64,102 +62,40 @@ func (c *cache) mutexHandler(key string, f func()) {
 	common.Redis.Del(keyMutex)
 }
 
-// load data to map and list
-func (c *cache) LoadMapAndList(keyName string, vm map[string]interface{}) {
-	if c.hasRedis() {
-		key := common.Cfg.GetString(keyName)
-		if key == "" {
-			return
-		}
-		mapKey := key + _MAP
-		targetMapKey := mapKey + c.getTimestamp()
-		listKey := key + _LIST
-		targetListKey := listKey + c.getTimestamp()
-		c.mutexHandler(mapKey, func() {
-			var arr []interface{}
-			for k, v := range vm {
-				value := util.ObjToJsonStr(v)
-				common.Redis.HSet(targetMapKey, k, value)
-				arr = append(arr, value)
-			}
-			common.Redis.Expire(targetMapKey, _ONE_WEEK)
-			oldTargetMapKey := common.Redis.Get(mapKey).Val()
-			common.Redis.Set(mapKey, targetMapKey, _ONE_WEEK)
-			if oldTargetMapKey != "" {
-				common.Redis.Del(oldTargetMapKey)
-			}
-			if len(arr) > 0 {
-				common.Redis.RPush(targetListKey, arr...)
-			}
-			oldTargetListKey := common.Redis.Get(listKey).Val()
-			common.Redis.Set(listKey, targetListKey, _ONE_WEEK)
-			common.Redis.Expire(targetListKey, _ONE_WEEK)
-			if oldTargetListKey != "" {
-				common.Redis.Del(oldTargetListKey)
-			}
-		})
+func (c cache) setMap(keyName string, vm map[string]interface{}, duration time.Duration) {
+	key := common.Cfg.GetString(keyName)
+	if key == "" {
+		return
 	}
+	mapKey := key + _MAP
+	c.mutexHandler(mapKey, func() {
+		common.Redis.HMSet(mapKey, vm)
+		common.Redis.Expire(mapKey, duration)
+	})
 }
 
-// get data from list
-func (c *cache) GetListData(keyName string) []string {
-	if c.hasRedis() {
-		key := common.Cfg.GetString(keyName)
-		if key == "" {
-			return nil
-		}
-		listKey := key + _LIST
-		targetListKey := common.Redis.Get(listKey).Val()
-		if targetListKey == "" {
-			return nil
-		}
-		return common.Redis.LRange(targetListKey, 0, -1).Val()
+func (c cache) getMap(keyName string, field ...int) []string {
+	key := common.Cfg.GetString(keyName)
+	if key == "" {
+		return nil
 	}
-	return nil
-}
-
-func (c *cache) GetMapData(keyName string, fields ...string) []string {
-	if c.hasRedis() {
-		key := common.Cfg.GetString(keyName)
-		if key == "" {
-			return nil
-		}
-		mapKey := key + _MAP
-		targetMapKey := common.Redis.Get(mapKey).Val()
-		if targetMapKey == "" {
-			return nil
-		}
-		interArr := common.Redis.HMGet(targetMapKey, fields...).Val()
-		var strArr []string
-		for _, v := range interArr {
-			if v == nil {
-				continue
+	var arr []string
+	mapKey := key + _MAP
+	c.mutexHandler(mapKey, func() {
+		if len(field) == 0 {
+			m := common.Redis.HGetAll(mapKey).Val()
+			for _, v := range m {
+				arr = append(arr, v)
 			}
-			strArr = append(strArr, fmt.Sprint(v))
+		} else {
+			m := common.Redis.HMGet(mapKey, util.IntSlinceToStringSlince(field)...).Val()
+			for _, v := range m {
+				s, ok := v.(string)
+				if ok {
+					arr = append(arr, s)
+				}
+			}
 		}
-		return strArr
-	}
-	return nil
-}
-
-// get data from list page
-func (c *cache) GetListDataPage(keyName string, page *common.Page) []string {
-	if c.hasRedis() {
-		key := common.Cfg.GetString(keyName)
-		if key == "" {
-			return nil
-		}
-		listKey := key + _LIST
-		targetListKey := common.Redis.Get(listKey).Val()
-		if targetListKey == "" {
-			return nil
-		}
-		total := common.Redis.LLen(targetListKey).Val()
-		if total == 0 {
-			return nil
-		}
-		page.SetTotal(int(total))
-		return common.Redis.LRange(targetListKey, int64(page.StartRow), int64(page.StopRow)).Val()
-	}
-	return nil
+	})
+	return arr
 }

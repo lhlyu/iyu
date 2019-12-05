@@ -2,10 +2,11 @@ package service
 
 import (
 	"github.com/lhlyu/iyu/cache"
-	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
 	"github.com/lhlyu/iyu/service/bo"
+	"github.com/lhlyu/iyu/util"
 )
 
 type nailService struct {
@@ -15,74 +16,55 @@ func NewNailService() *nailService {
 	return &nailService{}
 }
 
-// get all nails
-func (*nailService) GetAll(reload bool) *errcode.ErrCode {
+func (s *nailService) Query(reload bool, id ...int) *errcode.ErrCode {
 	c := cache.NewCache()
-	var nails []*bo.Nail
+	var values []*bo.Nail
 	if !reload {
-		nails = c.GetNailAll()
+		values = c.GetNail(id...)
 	}
-	if len(nails) != 0 {
-		return errcode.Success.WithData(nails)
+	if len(values) > 0 {
+		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().GetNailAll()
+	datas := repository.NewDao().QueryNail(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
 	for _, v := range datas {
-		nails = append(nails, &bo.Nail{v.Id, v.Name, v.Color, v.IsDelete})
+		values = append(values, &bo.Nail{v.Id, v.Name, v.Color, v.IsDelete})
 	}
-	go c.LoadNails(nails...)
-	return errcode.Success.WithData(nails)
+	go c.SetNail(values...)
+	return errcode.Success.WithData(values)
 }
 
-func (s *nailService) Insert(name, color string) *errcode.ErrCode {
+// add update
+func (s *nailService) Edit(param *vo.NailVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetNailByName(0, name)
-	if data != nil {
-		return errcode.ExsistData
-	}
-	if err := dao.InsertNail(name, color); err != nil {
-		return errcode.InsertError
-	}
-	go s.GetAll(true)
-	return errcode.Success
-}
-
-func (s *nailService) Update(id, status int, name, color string) *errcode.ErrCode {
-	dao := repository.NewDao()
-	data := dao.GetNailById(id)
-	if data == nil {
-		return errcode.NoExsistData
-	}
-	other := dao.GetNailByName(id, name)
-	if other != nil {
-		return errcode.ExsistData
-	}
-	if err := dao.UpdateNail(data.Id, status, name, color); err != nil {
-		return errcode.UpdateError
-	}
-	go s.GetAll(true)
-	return errcode.Success
-}
-
-// if real == 1 then delete from database
-func (s *nailService) Delete(id, real int) *errcode.ErrCode {
-	dao := repository.NewDao()
-	data := dao.GetNailById(id)
-	if data == nil {
-		return errcode.NoExsistData
-	}
-	if real == 1 {
-		if err := dao.DeleteNailById(data.Id); err != nil {
-			return errcode.DeleteError
+	if param.Id == 0 {
+		data := dao.GetNailByName(param.Name)
+		if data != nil {
+			return errcode.ExsistData
 		}
-		go s.GetAll(true)
+		id, err := dao.InsertNail(param)
+		if err != nil {
+			return errcode.InsertError
+		}
+		go s.Query(true, id)
 		return errcode.Success
 	}
-	if err := dao.UpdateNail(data.Id, common.TWO, data.Name, data.Color); err != nil {
+	data := dao.GetNailById(param.Id)
+	if data == nil {
+		return errcode.NoExsistData
+	}
+	other := dao.GetNailByName(param.Name)
+	if other != nil && other.Id != data.Id {
+		return errcode.ExsistData
+	}
+	util.CompareIntSet(&data.IsDelete, &param.IsDelete)
+	util.CompareStrSet(&data.Name, &param.Name)
+	util.CompareStrSet(&data.Color, &param.Color)
+	if err := dao.UpdateNail(data); err != nil {
 		return errcode.UpdateError
 	}
-	go s.GetAll(true)
+	go s.Query(true, data.Id)
 	return errcode.Success
 }

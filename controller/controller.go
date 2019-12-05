@@ -50,13 +50,33 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 	return nil
 }
 
+/**
+jwt 通用
+iss: 签发者
+sub: 面向的用户
+aud: 接收方
+exp: 过期时间
+nbf: 生效时间
+iat: 签发时间
+jti: 唯一身份标识
+*/
+
 func (controller) getToken(user *common.XUser) string {
+	itv := common.Cfg.GetInt("jwt.itv")
+	if itv == 0 {
+		itv = common.ITV
+	}
 	m := make(map[string]interface{})
 	m[common.X_ID] = user.Id
 	m[common.X_ROLE] = user.Role
-	m["t"] = time.Now().Unix()
+	now := time.Now()
+	m["iat"] = now.Unix()
+	m["nbf"] = now.Unix()
+	m["exp"] = now.Add(time.Second * time.Duration(itv)).Unix()
+	m["iss"] = common.Cfg.GetString("author")
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
 	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
+	cache.NewCache().SetJwt(tokenString)
 	return tokenString
 }
 
