@@ -6,8 +6,8 @@ import (
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
-	"github.com/lhlyu/iyu/repository/po"
 	"github.com/lhlyu/iyu/service/bo"
+	"github.com/lhlyu/iyu/util"
 )
 
 type quantaService struct {
@@ -17,101 +17,67 @@ func NewQuantaService() *quantaService {
 	return &quantaService{}
 }
 
-// get all quantas
-func (*quantaService) GetAll(page *common.Page, reload bool) *errcode.ErrCode {
-	if page == nil {
-		page = common.NewPage(1, 10)
-	}
-	c := cache.NewCache()
-	var quantas []*bo.Quanta
-	if !reload {
-		quantas = c.GetQuantaPage(page)
-	}
-	if len(quantas) != 0 {
-		return errcode.Success.WithPage(page, quantas)
-	}
-	datas := repository.NewDao().GetQuantaAll()
-	total := len(datas)
-	if total == 0 {
+func (s *quantaService) QueryPage(page *common.Page) *errcode.ErrCode {
+	dao := repository.NewDao()
+	total := dao.QueryQuantaCount()
+	page.SetTotal(total)
+	datas := dao.QueryQuantaPage(page)
+	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
-	page.SetTotal(total)
-	var quantaAll []*bo.Quanta
+	return errcode.Success.WithPage(page, datas)
+}
+
+func (s *quantaService) Query(reload bool, id ...int) *errcode.ErrCode {
+	c := cache.NewCache()
+	var values []*bo.Quanta
+	if !reload {
+		values = c.GetQuanta(id...)
+	}
+	if len(values) > 0 {
+		return errcode.Success.WithData(values)
+	}
+	datas := repository.NewDao().QueryQuanta(id...)
+	if len(datas) == 0 {
+		return errcode.EmptyData
+	}
 	for _, v := range datas {
-		quantaAll = append(quantaAll, &bo.Quanta{v.Id, v.Key, v.Value, v.Desc, v.IsEnable})
+		values = append(values, &bo.Quanta{v.Id, v.Key, v.Value, v.Desc, v.IsEnable})
 	}
-	quantas = quantaAll[page.StartRow:page.StopRow]
-	go c.LoadQuantas(quantaAll...)
-	return errcode.Success.WithPage(page, quantas)
+	go c.SetQuanta(values...)
+	return errcode.Success.WithData(values)
 }
 
-func (s *quantaService) Insert(param *vo.QuantaVo) *errcode.ErrCode {
+// add update
+func (s *quantaService) Edit(param *vo.QuantaVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetQuantaByKey(param.Key)
-	if data != nil {
-		return errcode.ExsistData
+	if param.Id == 0 {
+		data := dao.GetQuantaByKey(param.Key)
+		if data != nil {
+			return errcode.ExsistData
+		}
+		id, err := dao.InsertQuanta(param)
+		if err != nil {
+			return errcode.InsertError
+		}
+		go s.Query(true, id)
+		return errcode.Success
 	}
-	p := &po.YuQuanta{
-		Key:      param.Key,
-		Value:    param.Value,
-		Desc:     param.Desc,
-		IsEnable: param.IsEnable,
-	}
-	if err := dao.InsertQuanta(p); err != nil {
-		return errcode.InsertError
-	}
-	go s.GetAll(nil, true)
-	return errcode.Success
-}
-
-func (s *quantaService) Update(param *vo.QuantaVo) *errcode.ErrCode {
-	dao := repository.NewDao()
 	data := dao.GetQuantaById(param.Id)
 	if data == nil {
 		return errcode.NoExsistData
 	}
 	other := dao.GetQuantaByKey(param.Key)
-	if other != nil && other.Id != param.Id {
+	if other != nil && other.Id != data.Id {
 		return errcode.ExsistData
 	}
-	p := &po.YuQuanta{
-		Id:       param.Id,
-		Key:      param.Key,
-		Value:    param.Value,
-		Desc:     param.Desc,
-		IsEnable: param.IsEnable,
-	}
-	if err := dao.UpdateQuanta(p); err != nil {
+	util.CompareIntSet(&data.IsEnable, &param.IsEnable)
+	util.CompareStrSet(&data.Key, &param.Key)
+	util.CompareStrSet(&data.Value, &param.Value)
+	util.CompareStrSet(&data.Desc, &param.Desc)
+	if err := dao.UpdateQuanta(data); err != nil {
 		return errcode.UpdateError
 	}
-	go s.GetAll(nil, true)
-	return errcode.Success
-}
-
-// if real == 1 then delete from database
-func (s *quantaService) Delete(param *vo.QuantaVo) *errcode.ErrCode {
-	dao := repository.NewDao()
-	data := dao.GetQuantaById(param.Id)
-	if data == nil {
-		return errcode.NoExsistData
-	}
-	if param.Real == 1 {
-		if err := dao.DeleteQuantaById(data.Id); err != nil {
-			return errcode.DeleteError
-		}
-		go s.GetAll(nil, true)
-		return errcode.Success
-	}
-	p := &po.YuQuanta{
-		Id:       param.Id,
-		Key:      data.Key,
-		Value:    data.Value,
-		Desc:     data.Desc,
-		IsEnable: common.TWO,
-	}
-	if err := dao.UpdateQuanta(p); err != nil {
-		return errcode.UpdateError
-	}
-	go s.GetAll(nil, true)
+	go s.Query(true, data.Id)
 	return errcode.Success
 }

@@ -14,6 +14,7 @@ type YuRecord struct {
 }
 
 type Stat struct {
-	Action int `db:"action"`
-	Number int `db:"number"`
+	BusinessId int `db:"business_id"`
+	Action     int `db:"action"`
+	Number     int `db:"number"`
 }

@@ -13,7 +13,7 @@ type nailController struct {
 
 func (*nailController) GetNailAll(ctx iris.Context) {
 	svc := service.NewNailService()
-	ctx.JSON(svc.GetAll(false))
+	ctx.JSON(svc.Query(false))
 }
 
 func (c *nailController) UpdateNail(ctx iris.Context) {
@@ -37,7 +37,7 @@ func (c *nailController) UpdateNail(ctx iris.Context) {
 		param.Color = common.COLOR
 	}
 	svc := service.NewNailService()
-	ctx.JSON(svc.Update(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *nailController) InsertNail(ctx iris.Context) {
@@ -54,7 +54,7 @@ func (c *nailController) InsertNail(ctx iris.Context) {
 		param.Color = common.COLOR
 	}
 	svc := service.NewNailService()
-	ctx.JSON(svc.Insert(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 // id real
@@ -70,5 +70,5 @@ func (c *nailController) DeleteNail(ctx iris.Context) {
 	}
 	param.IsDelete = common.DELETED
 	svc := service.NewNailService()
-	ctx.JSON(svc.Delete(param))
+	ctx.JSON(svc.Edit(param))
 }

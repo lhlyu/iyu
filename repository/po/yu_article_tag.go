@@ -10,3 +10,8 @@ type YuArticleTag struct {
 	CreatedAt time.Time `db:"created_at"` // 创建时间
 	UpdatedAt time.Time `db:"updated_at"` // 更新时间
 }
+
+type YuArticleTagV2 struct {
+	ArticleId int    `db:"article_id"`
+	TagIds    string `db:"tags"`
+}

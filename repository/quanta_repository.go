@@ -1,15 +1,43 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/repository/po"
 )
 
-// get all quantas
-func (d *dao) GetQuantaAll() []*po.YuQuanta {
-	sql := "SELECT * FROM yu_quanta ORDER BY is_enable,`key`,updated_at DESC,created_at DESC"
+func (d *dao) QueryQuanta(id ...int) []*po.YuQuanta {
+	sql := "SELECT * FROM yu_quanta"
+	var params []interface{}
+	if len(id) > 0 {
+		marks := d.createQuestionMarks(len(id))
+		params = d.intConvertToInterface(id)
+		sql += fmt.Sprintf(" where id in (%s)", marks)
+	}
+	sql += " ORDER BY is_enable,`key`"
 	var values []*po.YuQuanta
-	if err := common.DB.Select(&values, sql); err != nil {
+	if err := common.DB.Select(&values, sql, params...); err != nil {
+		common.Ylog.Debug(err)
+		return nil
+	}
+	return values
+}
+
+func (d *dao) QueryQuantaCount() int {
+	sql := "SELECT count(*) FROM yu_quanta ORDER BY is_enable,`key`"
+	var value int
+	if err := common.DB.Get(&value, sql); err != nil {
+		common.Ylog.Debug(err)
+		return 0
+	}
+	return value
+}
+
+func (d *dao) QueryQuantaPage(page *common.Page) []*po.YuQuanta {
+	sql := "SELECT * FROM yu_quanta ORDER BY is_enable,`key` limit ?,?"
+	var values []*po.YuQuanta
+	if err := common.DB.Select(&values, sql, page.StartRow, page.PageSize); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}
@@ -58,11 +86,13 @@ func (d *dao) DeleteQuantaById(id int) error {
 }
 
 // add quanta
-func (d *dao) InsertQuanta(p *po.YuQuanta) error {
+func (d *dao) InsertQuanta(p *vo.QuantaVo) (int, error) {
 	sql := "INSERT INTO yu_quanta(`key`,`value`,`desc`,is_enable) VALUES(?,?,?,?)"
-	if _, err := common.DB.Exec(sql, p.Key, p.Value, p.Desc, p.IsEnable); err != nil {
+	result, err := common.DB.Exec(sql, p.Key, p.Value, p.Desc, p.IsEnable)
+	if err != nil {
 		common.Ylog.Debug(err)
-		return err
+		return 0, err
 	}
-	return nil
+	id, _ := result.LastInsertId()
+	return int(id), nil
 }

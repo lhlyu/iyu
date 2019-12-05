@@ -13,7 +13,7 @@ type tagController struct {
 
 func (*tagController) GetTagAll(ctx iris.Context) {
 	svc := service.NewTagService()
-	ctx.JSON(svc.GetAll(false))
+	ctx.JSON(svc.Query(false))
 }
 
 func (c *tagController) UpdateTag(ctx iris.Context) {
@@ -34,7 +34,7 @@ func (c *tagController) UpdateTag(ctx iris.Context) {
 		return
 	}
 	svc := service.NewTagService()
-	ctx.JSON(svc.Update(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *tagController) InsertTag(ctx iris.Context) {
@@ -48,7 +48,7 @@ func (c *tagController) InsertTag(ctx iris.Context) {
 		return
 	}
 	svc := service.NewTagService()
-	ctx.JSON(svc.Insert(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *tagController) DeleteTag(ctx iris.Context) {
@@ -63,5 +63,5 @@ func (c *tagController) DeleteTag(ctx iris.Context) {
 	}
 	param.IsDelete = common.DELETED
 	svc := service.NewTagService()
-	ctx.JSON(svc.Delete(param))
+	ctx.JSON(svc.Edit(param))
 }

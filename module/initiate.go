@@ -30,15 +30,15 @@ func (initiate) SetUp() {
 func loadCache() {
 	time.AfterFunc(time.Second*5, func() {
 		log.Println("load nail datas ...")
-		service.NewNailService().GetAll(true)
+		service.NewNailService().Query(true)
 		log.Println("load category datas ...")
-		service.NewCategoryService().GetAll(true)
+		service.NewCategoryService().Query(true)
 		log.Println("load tag datas ...")
-		service.NewTagService().GetAll(true)
+		service.NewTagService().Query(true)
 		log.Println("load quanta datas ...")
-		service.NewQuantaService().GetAll(nil, true)
+		service.NewQuantaService().Query(true)
 		log.Println("load article datas ...")
-		service.NewArticleService().LoadArticles(nil)
+		service.NewArticleService().Query(true)
 	})
 }
 

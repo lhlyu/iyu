@@ -13,7 +13,7 @@ type categoryController struct {
 
 func (*categoryController) GetCategoryAll(ctx iris.Context) {
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.GetAll(false))
+	ctx.JSON(svc.Query(false))
 }
 
 func (c *categoryController) UpdateCategory(ctx iris.Context) {
@@ -34,7 +34,7 @@ func (c *categoryController) UpdateCategory(ctx iris.Context) {
 		return
 	}
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.Update(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *categoryController) InsertCategory(ctx iris.Context) {
@@ -48,7 +48,7 @@ func (c *categoryController) InsertCategory(ctx iris.Context) {
 		return
 	}
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.Insert(param))
+	ctx.JSON(svc.Edit(param))
 }
 
 func (c *categoryController) DeleteCategory(ctx iris.Context) {
@@ -63,5 +63,5 @@ func (c *categoryController) DeleteCategory(ctx iris.Context) {
 	}
 	param.IsDelete = common.DELETED
 	svc := service.NewCategoryService()
-	ctx.JSON(svc.Delete(param))
+	ctx.JSON(svc.Edit(param))
 }

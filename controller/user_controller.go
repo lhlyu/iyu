@@ -19,10 +19,15 @@ func (c *userController) Login(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
-	user := service.NewUserService().GetById(id).Data.(*bo.UserData)
+	result := service.NewUserService().Query(false, id)
+	if !result.IsSuccess() {
+		ctx.JSON(result)
+		return
+	}
+	users := result.Data.([]*bo.User)
 	xuser := &common.XUser{
-		Id:   user.Id,
-		Role: user.Role,
+		Id:   users[0].Id,
+		Role: users[0].Role,
 	}
 	token := c.getToken(xuser)
 	ctx.JSON(errcode.Success.WithData(token))
@@ -38,7 +43,7 @@ func (c *userController) UpdateUser(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
-	ctx.JSON(service.NewUserService().Update(param))
+	ctx.JSON(service.NewUserService().Edit(param))
 }
 
 func (c *userController) InsertUser(ctx iris.Context) {
@@ -47,7 +52,7 @@ func (c *userController) InsertUser(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
-	ctx.JSON(service.NewUserService().Insert(param))
+	ctx.JSON(service.NewUserService().Edit(param))
 }
 
 func (c *userController) QueryUser(ctx iris.Context) {
@@ -56,5 +61,5 @@ func (c *userController) QueryUser(ctx iris.Context) {
 		ctx.JSON(err)
 		return
 	}
-	ctx.JSON(service.NewUserService().Query(param))
+	ctx.JSON(service.NewUserService().QueryPage(param))
 }

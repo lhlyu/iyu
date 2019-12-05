@@ -17,125 +17,7 @@ func NewUserService() *userService {
 	return &userService{}
 }
 
-func (*userService) LoadUsers(id int) {
-	dao := repository.NewDao()
-	param := &vo.UserParam{
-		PageSize: 100,
-		PageNum:  1,
-		Id:       id,
-	}
-	total, err := dao.GetUsersCount(param)
-	if err != nil {
-		return
-	}
-	if total == 0 {
-		return
-	}
-	page := common.NewPage(param.PageNum, param.PageSize)
-	page.SetTotal(total)
-	for i := 0; i < page.PageMax; i++ {
-		param.PageNum = i
-		datas, err := dao.QueryUser(param, page)
-		if err != nil {
-			return
-		}
-		var result []*bo.UserData
-		for _, v := range datas {
-			updatedAt := v.UpdatedAt.Unix()
-			if updatedAt < 0 {
-				updatedAt = v.CreatedAt.Unix()
-			}
-			user := &bo.UserData{
-				Id:        v.Id,
-				Ip:        v.Ip,
-				Bio:       v.Bio,
-				Role:      v.Role,
-				ThirdId:   v.ThirdId,
-				From:      v.From,
-				Status:    v.Status,
-				AvatarUrl: v.AvatarUrl,
-				UserUrl:   v.UserUrl,
-				UserName:  v.UserName,
-				UpdatedAt: int(updatedAt),
-				CreatedAt: int(v.CreatedAt.Unix()),
-			}
-			result = append(result, user)
-		}
-		cache.NewCache().LoadUser(result)
-	}
-	return
-}
-
-func (s *userService) GetById(id int) *errcode.ErrCode {
-	che := cache.NewCache()
-	users := che.GetUsers(id)
-	if len(users) > 0 {
-		return errcode.Success.WithData(users[0])
-	}
-	dao := repository.NewDao()
-	user, err := dao.GetUserById(id)
-	if err != nil {
-		return errcode.QueryError
-	}
-	if user == nil {
-		return errcode.NoExsistData
-	}
-	updatedAt := user.UpdatedAt.Unix()
-	if updatedAt < 0 {
-		updatedAt = user.CreatedAt.Unix()
-	}
-	result := &bo.UserData{
-		Id:        user.Id,
-		Ip:        user.Ip,
-		Bio:       user.Bio,
-		Role:      user.Role,
-		ThirdId:   user.ThirdId,
-		From:      user.From,
-		Status:    user.Status,
-		AvatarUrl: user.AvatarUrl,
-		UserUrl:   user.UserUrl,
-		UserName:  user.UserName,
-		UpdatedAt: int(updatedAt),
-		CreatedAt: int(user.CreatedAt.Unix()),
-	}
-	che.LoadUser([]*bo.UserData{result})
-	return errcode.Success.WithData(result)
-}
-
-func (s *userService) Update(param *vo.UserEditParam) *errcode.ErrCode {
-	dao := repository.NewDao()
-	user, err := dao.GetUserById(param.Id)
-	if err != nil {
-		return errcode.UpdateError
-	}
-	if user == nil {
-		return errcode.NoExsistData
-	}
-	util.CompareStrSet(&user.UserName, &param.UserName)
-	util.CompareStrSet(&user.AvatarUrl, &param.AvatarUrl)
-	util.CompareStrSet(&user.Ip, &param.Ip)
-	util.CompareStrSet(&user.Bio, &param.Bio)
-	util.CompareIntSet(&user.Status, &param.Status)
-	util.CompareIntSet(&user.Role, &param.Role)
-	err = dao.UpdateUser(user)
-	if err != nil {
-		return errcode.UpdateError
-	}
-	s.LoadUsers(user.Id)
-	return errcode.Success
-}
-
-func (s *userService) Insert(param *vo.UserEditParam) *errcode.ErrCode {
-	dao := repository.NewDao()
-	id, err := dao.InsertUser(param)
-	if err != nil {
-		return errcode.UpdateError
-	}
-	s.LoadUsers(id)
-	return errcode.Success
-}
-
-func (s *userService) Query(param *vo.UserParam) *errcode.ErrCode {
+func (s *userService) QueryPage(param *vo.UserParam) *errcode.ErrCode {
 	dao := repository.NewDao()
 	total, err := dao.GetUsersCount(param)
 	if err != nil {
@@ -146,17 +28,36 @@ func (s *userService) Query(param *vo.UserParam) *errcode.ErrCode {
 	}
 	page := common.NewPage(param.PageNum, param.PageSize)
 	page.SetTotal(total)
-	datas, err := dao.QueryUser(param, page)
+	datas, err := dao.QueryUserPage(param, page)
 	if err != nil {
 		return errcode.QueryError
 	}
-	var result []*bo.UserData
+	result := s.Query(false, datas...)
+	if result.IsSuccess() {
+		return errcode.Success.WithPage(page, result.Data)
+	}
+	return result
+}
+
+func (s *userService) Query(reload bool, id ...int) *errcode.ErrCode {
+	c := cache.NewCache()
+	var values []*bo.User
+	if !reload {
+		values = c.GetUser(id...)
+	}
+	if len(values) > 0 {
+		return errcode.Success.WithData(values)
+	}
+	datas := repository.NewDao().QueryUser(id...)
+	if len(datas) == 0 {
+		return errcode.EmptyData
+	}
 	for _, v := range datas {
 		updatedAt := v.UpdatedAt.Unix()
 		if updatedAt < 0 {
 			updatedAt = v.CreatedAt.Unix()
 		}
-		user := &bo.UserData{
+		values = append(values, &bo.User{
 			Id:        v.Id,
 			Ip:        v.Ip,
 			Bio:       v.Bio,
@@ -169,8 +70,39 @@ func (s *userService) Query(param *vo.UserParam) *errcode.ErrCode {
 			UserName:  v.UserName,
 			UpdatedAt: int(updatedAt),
 			CreatedAt: int(v.CreatedAt.Unix()),
-		}
-		result = append(result, user)
+		})
 	}
-	return errcode.Success.WithPage(page, result)
+	go c.SetUser(values...)
+	return errcode.Success.WithData(values)
+}
+
+// add update
+func (s *userService) Edit(param *vo.UserEditParam) *errcode.ErrCode {
+	dao := repository.NewDao()
+	if param.Id == 0 {
+		id, err := dao.InsertUser(param)
+		if err != nil {
+			return errcode.InsertError
+		}
+		go s.Query(true, id)
+		return errcode.Success
+	}
+	data, err := dao.GetUserById(param.Id)
+	if err != nil {
+		return errcode.QueryError
+	}
+	if data == nil {
+		return errcode.NoExsistData
+	}
+	util.CompareStrSet(&data.UserName, &param.UserName)
+	util.CompareStrSet(&data.AvatarUrl, &param.AvatarUrl)
+	util.CompareStrSet(&data.Ip, &param.Ip)
+	util.CompareStrSet(&data.Bio, &param.Bio)
+	util.CompareIntSet(&data.Status, &param.Status)
+	util.CompareIntSet(&data.Role, &param.Role)
+	if err := dao.UpdateUser(data); err != nil {
+		return errcode.UpdateError
+	}
+	go s.Query(true, data.Id)
+	return errcode.Success
 }

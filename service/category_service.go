@@ -6,6 +6,7 @@ import (
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository"
 	"github.com/lhlyu/iyu/service/bo"
+	"github.com/lhlyu/iyu/util"
 )
 
 type categoryService struct {
@@ -15,74 +16,54 @@ func NewCategoryService() *categoryService {
 	return &categoryService{}
 }
 
-// get all categorys
-func (*categoryService) GetAll(reload bool) *errcode.ErrCode {
+func (s *categoryService) Query(reload bool, id ...int) *errcode.ErrCode {
 	c := cache.NewCache()
-	var categorys []*bo.Category
+	var values []*bo.Category
 	if !reload {
-		categorys = c.GetCategoryAll()
+		values = c.GetCategory(id...)
 	}
-	if len(categorys) != 0 {
-		return errcode.Success.WithData(categorys)
+	if len(values) > 0 {
+		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().GetCategoryAll()
+	datas := repository.NewDao().QueryCategory(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
 	for _, v := range datas {
-		categorys = append(categorys, &bo.Category{v.Id, v.Name, v.IsDelete})
+		values = append(values, &bo.Category{v.Id, v.Name, v.IsDelete})
 	}
-	go c.LoadCategorys(categorys...)
-	return errcode.Success.WithData(categorys)
+	go c.SetCategory(values...)
+	return errcode.Success.WithData(values)
 }
 
-func (s *categoryService) Insert(param *vo.CategoryVo) *errcode.ErrCode {
+// add update
+func (s *categoryService) Edit(param *vo.CategoryVo) *errcode.ErrCode {
 	dao := repository.NewDao()
-	data := dao.GetCategoryByName(param.Name)
-	if data != nil {
-		return errcode.ExsistData
+	if param.Id == 0 {
+		data := dao.GetCategoryByName(param.Name)
+		if data != nil {
+			return errcode.ExsistData
+		}
+		id, err := dao.InsertCategory(param)
+		if err != nil {
+			return errcode.InsertError
+		}
+		go s.Query(true, id)
+		return errcode.Success
 	}
-	if err := dao.InsertCategory(param); err != nil {
-		return errcode.InsertError
-	}
-	go s.GetAll(true)
-	return errcode.Success
-}
-
-func (s *categoryService) Update(param *vo.CategoryVo) *errcode.ErrCode {
-	dao := repository.NewDao()
 	data := dao.GetCategoryById(param.Id)
 	if data == nil {
 		return errcode.NoExsistData
 	}
 	other := dao.GetCategoryByName(param.Name)
-	if other != nil && other.Id != param.Id {
+	if other != nil && other.Id != data.Id {
 		return errcode.ExsistData
 	}
-	if err := dao.UpdateCategory(param); err != nil {
+	util.CompareIntSet(&data.IsDelete, &param.IsDelete)
+	util.CompareStrSet(&data.Name, &param.Name)
+	if err := dao.UpdateCategory(data); err != nil {
 		return errcode.UpdateError
 	}
-	go s.GetAll(true)
-	return errcode.Success
-}
-
-// if real == 1 then delete from database
-func (s *categoryService) Delete(param *vo.CategoryVo) *errcode.ErrCode {
-	dao := repository.NewDao()
-	data := dao.GetCategoryById(param.Id)
-	if data == nil {
-		return errcode.NoExsistData
-	}
-	if param.Real == 1 {
-		if err := dao.DeleteCategoryById(data.Id); err != nil {
-			return errcode.DeleteError
-		}
-		go s.GetAll(true)
-		return errcode.Success
-	}
-	if err := dao.UpdateCategory(param); err != nil {
-		return errcode.UpdateError
-	}
-	go s.GetAll(true)
+	go s.Query(true, data.Id)
 	return errcode.Success
 }
