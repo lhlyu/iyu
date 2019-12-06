@@ -9,8 +9,9 @@ type Page struct {
 	PageMax     int  `json:"pageMax"`
 	PrePage     int  `json:"prePage"`
 	NextPage    int  `json:"nextPage"`
-	hasPrePage  bool `json:"hasPrePage"`
-	hasNextPage bool `json:"hasNextPage"`
+	HasPrePage  bool `json:"hasPrePage"`
+	HasNextPage bool `json:"hasNextPage"`
+	Remainder   int  `json:"remainder"`
 	StartRow    int  `json:"-"`
 	StopRow     int  `json:"-"`
 }
@@ -37,15 +38,15 @@ func (p *Page) SetTotal(total int) {
 	p.NextPage = p.PageNum + 1
 	if p.PrePage <= 0 {
 		p.PrePage = -1
-		p.hasPrePage = false
+		p.HasPrePage = false
 	} else {
-		p.hasPrePage = true
+		p.HasPrePage = true
 	}
 	if p.NextPage >= p.PageMax {
 		p.NextPage = -1
-		p.hasNextPage = false
+		p.HasNextPage = false
 	} else {
-		p.hasNextPage = true
+		p.HasNextPage = true
 	}
 	if p.StartRow > p.Total {
 		p.StartRow = p.Total
@@ -53,4 +54,5 @@ func (p *Page) SetTotal(total int) {
 	if p.StopRow > p.Total {
 		p.StopRow = p.Total
 	}
+	p.Remainder = p.Total - p.StopRow
 }

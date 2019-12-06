@@ -31,6 +31,7 @@ redis_key:
   nail: "iyu:nail"
   category: "iyu:category"
   quanta: "iyu:quanta"
+  quanta_key: "iyu:quanta:key"
   article: "iyu:article"
   user: "iyu:user"
   token: "iyu:token:"

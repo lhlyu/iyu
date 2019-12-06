@@ -17,8 +17,8 @@ func (*recordService) Insert(param *vo.RecordParam) *errcode.ErrCode {
 	if err := repository.NewDao().InsertRecord([]*vo.RecordParam{param}); err != nil {
 		return errcode.InsertError
 	}
-	//svc := NewArticleService()
-	//svc.GetById(param.BusinessId, true)
+	svc := NewArticleService()
+	svc.Query(true, param.BusinessId)
 	return errcode.Success
 }
 

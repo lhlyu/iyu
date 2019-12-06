@@ -41,3 +41,10 @@ const (
 	COLOR = "#000000"
 	ITV   = 3600 * 24
 )
+
+// quanta key
+const (
+	KEY_1 = "admin.pass"
+	KEY_2 = "cmnt.open"
+	KEY_3 = "cmnt.check"
+)

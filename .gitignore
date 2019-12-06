@@ -13,3 +13,4 @@
 
 .idea
 /conf/dev.yaml
+/deploy

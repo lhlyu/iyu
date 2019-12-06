@@ -70,6 +70,7 @@ const (
 )
 
 const (
+	NOLOGIN      = 402
 	NOPERMISSION = 403
 	NOFOUND      = 404
 )
@@ -88,12 +89,17 @@ const (
 	DELETE_ERROR
 )
 
+const (
+	NO_OPEN_CMNT = iota + 100000
+)
+
 // 常用
 var (
 	Error   = NewErrcode(ERROR, nil)
 	Success = NewErrcode(SUCCESS, nil)
 	Failure = NewErrcode(FAILURE, nil)
 
+	NoLogin      = NewErrcode(NOLOGIN, nil)
 	NoPermission = NewErrcode(NOPERMISSION, nil)
 	NofoundError = NewErrcode(NOFOUND, nil)
 
@@ -106,6 +112,8 @@ var (
 	UpdateError = NewErrcode(UPDATE_ERROR, nil)
 	InsertError = NewErrcode(INSERT_ERROR, nil)
 	DeleteError = NewErrcode(DELETE_ERROR, nil)
+
+	NoOpenCmntError = NewErrcode(NO_OPEN_CMNT, nil)
 )
 
 var errCodeMap = map[int]string{
@@ -113,6 +121,7 @@ var errCodeMap = map[int]string{
 	SUCCESS: "成功",
 	FAILURE: "失败",
 
+	NOLOGIN:      "没有登录",
 	NOPERMISSION: "没有权限",
 	NOFOUND:      "404",
 
@@ -125,4 +134,6 @@ var errCodeMap = map[int]string{
 	UPDATE_ERROR: "更新错误",
 	INSERT_ERROR: "添加错误",
 	DELETE_ERROR: "删除错误",
+
+	NO_OPEN_CMNT: "暂未开放评论",
 }

@@ -45,14 +45,20 @@ func (d *dao) QueryQuantaPage(page *common.Page) []*po.YuQuanta {
 }
 
 // get quanta by key
-func (d *dao) GetQuantaByKey(key string) *po.YuQuanta {
-	sql := "SELECT * FROM yu_quanta WHERE `key` = ? limit 1"
-	value := &po.YuQuanta{}
-	if err := common.DB.Get(value, sql, key); err != nil {
+func (d *dao) GetQuantaByKey(key ...string) []*po.YuQuanta {
+	if len(key) == 0 {
+		return nil
+	}
+	sql := "SELECT * FROM yu_quanta WHERE `key`in (%s) limit 1"
+	marks := d.createQuestionMarks(len(key))
+	sql = fmt.Sprintf(sql, marks)
+	params := d.strConvertToInterface(key)
+	var values []*po.YuQuanta
+	if err := common.DB.Select(values, sql, params...); err != nil {
 		common.Ylog.Debug(err)
 		return nil
 	}
-	return value
+	return values
 }
 
 func (d *dao) GetQuantaById(id int) *po.YuQuanta {

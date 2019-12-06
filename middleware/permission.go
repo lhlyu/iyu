@@ -7,7 +7,18 @@ import (
 	"github.com/lhlyu/iyu/errcode"
 )
 
-func Permission() context.Handler {
+func PermissionUser() context.Handler {
+	return func(ctx iris.Context) {
+		user, ok := ctx.Values().Get(common.X_USER).(*common.XUser)
+		if !ok || user == nil || user.Id == 0 {
+			ctx.JSON(errcode.NoLogin)
+			return
+		}
+		ctx.Next()
+	}
+}
+
+func PermissionAdmin() context.Handler {
 	return func(ctx iris.Context) {
 		user := ctx.Values().Get(common.X_USER).(*common.XUser)
 		if user.Role < common.PERMISSION {

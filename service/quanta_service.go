@@ -68,7 +68,7 @@ func (s *quantaService) Edit(param *vo.QuantaVo) *errcode.ErrCode {
 		return errcode.NoExsistData
 	}
 	other := dao.GetQuantaByKey(param.Key)
-	if other != nil && other.Id != data.Id {
+	if len(other) > 0 && other[0].Id != data.Id {
 		return errcode.ExsistData
 	}
 	util.CompareIntSet(&data.IsEnable, &param.IsEnable)
@@ -80,4 +80,32 @@ func (s *quantaService) Edit(param *vo.QuantaVo) *errcode.ErrCode {
 	}
 	go s.Query(true, data.Id)
 	return errcode.Success
+}
+
+func (s *quantaService) QueryByKey(key ...string) map[string]*bo.Quanta {
+	che := cache.NewCache()
+	datas := che.GetQuantaByKeys(key...)
+	m := make(map[string]*bo.Quanta)
+	if len(datas) > 0 {
+		for _, v := range datas {
+			m[v.Key] = v
+		}
+		return m
+	}
+	dao := repository.NewDao()
+	list := dao.GetQuantaByKey(key...)
+	if len(list) == 0 {
+		return nil
+	}
+	for _, v := range list {
+		value := &bo.Quanta{
+			Id:       v.Id,
+			Key:      v.Key,
+			Value:    v.Value,
+			Desc:     v.Desc,
+			IsEnable: v.IsEnable,
+		}
+		m[v.Key] = value
+	}
+	return m
 }

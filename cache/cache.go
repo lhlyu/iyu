@@ -2,7 +2,6 @@ package cache
 
 import (
 	"github.com/lhlyu/iyu/common"
-	"github.com/lhlyu/iyu/util"
 	"log"
 	"strconv"
 	"strings"
@@ -74,7 +73,7 @@ func (c cache) setMap(keyName string, vm map[string]interface{}, duration time.D
 	})
 }
 
-func (c cache) getMap(keyName string, field ...int) []string {
+func (c cache) getMap(keyName string, field ...string) []string {
 	key := common.Cfg.GetString(keyName)
 	if key == "" {
 		return nil
@@ -88,7 +87,7 @@ func (c cache) getMap(keyName string, field ...int) []string {
 				arr = append(arr, v)
 			}
 		} else {
-			m := common.Redis.HMGet(mapKey, util.IntSlinceToStringSlince(field)...).Val()
+			m := common.Redis.HMGet(mapKey, field...).Val()
 			for _, v := range m {
 				s, ok := v.(string)
 				if ok {

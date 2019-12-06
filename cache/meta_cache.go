@@ -10,7 +10,8 @@ const (
 	_tag_key      = "redis_key.tag"
 	_category_key = "redis_key.category"
 	_nail_key     = "redis_key.nail"
-	_quanta_key   = "redis_key.quanta"
+	_quanta_map   = "redis_key.quanta"
+	_quanta_key   = "redis_key.quanta_key"
 	_user_key     = "redis_key.user"
 	_article_key  = "redis_key.article"
 )
@@ -32,7 +33,7 @@ func (c cache) SetTag(values ...*bo.Tag) {
 
 func (c cache) GetTag(field ...int) []*bo.Tag {
 	if c.hasRedis() {
-		arr := c.getMap(_tag_key, field...)
+		arr := c.getMap(_tag_key, util.IntSlinceToStringSlince(field)...)
 		var values []*bo.Tag
 		for _, v := range arr {
 			value := &bo.Tag{}
@@ -63,7 +64,7 @@ func (c cache) SetCategory(values ...*bo.Category) {
 
 func (c cache) GetCategory(field ...int) []*bo.Category {
 	if c.hasRedis() {
-		arr := c.getMap(_category_key, field...)
+		arr := c.getMap(_category_key, util.IntSlinceToStringSlince(field)...)
 		var values []*bo.Category
 		for _, v := range arr {
 			value := &bo.Category{}
@@ -94,7 +95,7 @@ func (c cache) SetNail(values ...*bo.Nail) {
 
 func (c cache) GetNail(field ...int) []*bo.Nail {
 	if c.hasRedis() {
-		arr := c.getMap(_nail_key, field...)
+		arr := c.getMap(_nail_key, util.IntSlinceToStringSlince(field)...)
 		var values []*bo.Nail
 		for _, v := range arr {
 			value := &bo.Nail{}
@@ -115,15 +116,34 @@ func (c cache) SetQuanta(values ...*bo.Quanta) {
 	}
 	if c.hasRedis() {
 		m := make(map[string]interface{})
+		n := make(map[string]interface{})
 		for _, v := range values {
 			value := util.ObjToJsonStr(v)
 			m[strconv.Itoa(v.Id)] = value
+			n[v.Key] = value
 		}
-		c.setMap(_quanta_key, m, _ONE_WEEK)
+		c.setMap(_quanta_map, m, _ONE_WEEK)
+		c.setMap(_quanta_key, n, _ONE_WEEK)
 	}
 }
 
 func (c cache) GetQuanta(field ...int) []*bo.Quanta {
+	if c.hasRedis() {
+		arr := c.getMap(_quanta_map, util.IntSlinceToStringSlince(field)...)
+		var values []*bo.Quanta
+		for _, v := range arr {
+			value := &bo.Quanta{}
+			if err := util.JsonStrToObj(v, value); err != nil {
+				continue
+			}
+			values = append(values, value)
+		}
+		return values
+	}
+	return nil
+}
+
+func (c cache) GetQuantaByKeys(field ...string) []*bo.Quanta {
 	if c.hasRedis() {
 		arr := c.getMap(_quanta_key, field...)
 		var values []*bo.Quanta
@@ -156,7 +176,7 @@ func (c cache) SetUser(values ...*bo.User) {
 
 func (c cache) GetUser(field ...int) []*bo.User {
 	if c.hasRedis() {
-		arr := c.getMap(_user_key, field...)
+		arr := c.getMap(_user_key, util.IntSlinceToStringSlince(field)...)
 		var values []*bo.User
 		for _, v := range arr {
 			value := &bo.User{}
@@ -187,7 +207,7 @@ func (c cache) SetArticle(values ...*bo.Article) {
 
 func (c cache) GetArticle(field ...int) []*bo.Article {
 	if c.hasRedis() {
-		arr := c.getMap(_article_key, field...)
+		arr := c.getMap(_article_key, util.IntSlinceToStringSlince(field)...)
 		var values []*bo.Article
 		for _, v := range arr {
 			value := &bo.Article{}

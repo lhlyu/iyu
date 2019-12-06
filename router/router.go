@@ -24,8 +24,16 @@ func SetRouter(app *iris.Application) {
 		api.Get("/articles", ctr.QueryArticles)
 		api.Get("/article", ctr.GetArticleById)
 	}
-	admin := api.Party("/admin", middleware.Permission())
 	{
+		api.Use(middleware.PermissionUser())
+		api.Post("/cmnt", ctr.InsertCmnt)
+		api.Post("/post", ctr.InsertPost)
+	}
+	admin := api.Party("/admin", middleware.PermissionAdmin())
+	{
+		api.Put("/cmnt", ctr.UpdateCmnt)
+		api.Put("/post", ctr.UpdatePost)
+
 		admin.Get("/articles", ctr.QueryArticles)
 		admin.Get("/article", ctr.GetArticleById)
 		admin.Post("/article", ctr.InsertArticle)

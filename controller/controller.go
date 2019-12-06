@@ -141,4 +141,6 @@ type Controller struct {
 	nailController
 	categoryController
 	quantaController
+	cmntController
+	postController
 }
