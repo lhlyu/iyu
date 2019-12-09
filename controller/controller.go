@@ -23,7 +23,7 @@ func (s controller) Error(traceId string, param ...interface{}) {
 }
 
 func (s controller) Info(traceId string, param ...interface{}) {
-	common.Ylog.Log(3, "info", traceId, "controller", param...)
+	common.Ylog.Log(4, "info", traceId, "controller", param...)
 }
 
 // 统一响应处理
@@ -57,7 +57,7 @@ func (c controller) getParams(ctx iris.Context, v interface{}, check bool) *errc
 			}
 		}
 	}
-	c.Error(c.GetGUID(ctx), v)
+	c.Info(c.GetGUID(ctx), v)
 	if !check {
 		return nil
 	}
@@ -79,7 +79,13 @@ iat: 签发时间
 jti: 唯一身份标识
 */
 
-func (c controller) getToken(user *common.XUser) string {
+func (c controller) getToken(ctx iris.Context, user *common.XUser) string {
+	guid := ctx.Values().Get(common.X_TRACE).(string)
+	che := cache.NewCache(guid)
+	tokenString := che.GetJwt(user.Id)
+	if tokenString != "" {
+		return tokenString
+	}
 	itv := common.Cfg.GetInt("jwt.itv")
 	if itv == 0 {
 		itv = common.ITV
@@ -93,9 +99,8 @@ func (c controller) getToken(user *common.XUser) string {
 	m["exp"] = now.Add(time.Second * time.Duration(itv)).Unix()
 	m["iss"] = common.Cfg.GetString("author")
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
-	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
-
-	cache.NewCache("").SetJwt(tokenString)
+	tokenString, _ = token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
+	che.SetJwt(user.Id, tokenString)
 	return tokenString
 }
 

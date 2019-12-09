@@ -2,36 +2,34 @@ package cache
 
 import (
 	"github.com/lhlyu/iyu/common"
+	"strconv"
 	"time"
 )
 
-func (c *cache) SetJwt(token string) {
+func (c *cache) SetJwt(userId int, token string) {
 	if c.hasRedis() {
 		itv := common.Cfg.GetInt("jwt.itv")
 		if itv == 0 {
 			itv = common.ITV
 		}
-		key := common.Cfg.GetString("redis_key.token") + token
-		now := time.Now().Format("20060102150405")
-		common.Redis.Set(key, now, time.Second*time.Duration(itv))
+		key := common.Cfg.GetString("redis_key.token") + strconv.Itoa(userId)
+		err := common.Redis.Set(key, token, time.Second*time.Duration(itv)).Err()
+		c.Error(err)
 	}
 }
 
-func (c *cache) ExistsJwt(token string) bool {
+func (c *cache) GetJwt(userId int) string {
 	if c.hasRedis() {
-		key := common.Cfg.GetString("redis_key.token") + token
-		val := common.Redis.Exists(key).Val()
-		if val > 0 {
-			return true
-		}
-		return false
+		key := common.Cfg.GetString("redis_key.token") + strconv.Itoa(userId)
+		return common.Redis.Get(key).Val()
 	}
-	return true
+	return ""
 }
 
-func (c *cache) DelJwt(token string) {
+func (c *cache) DelJwt(userId int) {
 	if c.hasRedis() {
-		key := common.Cfg.GetString("redis_key.token") + token
-		common.Redis.Del(key)
+		key := common.Cfg.GetString("redis_key.token") + strconv.Itoa(userId)
+		err := common.Redis.Del(key).Err()
+		c.Error(err)
 	}
 }

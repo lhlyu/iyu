@@ -29,12 +29,10 @@ func NewCache(traceId string) *cache {
 	return &cache{traceId}
 }
 
-func (s *cache) Error(param ...interface{}) {
-	common.Ylog.Log(3, "error", s.TraceId, "cache", param...)
-}
-
-func (s *cache) Info(param ...interface{}) {
-	common.Ylog.Log(3, "info", s.TraceId, "cache", param...)
+func (s *cache) Error(err error) {
+	if err != nil {
+		common.Ylog.Log(4, "error", s.TraceId, "cache", err.Error())
+	}
 }
 
 func (c *cache) hasRedis() bool {
@@ -57,17 +55,23 @@ func (c *cache) getTimestamp() string {
 func (c *cache) ClearCache(key string) {
 	if c.hasRedis() {
 		keys := common.Redis.Keys(key).Val()
-		common.Redis.Del(keys...)
+		if len(keys) == 0 {
+			return
+		}
+		err := common.Redis.Del(keys...).Err()
+		c.Error(err)
 	}
 }
 
 func (c *cache) mutexHandler(key string, f func()) {
 	keyMutex := key + _MUTEX
-	if rs, _ := common.Redis.SetNX(keyMutex, 1, time.Second*5).Result(); !rs {
+	if rs, err := common.Redis.SetNX(keyMutex, 1, time.Second*5).Result(); !rs {
+		c.Error(err)
 		return
 	}
 	f()
-	common.Redis.Del(keyMutex)
+	err := common.Redis.Del(keyMutex).Err()
+	c.Error(err)
 }
 
 func (c cache) setMap(keyName string, vm map[string]interface{}, duration time.Duration) {

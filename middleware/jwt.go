@@ -27,14 +27,15 @@ func Jwt() context.Handler {
 			Expiration:    true,
 		}).CheckJWT(ctx); err == nil {
 			token, _ := jwt.FromAuthHeader(ctx)
-			if !cache.NewCache(traceId).ExistsJwt(token) {
-				ctx.JSON(errcode.NoPermission)
-				return
-			}
 			tokens, _ := ctx.Values().Get("jwt").(*jwt.Token)
 			tokenMap := tokens.Claims.(jwt.MapClaims)
 			user.Id = int(tokenMap[common.X_ID].(float64))
 			user.Role = int(tokenMap[common.X_ROLE].(float64))
+			cacheToken := cache.NewCache(traceId).GetJwt(user.Id)
+			if cacheToken == "" || token != cacheToken {
+				ctx.JSON(errcode.NoPermission)
+				return
+			}
 		}
 		ctx.Values().Set(common.X_USER, user)
 		ctx.Next()

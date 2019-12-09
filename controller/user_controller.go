@@ -39,7 +39,7 @@ func (c *userController) Login(ctx iris.Context) {
 		Id:   users[0].Id,
 		Role: users[0].Role,
 	}
-	token := c.getToken(xuser)
+	token := c.getToken(ctx, xuser)
 	c.Response(ctx, errcode.Success.WithData(token))
 }
 
