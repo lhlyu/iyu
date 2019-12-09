@@ -9,6 +9,7 @@ type Article struct {
 	UnLike    int       `json:"unlike"`
 	CreatedAt int       `json:"createdAt"`
 	UpdatedAt int       `json:"updatedAt"`
+	IsOpen    int       `json:"isOpen"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	Wraper    string    `json:"wraper"`

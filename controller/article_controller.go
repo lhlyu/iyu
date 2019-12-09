@@ -16,7 +16,7 @@ type articleController struct {
 func (c *articleController) QueryArticles(ctx iris.Context) {
 	article := &vo.ArticleParam{}
 	if err := c.getParams(ctx, article, true); err != nil {
-		ctx.JSON(err)
+		c.Response(ctx, err)
 		return
 	}
 	if c.IsAdminRouter(ctx) {
@@ -25,56 +25,56 @@ func (c *articleController) QueryArticles(ctx iris.Context) {
 		article.Kind = common.ARTICLE_NORMAL
 		article.IsDelete = 1
 	}
-	svc := service.NewArticleService()
-	ctx.JSON(svc.QueryArticlePage(article))
+	svc := service.NewArticleService(c.GetGUID(ctx))
+	c.Response(ctx, svc.QueryArticlePage(article))
 }
 
 func (c *articleController) GetArticleById(ctx iris.Context) {
 	id := ctx.URLParamIntDefault("id", 0)
 	if id <= 0 {
-		ctx.JSON(errcode.IllegalParam)
+		c.Response(ctx, errcode.IllegalParam)
 		return
 	}
 	if !c.IsAdminRouter(ctx) {
 		go c.Record(ctx, id, common.KIND_ARTICLE, common.ACTION_VISIT)
 	}
-	svc := service.NewArticleService()
+	svc := service.NewArticleService(c.GetGUID(ctx))
 	result := svc.Query(false, id)
 	if !result.IsSuccess() {
-		ctx.JSON(result)
+		c.Response(ctx, result)
 		return
 	}
 	datas := result.Data.([]*bo.Article)
-	ctx.JSON(errcode.Success.WithData(datas[0]))
+	c.Response(ctx, errcode.Success.WithData(datas[0]))
 }
 
 func (c *articleController) InsertArticle(ctx iris.Context) {
 	article := &vo.ArticleVo{}
 	if err := c.getParams(ctx, article, true); err != nil {
-		ctx.JSON(err)
+		c.Response(ctx, err)
 		return
 	}
-	svc := service.NewArticleService()
-	ctx.JSON(svc.Edit(article))
+	svc := service.NewArticleService(c.GetGUID(ctx))
+	c.Response(ctx, svc.Edit(article))
 }
 
 func (c *articleController) UpdateArticle(ctx iris.Context) {
 	article := &vo.ArticleVo{}
 	if err := c.getParams(ctx, article, false); err != nil {
-		ctx.JSON(err)
+		c.Response(ctx, err)
 		return
 	}
-	svc := service.NewArticleService()
-	ctx.JSON(svc.Edit(article))
+	svc := service.NewArticleService(c.GetGUID(ctx))
+	c.Response(ctx, svc.Edit(article))
 }
 
 func (c *articleController) DeleteArticle(ctx iris.Context) {
 	article := &vo.ArticleVo{}
 	if err := c.getParams(ctx, article, false); err != nil {
-		ctx.JSON(err)
+		c.Response(ctx, err)
 		return
 	}
 	article.IsDelete = common.DELETED
-	svc := service.NewArticleService()
-	ctx.JSON(svc.Edit(article))
+	svc := service.NewArticleService(c.GetGUID(ctx))
+	c.Response(ctx, svc.Edit(article))
 }

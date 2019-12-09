@@ -18,7 +18,7 @@ func (d *dao) QueryQuanta(id ...int) []*po.YuQuanta {
 	sql += " ORDER BY is_enable,`key`"
 	var values []*po.YuQuanta
 	if err := common.DB.Select(&values, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil
 	}
 	return values
@@ -28,7 +28,7 @@ func (d *dao) QueryQuantaCount() int {
 	sql := "SELECT count(*) FROM yu_quanta ORDER BY is_enable,`key`"
 	var value int
 	if err := common.DB.Get(&value, sql); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return 0
 	}
 	return value
@@ -38,7 +38,7 @@ func (d *dao) QueryQuantaPage(page *common.Page) []*po.YuQuanta {
 	sql := "SELECT * FROM yu_quanta ORDER BY is_enable,`key` limit ?,?"
 	var values []*po.YuQuanta
 	if err := common.DB.Select(&values, sql, page.StartRow, page.PageSize); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil
 	}
 	return values
@@ -55,7 +55,7 @@ func (d *dao) GetQuantaByKey(key ...string) []*po.YuQuanta {
 	params := d.strConvertToInterface(key)
 	var values []*po.YuQuanta
 	if err := common.DB.Select(values, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil
 	}
 	return values
@@ -65,7 +65,7 @@ func (d *dao) GetQuantaById(id int) *po.YuQuanta {
 	sql := "SELECT * FROM yu_quanta WHERE id = ? limit 1"
 	value := &po.YuQuanta{}
 	if err := common.DB.Get(value, sql, id); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil
 	}
 	return value
@@ -75,7 +75,7 @@ func (d *dao) GetQuantaById(id int) *po.YuQuanta {
 func (d *dao) UpdateQuanta(p *po.YuQuanta) error {
 	sql := "UPDATE yu_quanta SET is_enable=?,`key` = ?,`value` = ?,`desc` = ?,updated_at = NOW() WHERE id = ?"
 	if _, err := common.DB.Exec(sql, p.IsEnable, p.Key, p.Value, p.Desc, p.Id); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return err
 	}
 	return nil
@@ -85,7 +85,7 @@ func (d *dao) UpdateQuanta(p *po.YuQuanta) error {
 func (d *dao) DeleteQuantaById(id int) error {
 	sql := "DELETE FROM yu_quanta WHERE id = ?"
 	if _, err := common.DB.Exec(sql, id); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return err
 	}
 	return nil
@@ -96,7 +96,7 @@ func (d *dao) InsertQuanta(p *vo.QuantaVo) (int, error) {
 	sql := "INSERT INTO yu_quanta(`key`,`value`,`desc`,is_enable) VALUES(?,?,?,?)"
 	result, err := common.DB.Exec(sql, p.Key, p.Value, p.Desc, p.IsEnable)
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return 0, err
 	}
 	id, _ := result.LastInsertId()

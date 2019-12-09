@@ -16,7 +16,7 @@ func (d *dao) InsertRecord(param []*vo.RecordParam) error {
 	batchSql, params := d.createQuestionMarksForBatch(valueArr...)
 	sql += batchSql
 	if _, err := common.DB.Exec(sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return err
 	}
 	return nil

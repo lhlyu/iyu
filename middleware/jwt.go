@@ -15,6 +15,7 @@ Authorization:bearer xxxxxxxxxxx
 */
 func Jwt() context.Handler {
 	return func(ctx iris.Context) {
+		traceId := ctx.Values().Get(common.X_TRACE).(string)
 		user := &common.XUser{}
 		user.Ip = util.RemoteIp(ctx.Request())
 		var err error
@@ -26,7 +27,7 @@ func Jwt() context.Handler {
 			Expiration:    true,
 		}).CheckJWT(ctx); err == nil {
 			token, _ := jwt.FromAuthHeader(ctx)
-			if !cache.NewCache().ExistsJwt(token) {
+			if !cache.NewCache(traceId).ExistsJwt(token) {
 				ctx.JSON(errcode.NoPermission)
 				return
 			}

@@ -22,10 +22,19 @@ const (
 )
 
 type cache struct {
+	TraceId string
 }
 
-func NewCache() *cache {
-	return &cache{}
+func NewCache(traceId string) *cache {
+	return &cache{traceId}
+}
+
+func (s *cache) Error(param ...interface{}) {
+	common.Ylog.Log(3, "error", s.TraceId, "cache", param...)
+}
+
+func (s *cache) Info(param ...interface{}) {
+	common.Ylog.Log(3, "info", s.TraceId, "cache", param...)
 }
 
 func (c *cache) hasRedis() bool {

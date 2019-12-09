@@ -10,14 +10,18 @@ import (
 )
 
 type tagService struct {
+	*Service
 }
 
-func NewTagService() *tagService {
-	return &tagService{}
+func NewTagService(traceId string) *tagService {
+	return &tagService{
+		Service: &Service{traceId},
+	}
 }
 
 func (s *tagService) Query(reload bool, id ...int) *errcode.ErrCode {
-	c := cache.NewCache()
+	s.Info(reload, id)
+	c := cache.NewCache(s.TraceId)
 	var values []*bo.Tag
 	if !reload {
 		values = c.GetTag(id...)
@@ -25,7 +29,7 @@ func (s *tagService) Query(reload bool, id ...int) *errcode.ErrCode {
 	if len(values) > 0 {
 		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().QueryTag(id...)
+	datas := repository.NewDao(s.TraceId).QueryTag(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
@@ -38,7 +42,7 @@ func (s *tagService) Query(reload bool, id ...int) *errcode.ErrCode {
 
 // add update
 func (s *tagService) Edit(param *vo.TagVo) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	if param.Id == 0 {
 		data := dao.GetTagByName(param.Name)
 		if data != nil {

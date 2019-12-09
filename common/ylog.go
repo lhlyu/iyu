@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/golog"
+	"github.com/kataras/pio"
 	"github.com/lhlyu/iyu/util"
 	"os"
 	"strconv"
@@ -11,9 +12,7 @@ import (
 	"time"
 )
 
-const _json = "json"
 const _timeFormat = "2006-01-02 15:04:05"
-const _debug = "debug"
 
 type ylog struct {
 	g          *golog.Logger
@@ -22,58 +21,72 @@ type ylog struct {
 	level      string
 }
 
-type logJson struct {
-	L string `json:"level"`
-	T string `json:"time"`
-	P string `json:"position"`
-	C string `json:"content"`
-}
-
-func NewYlog(level, timeFormat, outFile, outWay string) *ylog {
+func NewYlog(level, timeFormat, outFile string) *ylog {
 	g := golog.New()
 	yg := &ylog{
 		timeFormat: _timeFormat,
 		g:          g,
 	}
 	if level != "" {
-		g.SetLevel(level)
+		yg.g.SetLevel(level)
 		yg.level = level
 	}
 	if timeFormat != "" {
-		g.SetTimeFormat(timeFormat)
+		yg.g.SetTimeFormat("")
 		yg.timeFormat = timeFormat
 	}
 	if outFile != "" {
-		fl, e := os.Create(outFile)
+		// 写入文件不打印前面的日志等级标志
+		yg.g.Hijack(func(ctx *pio.Ctx) {
+			l, ok := ctx.Value.(*golog.Log)
+			if !ok {
+				ctx.Next()
+				return
+			}
+			line := golog.GetTextForLevel(golog.DisableLevel, ctx.Printer.IsTerminal)
+			if line != "" {
+				line += " "
+			}
+			if t := l.FormatTime(); t != "" {
+				line += t + " "
+			}
+			line += l.Message
+			var b []byte
+			if pref := l.Logger.Prefix; len(pref) > 0 {
+				b = append(pref, []byte(line)...)
+			} else {
+				b = []byte(line)
+			}
+			ctx.Store(b, nil)
+			ctx.Next()
+		})
+		fl, e := os.OpenFile(outFile, os.O_CREATE|os.O_APPEND, 0666)
 		if e != nil {
 			panic(e)
 		}
 		g.SetOutput(fl)
 	}
-	if outWay == _json {
-		yg.outWay = _json
-	}
+	yg.g.Println("service is running : ", time.Now().Format(timeFormat))
 	return yg
 }
 
-func (y *ylog) Debug(v ...interface{}) {
+// 封装一个简易的日志追踪 根据traceId追踪日志
+func (y *ylog) Log(skip int, level, traceId, layer string, param ...interface{}) {
 	if y == nil {
 		return
 	}
-	if y.level != _debug {
-		return
+	fname, fileName, line := util.CurrentInfo(skip)
+	m := map[string]interface{}{
+		"LEVEL":     level,
+		"TRACEID":   traceId,
+		"LAYER":     layer,
+		"FNAME":     fname,
+		"CREATEDAT": time.Now().Format(y.timeFormat),
+		"POSITION":  strings.Join([]string{fileName, strconv.Itoa(line)}, ":"),
 	}
-	funcName, fileName, line := util.CurrentInfo(2)
-	lgJson := logJson{
-		L: y.level,
-		T: time.Now().Format(y.timeFormat),
-		P: strings.Join([]string{funcName, fileName, strconv.Itoa(line)}, " "),
-		C: fmt.Sprint(v),
+	if len(param) > 0 {
+		m["PARAM"] = fmt.Sprint(param...)
 	}
-	if y.outWay == _json {
-		bytes, _ := json.Marshal(lgJson)
-		y.g.Print(string(bytes))
-	} else {
-		y.g.Debugf("| %v | %v", lgJson.P, lgJson.C)
-	}
+	bytes, _ := json.Marshal(m)
+	y.g.Log(golog.ParseLevel(level), string(bytes))
 }

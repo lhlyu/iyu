@@ -34,7 +34,7 @@ func (d *dao) GetArticleCount(param *vo.ArticleParam) (int, error) {
 	}
 	var total int
 	if err := common.DB.Get(&total, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return 0, err
 	}
 	return total, nil
@@ -69,7 +69,7 @@ func (d *dao) QueryArticlePage(param *vo.ArticleParam, page *common.Page) ([]int
 	params = append(params, page.StartRow, page.PageSize)
 	var result []int
 	if err := common.DB.Select(&result, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return result, nil
@@ -77,18 +77,18 @@ func (d *dao) QueryArticlePage(param *vo.ArticleParam, page *common.Page) ([]int
 
 // 插入
 func (d *dao) InsertArticle(article *vo.ArticleVo) (int, error) {
-	sql1 := "INSERT INTO yu_article(user_id,wraper,title,content,is_top,category_id,nail_id,kind,is_delete,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,NOW(),NOW());"
+	sql1 := "INSERT INTO yu_article(user_id,wraper,title,content,is_top,category_id,nail_id,kind,is_open,is_delete,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,NOW(),NOW());"
 	sql2 := "INSERT INTO yu_article_tag(article_id,tag_id)"
 	tx, _ := common.DB.Beginx()
-	rs, err := tx.Exec(sql1, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsDelete)
+	rs, err := tx.Exec(sql1, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsOpen, article.IsDelete)
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		tx.Rollback()
 		return 0, nil
 	}
 	id, err := rs.LastInsertId()
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		tx.Rollback()
 		return 0, nil
 	}
@@ -106,12 +106,12 @@ func (d *dao) InsertArticle(article *vo.ArticleVo) (int, error) {
 	sql2 += batchSql
 	_, err = tx.Exec(sql2, params...)
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		tx.Rollback()
 		return 0, nil
 	}
 	if err = tx.Commit(); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		tx.Rollback()
 		return 0, nil
 	}
@@ -123,7 +123,7 @@ func (d *dao) GetArticleById(id int) (*po.YuArticle, error) {
 	sql := "select * from yu_article where id = ?"
 	article := &po.YuArticle{}
 	if err := common.DB.Get(article, sql, id); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return article, nil
@@ -131,6 +131,7 @@ func (d *dao) GetArticleById(id int) (*po.YuArticle, error) {
 
 // 获取标签
 func (d *dao) GetArticleTags(ids ...int) ([]*po.YuArticleTagV2, error) {
+	d.Info(ids)
 	sql := "SELECT article_id,GROUP_CONCAT(tag_id) as tags FROM yu_article_tag WHERE is_delete = 1"
 	if len(ids) > 0 {
 		sql += " AND article_id IN (%s)"
@@ -141,7 +142,7 @@ func (d *dao) GetArticleTags(ids ...int) ([]*po.YuArticleTagV2, error) {
 	params := d.intConvertToInterface(ids)
 	var articleTags []*po.YuArticleTagV2
 	if err := common.DB.Select(&articleTags, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return articleTags, nil
@@ -159,7 +160,7 @@ func (d *dao) GetArticleStat(ids ...int) ([]*po.Stat, error) {
 	params := d.intConvertToInterface(ids)
 	var stats []*po.Stat
 	if err := common.DB.Select(&stats, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return stats, nil
@@ -167,17 +168,17 @@ func (d *dao) GetArticleStat(ids ...int) ([]*po.Stat, error) {
 
 // 更新
 func (d *dao) UpdateArticle(article *po.YuArticle, articleTags []int) error {
-	sql := "UPDATE yu_article SET user_id = ?,wraper = ?,title = ?,content = ?,is_top = ?,category_id = ?,nail_id = ?,kind = ?,is_delete = ?,updated_at = NOW() WHERE id = ?"
+	sql := "UPDATE yu_article SET user_id = ?,wraper = ?,title = ?,content = ?,is_top = ?,category_id = ?,nail_id = ?,kind = ?,is_open = ?,is_delete = ?,updated_at = NOW() WHERE id = ?"
 	tx, _ := common.DB.Beginx()
-	if _, err := tx.Exec(sql, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsDelete, article.Id); err != nil {
-		common.Ylog.Debug(err)
+	if _, err := tx.Exec(sql, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsOpen, article.IsDelete, article.Id); err != nil {
+		d.Error(err)
 		tx.Rollback()
 		return nil
 	}
 	if len(articleTags) > 0 {
 		sql = "UPDATE yu_article_tag SET is_delete = 2,updated_at = NOW() WHERE article_id = ?"
 		if _, err := tx.Exec(sql, article.Id); err != nil {
-			common.Ylog.Debug(err)
+			d.Error(err)
 			tx.Rollback()
 			return nil
 		}
@@ -191,13 +192,13 @@ func (d *dao) UpdateArticle(article *po.YuArticle, articleTags []int) error {
 		batchSql, params := d.createQuestionMarksForBatch(valueArr...)
 		sql += batchSql
 		if _, err := tx.Exec(sql, params...); err != nil {
-			common.Ylog.Debug(err)
+			d.Error(err)
 			tx.Rollback()
 			return nil
 		}
 	}
 	if err := tx.Commit(); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		tx.Rollback()
 		return nil
 	}
@@ -215,7 +216,7 @@ func (d *dao) DeleteArticle(real bool, ids ...int) error {
 	sql = fmt.Sprintf(sql, marks)
 	_, err := common.DB.Exec(sql, params...)
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return err
 	}
 	return nil
@@ -232,7 +233,7 @@ func (d *dao) QueryArticle(ids ...int) ([]*po.YuArticle, error) {
 	}
 	var result []*po.YuArticle
 	if err := common.DB.Select(&result, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return result, nil

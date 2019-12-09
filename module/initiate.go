@@ -4,6 +4,7 @@ import (
 	"github.com/lhlyu/iyu/cache"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/service"
+	"github.com/lhlyu/iyu/util"
 	"log"
 	"time"
 )
@@ -19,26 +20,26 @@ func (initiate) seq() int {
 func (initiate) SetUp() {
 	log.Println("init initiate module ->")
 	// 初始化数据
-
-	che := cache.NewCache()
+	traceId := util.GetGID()
+	che := cache.NewCache(traceId)
 	keys := che.JoinSep(common.Cfg.GetString("redis_key.iyu"), "*")
 	che.ClearCache(keys)
 
-	go loadCache()
+	go loadCache(traceId)
 }
 
-func loadCache() {
+func loadCache(traceId string) {
 	time.AfterFunc(time.Second*5, func() {
 		log.Println("load nail datas ...")
-		service.NewNailService().Query(true)
+		service.NewNailService(traceId).Query(true)
 		log.Println("load category datas ...")
-		service.NewCategoryService().Query(true)
+		service.NewCategoryService(traceId).Query(true)
 		log.Println("load tag datas ...")
-		service.NewTagService().Query(true)
+		service.NewTagService(traceId).Query(true)
 		log.Println("load quanta datas ...")
-		service.NewQuantaService().Query(true)
+		service.NewQuantaService(traceId).Query(true)
 		log.Println("load article datas ...")
-		service.NewArticleService().Query(true)
+		service.NewArticleService(traceId).Query(true)
 	})
 }
 

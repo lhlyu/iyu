@@ -7,6 +7,14 @@ import (
 	"reflect"
 )
 
+func ObjToJsonBytes(v interface{}) []byte {
+	if v == nil {
+		return nil
+	}
+	bts, _ := json.Marshal(v)
+	return bts
+}
+
 func ObjToJsonStr(v interface{}) string {
 	if v == nil {
 		return ""

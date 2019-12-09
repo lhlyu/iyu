@@ -10,14 +10,17 @@ import (
 )
 
 type nailService struct {
+	*Service
 }
 
-func NewNailService() *nailService {
-	return &nailService{}
+func NewNailService(traceId string) *nailService {
+	return &nailService{
+		Service: &Service{traceId},
+	}
 }
 
 func (s *nailService) Query(reload bool, id ...int) *errcode.ErrCode {
-	c := cache.NewCache()
+	c := cache.NewCache(s.TraceId)
 	var values []*bo.Nail
 	if !reload {
 		values = c.GetNail(id...)
@@ -25,7 +28,7 @@ func (s *nailService) Query(reload bool, id ...int) *errcode.ErrCode {
 	if len(values) > 0 {
 		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().QueryNail(id...)
+	datas := repository.NewDao(s.TraceId).QueryNail(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
@@ -38,7 +41,7 @@ func (s *nailService) Query(reload bool, id ...int) *errcode.ErrCode {
 
 // add update
 func (s *nailService) Edit(param *vo.NailVo) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	if param.Id == 0 {
 		data := dao.GetNailByName(param.Name)
 		if data != nil {

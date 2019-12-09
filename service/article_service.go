@@ -15,15 +15,18 @@ import (
 )
 
 type articleService struct {
+	*Service
 }
 
-func NewArticleService() *articleService {
-	return &articleService{}
+func NewArticleService(traceId string) *articleService {
+	return &articleService{
+		Service: &Service{traceId},
+	}
 }
 
 // query articles
 func (s *articleService) QueryArticlePage(param *vo.ArticleParam) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	total, err := dao.GetArticleCount(param)
 	if err != nil {
 		return errcode.QueryError
@@ -45,7 +48,8 @@ func (s *articleService) QueryArticlePage(param *vo.ArticleParam) *errcode.ErrCo
 }
 
 func (s *articleService) Query(reload bool, id ...int) *errcode.ErrCode {
-	c := cache.NewCache()
+	s.Info(reload, id)
+	c := cache.NewCache(s.TraceId)
 	var values []*bo.Article
 	if !reload {
 		values = c.GetArticle(id...)
@@ -64,7 +68,7 @@ func (s *articleService) Query(reload bool, id ...int) *errcode.ErrCode {
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 	go func() {
-		dao := repository.NewDao()
+		dao := repository.NewDao(s.TraceId)
 		if articles, articleErr = dao.QueryArticle(id...); articleErr == nil {
 			for _, v := range articles {
 				categoryIds = append(categoryIds, v.CategoryId)
@@ -104,6 +108,7 @@ func (s *articleService) Query(reload bool, id ...int) *errcode.ErrCode {
 			Title:     v.Title,
 			Content:   util.Base64DecodeString(v.Content),
 			Wraper:    v.Wraper,
+			IsOpen:    v.IsOpen,
 		}
 		if d, ok := tagMap[v.Id]; ok {
 			value.Tags = d
@@ -128,7 +133,7 @@ func (s *articleService) Query(reload bool, id ...int) *errcode.ErrCode {
 
 // add update
 func (s *articleService) Edit(param *vo.ArticleVo) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	param.Content = util.Base64EncodeObj(param.Content)
 	if param.Id == 0 {
 		id, err := dao.InsertArticle(param)
@@ -147,6 +152,7 @@ func (s *articleService) Edit(param *vo.ArticleVo) *errcode.ErrCode {
 	}
 	util.CompareIntSet(&data.UserId, &param.UserId)
 	util.CompareIntSet(&data.IsDelete, &param.IsDelete)
+	util.CompareIntSet(&data.IsOpen, &param.IsOpen)
 	util.CompareIntSet(&data.CategoryId, &param.CategoryId)
 	util.CompareIntSet(&data.NailId, &param.NailId)
 	util.CompareIntSet(&data.IsTop, &param.IsTop)
@@ -187,7 +193,8 @@ func (s *articleService) Edit(param *vo.ArticleVo) *errcode.ErrCode {
 }
 
 func (s *articleService) getTagMap(id ...int) map[int][]*bo.Tag {
-	dao := repository.NewDao()
+	s.Info(id)
+	dao := repository.NewDao(s.TraceId)
 	values, err := dao.GetArticleTags(id...)
 	if err != nil || len(values) == 0 {
 		return nil
@@ -214,7 +221,7 @@ func (s *articleService) getTagMap(id ...int) map[int][]*bo.Tag {
 	for k := range idMap {
 		ids = append(ids, k)
 	}
-	result := NewTagService().Query(false, ids...)
+	result := NewTagService(s.TraceId).Query(false, ids...)
 	if !result.IsSuccess() {
 		return nil
 	}
@@ -234,7 +241,7 @@ func (s *articleService) getTagMap(id ...int) map[int][]*bo.Tag {
 }
 
 func (s *articleService) getStatMap(id ...int) map[int][]int {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	values, err := dao.GetArticleStat(id...)
 	if err != nil || len(values) == 0 {
 		return nil
@@ -253,7 +260,7 @@ func (s *articleService) getStatMap(id ...int) map[int][]int {
 }
 
 func (s *articleService) getCategoryMap(id ...int) map[int]*bo.Category {
-	svc := NewCategoryService()
+	svc := NewCategoryService(s.TraceId)
 	result := svc.Query(false, id...)
 	if !result.IsSuccess() {
 		return nil
@@ -266,7 +273,7 @@ func (s *articleService) getCategoryMap(id ...int) map[int]*bo.Category {
 }
 
 func (s *articleService) getNailMap(id ...int) map[int]*bo.Nail {
-	svc := NewNailService()
+	svc := NewNailService(s.TraceId)
 	result := svc.Query(false, id...)
 	if !result.IsSuccess() {
 		return nil

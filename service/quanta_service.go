@@ -11,14 +11,17 @@ import (
 )
 
 type quantaService struct {
+	*Service
 }
 
-func NewQuantaService() *quantaService {
-	return &quantaService{}
+func NewQuantaService(traceId string) *quantaService {
+	return &quantaService{
+		Service: &Service{traceId},
+	}
 }
 
 func (s *quantaService) QueryPage(page *common.Page) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	total := dao.QueryQuantaCount()
 	page.SetTotal(total)
 	datas := dao.QueryQuantaPage(page)
@@ -29,7 +32,7 @@ func (s *quantaService) QueryPage(page *common.Page) *errcode.ErrCode {
 }
 
 func (s *quantaService) Query(reload bool, id ...int) *errcode.ErrCode {
-	c := cache.NewCache()
+	c := cache.NewCache(s.TraceId)
 	var values []*bo.Quanta
 	if !reload {
 		values = c.GetQuanta(id...)
@@ -37,7 +40,7 @@ func (s *quantaService) Query(reload bool, id ...int) *errcode.ErrCode {
 	if len(values) > 0 {
 		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().QueryQuanta(id...)
+	datas := repository.NewDao(s.TraceId).QueryQuanta(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
@@ -50,7 +53,7 @@ func (s *quantaService) Query(reload bool, id ...int) *errcode.ErrCode {
 
 // add update
 func (s *quantaService) Edit(param *vo.QuantaVo) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	if param.Id == 0 {
 		data := dao.GetQuantaByKey(param.Key)
 		if data != nil {
@@ -83,7 +86,7 @@ func (s *quantaService) Edit(param *vo.QuantaVo) *errcode.ErrCode {
 }
 
 func (s *quantaService) QueryByKey(key ...string) map[string]*bo.Quanta {
-	che := cache.NewCache()
+	che := cache.NewCache(s.TraceId)
 	datas := che.GetQuantaByKeys(key...)
 	m := make(map[string]*bo.Quanta)
 	if len(datas) > 0 {
@@ -92,7 +95,7 @@ func (s *quantaService) QueryByKey(key ...string) map[string]*bo.Quanta {
 		}
 		return m
 	}
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	list := dao.GetQuantaByKey(key...)
 	if len(list) == 0 {
 		return nil

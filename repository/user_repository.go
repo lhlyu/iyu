@@ -17,47 +17,47 @@ func (d *dao) QueryUser(id ...int) []*po.YuUser {
 	}
 	var values []*po.YuUser
 	if err := common.DB.Select(&values, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil
 	}
 	return values
 }
 
-func (*dao) InsertUser(user *vo.UserEditParam) (int, error) {
+func (d *dao) InsertUser(user *vo.UserEditParam) (int, error) {
 	sql := "INSERT INTO yu_user (third_id,`from`,avatar_url,user_url,user_name,bio,ip) VALUES(?,?,?,?,?,?,?)"
 	result, err := common.DB.Exec(sql, user.ThirdId, user.From, user.AvatarUrl, user.UserUrl, user.UserName, user.Ip)
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return 0, err
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return 0, err
 	}
 	return int(id), nil
 }
 
-func (*dao) GetUserById(id int) (*po.YuUser, error) {
+func (d *dao) GetUserById(id int) (*po.YuUser, error) {
 	sql := "select * from yu_user where id = ? limit 1"
 	result := &po.YuUser{}
 	if err := common.DB.Get(result, sql, id); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return result, nil
 }
 
-func (*dao) UpdateUser(user *po.YuUser) error {
+func (d *dao) UpdateUser(user *po.YuUser) error {
 	sql := "UPDATE yu_user SET role = ?,`status` = ?,avatar_url = ?,user_name = ?,bio = ?,ip = ?,updated_at = NOW() WHERE id = ?"
 	if _, err := common.DB.Exec(sql, user.Role, user.Status, user.AvatarUrl, user.UserName, user.Bio, user.Ip, user.Id); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return err
 	}
 	return nil
 }
 
-func (*dao) GetUsersCount(param *vo.UserParam) (int, error) {
+func (d *dao) GetUsersCount(param *vo.UserParam) (int, error) {
 	sql := "SELECT count(*) FROM yu_user WHERE 1 = 1"
 	var params []interface{}
 	if param.KeyWord != "" {
@@ -71,13 +71,13 @@ func (*dao) GetUsersCount(param *vo.UserParam) (int, error) {
 	}
 	var result int
 	if err := common.DB.Get(&result, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return 0, err
 	}
 	return result, nil
 }
 
-func (*dao) QueryUserPage(param *vo.UserParam, page *common.Page) ([]int, error) {
+func (d *dao) QueryUserPage(param *vo.UserParam, page *common.Page) ([]int, error) {
 	sql := "SELECT id FROM yu_user WHERE 1 = 1"
 	var params []interface{}
 	if param.KeyWord != "" {
@@ -93,7 +93,7 @@ func (*dao) QueryUserPage(param *vo.UserParam, page *common.Page) ([]int, error)
 	params = append(params, page.StartRow, page.PageSize)
 	var result []int
 	if err := common.DB.Select(&result, sql, params...); err != nil {
-		common.Ylog.Debug(err)
+		d.Error(err)
 		return nil, err
 	}
 	return result, nil

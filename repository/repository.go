@@ -3,17 +3,30 @@ package repository
 import (
 	"bytes"
 	"fmt"
+	"github.com/lhlyu/iyu/common"
 	"reflect"
 	"strings"
 )
 
 type dao struct {
+	TraceId string
 }
 
-func NewDao() *dao {
-	return &dao{}
+func NewDao(traceId string) *dao {
+	return &dao{
+		TraceId: traceId,
+	}
 }
 
+func (s *dao) Error(param ...interface{}) {
+	common.Ylog.Log(3, "error", s.TraceId, "repository", param...)
+}
+
+func (s *dao) Info(param ...interface{}) {
+	common.Ylog.Log(3, "info", s.TraceId, "repository", param...)
+}
+
+// var valueArr [][]interface{}  column ...
 func (d *dao) createQuestionMarksForBatch(v ...[]interface{}) (string, []interface{}) {
 	if len(v) == 0 {
 		return "", nil

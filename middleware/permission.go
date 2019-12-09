@@ -7,6 +7,7 @@ import (
 	"github.com/lhlyu/iyu/errcode"
 )
 
+// for login user
 func PermissionUser() context.Handler {
 	return func(ctx iris.Context) {
 		user, ok := ctx.Values().Get(common.X_USER).(*common.XUser)
@@ -18,6 +19,7 @@ func PermissionUser() context.Handler {
 	}
 }
 
+// for admin
 func PermissionAdmin() context.Handler {
 	return func(ctx iris.Context) {
 		user := ctx.Values().Get(common.X_USER).(*common.XUser)

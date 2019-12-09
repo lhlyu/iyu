@@ -11,14 +11,17 @@ import (
 )
 
 type userService struct {
+	*Service
 }
 
-func NewUserService() *userService {
-	return &userService{}
+func NewUserService(traceId string) *userService {
+	return &userService{
+		Service: &Service{traceId},
+	}
 }
 
 func (s *userService) QueryPage(param *vo.UserParam) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	total, err := dao.GetUsersCount(param)
 	if err != nil {
 		return errcode.QueryError
@@ -39,8 +42,12 @@ func (s *userService) QueryPage(param *vo.UserParam) *errcode.ErrCode {
 	return result
 }
 
+func (s *userService) Get(id int) *errcode.ErrCode {
+	return s.Query(false, id)
+}
+
 func (s *userService) Query(reload bool, id ...int) *errcode.ErrCode {
-	c := cache.NewCache()
+	c := cache.NewCache(s.TraceId)
 	var values []*bo.User
 	if !reload {
 		values = c.GetUser(id...)
@@ -48,7 +55,7 @@ func (s *userService) Query(reload bool, id ...int) *errcode.ErrCode {
 	if len(values) > 0 {
 		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().QueryUser(id...)
+	datas := repository.NewDao(s.TraceId).QueryUser(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
@@ -78,7 +85,7 @@ func (s *userService) Query(reload bool, id ...int) *errcode.ErrCode {
 
 // add update
 func (s *userService) Edit(param *vo.UserEditParam) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	if param.Id == 0 {
 		id, err := dao.InsertUser(param)
 		if err != nil {

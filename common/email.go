@@ -2,7 +2,6 @@ package common
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/go-gomail/gomail"
 	"html/template"
 	"log"
@@ -57,13 +56,14 @@ func (y *yuEmail) Send(msg *MessageContent) {
 	buf := bytes.NewBufferString("")
 	err := t.Execute(buf, msg)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("send email err = ", err)
 		return
 	}
 	y.email.SetBody("text/html", buf.String())
 	d := gomail.NewDialer(Cfg.GetString("email.host"), Cfg.GetInt("email.port"), Cfg.GetString("email.user"), Cfg.GetString("email.password"))
 	if err := d.DialAndSend(y.email); err != nil {
 		log.Println("email send failure,err = ", err)
+		return
 	}
 	log.Println("send success")
 }

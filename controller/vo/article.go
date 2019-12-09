@@ -12,6 +12,7 @@ type ArticleVo struct {
 	TagArr     []int  `json:"tagArr"`                      // 标签ID组
 	Kind       int    `json:"kind"`                        // 文章类型
 	IsDelete   int    `json:"isDelete"`                    // 是否已删除:1-未删除;2-已删除
+	IsOpen     int    `json:"isOpen"`
 }
 
 type ArticleParam struct {

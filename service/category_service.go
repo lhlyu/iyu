@@ -10,14 +10,17 @@ import (
 )
 
 type categoryService struct {
+	*Service
 }
 
-func NewCategoryService() *categoryService {
-	return &categoryService{}
+func NewCategoryService(traceId string) *categoryService {
+	return &categoryService{
+		Service: &Service{traceId},
+	}
 }
 
 func (s *categoryService) Query(reload bool, id ...int) *errcode.ErrCode {
-	c := cache.NewCache()
+	c := cache.NewCache(s.TraceId)
 	var values []*bo.Category
 	if !reload {
 		values = c.GetCategory(id...)
@@ -25,7 +28,7 @@ func (s *categoryService) Query(reload bool, id ...int) *errcode.ErrCode {
 	if len(values) > 0 {
 		return errcode.Success.WithData(values)
 	}
-	datas := repository.NewDao().QueryCategory(id...)
+	datas := repository.NewDao(s.TraceId).QueryCategory(id...)
 	if len(datas) == 0 {
 		return errcode.EmptyData
 	}
@@ -38,7 +41,7 @@ func (s *categoryService) Query(reload bool, id ...int) *errcode.ErrCode {
 
 // add update
 func (s *categoryService) Edit(param *vo.CategoryVo) *errcode.ErrCode {
-	dao := repository.NewDao()
+	dao := repository.NewDao(s.TraceId)
 	if param.Id == 0 {
 		data := dao.GetCategoryByName(param.Name)
 		if data != nil {

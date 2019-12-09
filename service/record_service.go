@@ -7,23 +7,26 @@ import (
 )
 
 type recordService struct {
+	*Service
 }
 
-func NewRecordService() *recordService {
-	return &recordService{}
+func NewRecordService(traceId string) *recordService {
+	return &recordService{
+		Service: &Service{traceId},
+	}
 }
 
-func (*recordService) Insert(param *vo.RecordParam) *errcode.ErrCode {
-	if err := repository.NewDao().InsertRecord([]*vo.RecordParam{param}); err != nil {
+func (s *recordService) Insert(param *vo.RecordParam) *errcode.ErrCode {
+	if err := repository.NewDao(s.TraceId).InsertRecord([]*vo.RecordParam{param}); err != nil {
 		return errcode.InsertError
 	}
-	svc := NewArticleService()
+	svc := NewArticleService(s.TraceId)
 	svc.Query(true, param.BusinessId)
 	return errcode.Success
 }
 
-func (*recordService) BatchInsert(param []*vo.RecordParam) *errcode.ErrCode {
-	if err := repository.NewDao().InsertRecord(param); err != nil {
+func (s *recordService) BatchInsert(param []*vo.RecordParam) *errcode.ErrCode {
+	if err := repository.NewDao(s.TraceId).InsertRecord(param); err != nil {
 		return errcode.InsertError
 	}
 	return errcode.Success

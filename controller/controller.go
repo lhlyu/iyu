@@ -18,7 +18,20 @@ var validate = validator.New()
 type controller struct {
 }
 
-func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {
+func (s controller) Error(traceId string, param ...interface{}) {
+	common.Ylog.Log(4, "error", traceId, "controller", param...)
+}
+
+func (s controller) Info(traceId string, param ...interface{}) {
+	common.Ylog.Log(3, "info", traceId, "controller", param...)
+}
+
+// 统一响应处理
+func (s controller) Response(ctx iris.Context, data interface{}) {
+	ctx.JSON(data)
+}
+
+func (c controller) getParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {
 	// 根据方法获取参数
 	// GET  -   query params
 	// POST/PUT/DELETE  - body param
@@ -26,6 +39,7 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 	switch method {
 	case "GET":
 		if err := ctx.ReadQuery(v); err != nil {
+			c.Error(c.GetGUID(ctx), err)
 			return errcode.IllegalParam
 		}
 	case "POST", "PUT", "DELETE":
@@ -33,18 +47,22 @@ func (controller) getParams(ctx iris.Context, v interface{}, check bool) *errcod
 		switch contentType {
 		case "application/json":
 			if err := ctx.ReadJSON(v); err != nil {
+				c.Error(c.GetGUID(ctx), err)
 				return errcode.IllegalParam
 			}
 		case "application/x-www-form-urlencoded":
 			if err := ctx.ReadForm(v); err != nil {
+				c.Error(c.GetGUID(ctx), err)
 				return errcode.IllegalParam
 			}
 		}
 	}
+	c.Error(c.GetGUID(ctx), v)
 	if !check {
 		return nil
 	}
 	if err := validate.Struct(v); err != nil {
+		c.Error(c.GetGUID(ctx), err.Error())
 		return errcode.IllegalParam
 	}
 	return nil
@@ -61,7 +79,7 @@ iat: 签发时间
 jti: 唯一身份标识
 */
 
-func (controller) getToken(user *common.XUser) string {
+func (c controller) getToken(user *common.XUser) string {
 	itv := common.Cfg.GetInt("jwt.itv")
 	if itv == 0 {
 		itv = common.ITV
@@ -76,7 +94,8 @@ func (controller) getToken(user *common.XUser) string {
 	m["iss"] = common.Cfg.GetString("author")
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
 	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
-	cache.NewCache().SetJwt(tokenString)
+
+	cache.NewCache("").SetJwt(tokenString)
 	return tokenString
 }
 
@@ -98,10 +117,14 @@ func (controller) GetUser(ctx iris.Context) *common.XUser {
 	return ctx.Values().Get(common.X_USER).(*common.XUser)
 }
 
+func (controller) GetGUID(ctx iris.Context) string {
+	return ctx.Values().Get(common.X_TRACE).(string)
+}
+
 // 记录
 func (c controller) Record(ctx iris.Context, BusinessId, BusinessKind, Action int) {
 	user := c.GetUser(ctx)
-	svc := service.NewRecordService()
+	svc := service.NewRecordService(c.GetGUID(ctx))
 	param := &vo.RecordParam{
 		UserId:       user.Id,
 		Ip:           user.Ip,
@@ -115,7 +138,7 @@ func (c controller) Record(ctx iris.Context, BusinessId, BusinessKind, Action in
 	}
 	key := util.Base64EncodeObj(param)
 	// 限制
-	cache.NewCache().Record(key, func() {
+	cache.NewCache(c.GetGUID(ctx)).Record(key, func() {
 		svc.Insert(param)
 	})
 }
@@ -141,6 +164,5 @@ type Controller struct {
 	nailController
 	categoryController
 	quantaController
-	cmntController
-	postController
+	websiteController
 }

@@ -18,10 +18,11 @@ const (
 const PERMISSION = LV8
 
 const (
-	X_ID   = "i"
-	X_ROLE = "r"
-	X_TIME = "t"
-	X_USER = "x"
+	X_ID    = "i"
+	X_ROLE  = "r"
+	X_TIME  = "t"
+	X_USER  = "x"
+	X_TRACE = "c"
 )
 
 type XUser struct {
