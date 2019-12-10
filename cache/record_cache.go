@@ -14,3 +14,17 @@ func (c *cache) Record(key string, f func()) {
 		f()
 	}
 }
+
+/**
+redis design
+文章浏览总量: hset iyu:article:fire {id} number
+            hincrby iyu:article:fire {id} count       // + 1
+文章赞总量: hset iyu:article:like {id} number
+          hincrby iyu:article:like {id} count       // + 1  or  -1
+
+
+// 记录用户
+文章浏览: set iyu:article:fire:{id} userId
+文章Like: set iyu:article:like:{id} userId
+
+*/
