@@ -9,6 +9,7 @@ import (
 	"github.com/lhlyu/iyu/repository/po"
 	"github.com/lhlyu/iyu/service/bo"
 	"github.com/lhlyu/iyu/util"
+	"github.com/lhlyu/yutil"
 	"strconv"
 	"strings"
 	"sync"
@@ -106,8 +107,8 @@ func (s *articleService) Query(reload bool, id ...int) *errcode.ErrCode {
 			CreatedAt: int(v.CreatedAt.Unix()),
 			UpdatedAt: int(updatedAt),
 			Title:     v.Title,
-			Content:   util.Base64DecodeString(v.Content),
-			Wraper:    v.Wraper,
+			Content:   yutil.Base64DecodeStrToStr(v.Content),
+			Wrapper:   v.Wrapper,
 			IsOpen:    v.IsOpen,
 		}
 		if d, ok := tagMap[v.Id]; ok {
@@ -134,7 +135,7 @@ func (s *articleService) Query(reload bool, id ...int) *errcode.ErrCode {
 // add update
 func (s *articleService) Edit(param *vo.ArticleVo) *errcode.ErrCode {
 	dao := repository.NewDao(s.TraceId)
-	param.Content = util.Base64EncodeObj(param.Content)
+	param.Content = yutil.Base64EncodeObjToStr(param.Content)
 	if param.Id == 0 {
 		id, err := dao.InsertArticle(param)
 		if err != nil {
@@ -159,7 +160,7 @@ func (s *articleService) Edit(param *vo.ArticleVo) *errcode.ErrCode {
 	util.CompareIntSet(&data.Kind, &param.Kind)
 	util.CompareStrSet(&data.Title, &param.Title)
 	util.CompareStrSet(&data.Content, &param.Content)
-	util.CompareStrSet(&data.Wraper, &param.Wraper)
+	util.CompareStrSet(&data.Wrapper, &param.Wrapper)
 
 	NeedUpdateTag := false
 	if len(param.TagArr) > 0 {

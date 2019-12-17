@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
+	"github.com/lhlyu/yutil"
 	"net"
-	"regexp"
 	"testing"
 )
 
@@ -12,8 +12,11 @@ type A struct {
 }
 
 func TestSome(t *testing.T) {
-	regex := `[\P{Han}\W]+`
-	fmt.Println(regexp.MatchString(regex, "汉字"))
+	var a = "sda"
+	var b int
+	yutil.NotIgnore()
+	yutil.JsonStrToObj(a, &b)
+
 }
 
 func getMacAddrs() (macAddrs []string) {

@@ -3,17 +3,17 @@ package common
 import "math"
 
 type Page struct {
-	PageNum     int  `json:"pageNum" validate:"required,gt=0"`
-	PageSize    int  `json:"pageSize" validate:"required,gt=0"`
-	Total       int  `json:"total"`
-	PageMax     int  `json:"pageMax"`
-	PrePage     int  `json:"prePage"`
-	NextPage    int  `json:"nextPage"`
-	HasPrePage  bool `json:"hasPrePage"`
-	HasNextPage bool `json:"hasNextPage"`
-	Remainder   int  `json:"remainder"`
-	StartRow    int  `json:"-"`
-	StopRow     int  `json:"-"`
+	PageNum     int  `json:"pageNum" validate:"required,gt=0"`  // 当前页码
+	PageSize    int  `json:"pageSize" validate:"required,gt=0"` // 每页记录条数
+	Total       int  `json:"total"`                             // 记录总量
+	PageMax     int  `json:"pageMax"`                           // 最大页码
+	PrePage     int  `json:"prePage"`                           // 上一页码,如果没有为 0
+	NextPage    int  `json:"nextPage"`                          // 下一页码,如果没有为 0
+	HasPrePage  bool `json:"hasPrePage"`                        // 是否有上一页
+	HasNextPage bool `json:"hasNextPage"`                       // 是否有下一页
+	Remainder   int  `json:"remainder"`                         // 剩余数据量
+	StartRow    int  `json:"-"`                                 // 记录开始行
+	StopRow     int  `json:"-"`                                 // 记录结束行
 }
 
 func NewPage(pageNum, pageSize int) *Page {
@@ -37,13 +37,13 @@ func (p *Page) SetTotal(total int) {
 	p.PrePage = p.PageNum - 1
 	p.NextPage = p.PageNum + 1
 	if p.PrePage <= 0 {
-		p.PrePage = -1
+		p.PrePage = 0
 		p.HasPrePage = false
 	} else {
 		p.HasPrePage = true
 	}
 	if p.NextPage >= p.PageMax {
-		p.NextPage = -1
+		p.NextPage = 0
 		p.HasNextPage = false
 	} else {
 		p.HasNextPage = true

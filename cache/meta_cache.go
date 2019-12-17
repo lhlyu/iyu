@@ -2,7 +2,7 @@ package cache
 
 import (
 	"github.com/lhlyu/iyu/service/bo"
-	"github.com/lhlyu/iyu/util"
+	"github.com/lhlyu/yutil"
 	"strconv"
 )
 
@@ -24,7 +24,7 @@ func (c cache) SetTag(values ...*bo.Tag) {
 	if c.hasRedis() {
 		m := make(map[string]interface{})
 		for _, v := range values {
-			value := util.ObjToJsonStr(v)
+			value := yutil.JsonObjToStr(v)
 			m[strconv.Itoa(v.Id)] = value
 		}
 		c.setMap(_tag_key, m, _ONE_WEEK)
@@ -33,11 +33,12 @@ func (c cache) SetTag(values ...*bo.Tag) {
 
 func (c cache) GetTag(field ...int) []*bo.Tag {
 	if c.hasRedis() {
-		arr := c.getMap(_tag_key, util.IntSlinceToStringSlince(field)...)
+		arr := c.getMap(_tag_key, yutil.SliceIntToStr(field)...)
 		var values []*bo.Tag
 		for _, v := range arr {
 			value := &bo.Tag{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)
@@ -55,7 +56,7 @@ func (c cache) SetCategory(values ...*bo.Category) {
 	if c.hasRedis() {
 		m := make(map[string]interface{})
 		for _, v := range values {
-			value := util.ObjToJsonStr(v)
+			value := yutil.JsonObjToStr(v)
 			m[strconv.Itoa(v.Id)] = value
 		}
 		c.setMap(_category_key, m, _ONE_WEEK)
@@ -64,11 +65,12 @@ func (c cache) SetCategory(values ...*bo.Category) {
 
 func (c cache) GetCategory(field ...int) []*bo.Category {
 	if c.hasRedis() {
-		arr := c.getMap(_category_key, util.IntSlinceToStringSlince(field)...)
+		arr := c.getMap(_category_key, yutil.SliceIntToStr(field)...)
 		var values []*bo.Category
 		for _, v := range arr {
 			value := &bo.Category{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)
@@ -86,7 +88,7 @@ func (c cache) SetNail(values ...*bo.Nail) {
 	if c.hasRedis() {
 		m := make(map[string]interface{})
 		for _, v := range values {
-			value := util.ObjToJsonStr(v)
+			value := yutil.JsonObjToStr(v)
 			m[strconv.Itoa(v.Id)] = value
 		}
 		c.setMap(_nail_key, m, _ONE_WEEK)
@@ -95,11 +97,12 @@ func (c cache) SetNail(values ...*bo.Nail) {
 
 func (c cache) GetNail(field ...int) []*bo.Nail {
 	if c.hasRedis() {
-		arr := c.getMap(_nail_key, util.IntSlinceToStringSlince(field)...)
+		arr := c.getMap(_nail_key, yutil.SliceIntToStr(field)...)
 		var values []*bo.Nail
 		for _, v := range arr {
 			value := &bo.Nail{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)
@@ -118,7 +121,7 @@ func (c cache) SetQuanta(values ...*bo.Quanta) {
 		m := make(map[string]interface{})
 		n := make(map[string]interface{})
 		for _, v := range values {
-			value := util.ObjToJsonStr(v)
+			value := yutil.JsonObjToStr(v)
 			m[strconv.Itoa(v.Id)] = value
 			n[v.Key] = value
 		}
@@ -129,11 +132,12 @@ func (c cache) SetQuanta(values ...*bo.Quanta) {
 
 func (c cache) GetQuanta(field ...int) []*bo.Quanta {
 	if c.hasRedis() {
-		arr := c.getMap(_quanta_map, util.IntSlinceToStringSlince(field)...)
+		arr := c.getMap(_quanta_map, yutil.SliceIntToStr(field)...)
 		var values []*bo.Quanta
 		for _, v := range arr {
 			value := &bo.Quanta{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)
@@ -149,7 +153,8 @@ func (c cache) GetQuantaByKeys(field ...string) []*bo.Quanta {
 		var values []*bo.Quanta
 		for _, v := range arr {
 			value := &bo.Quanta{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)
@@ -167,7 +172,7 @@ func (c cache) SetUser(values ...*bo.User) {
 	if c.hasRedis() {
 		m := make(map[string]interface{})
 		for _, v := range values {
-			value := util.ObjToJsonStr(v)
+			value := yutil.JsonObjToStr(v)
 			m[strconv.Itoa(v.Id)] = value
 		}
 		c.setMap(_user_key, m, _ONE_WEEK)
@@ -176,11 +181,12 @@ func (c cache) SetUser(values ...*bo.User) {
 
 func (c cache) GetUser(field ...int) []*bo.User {
 	if c.hasRedis() {
-		arr := c.getMap(_user_key, util.IntSlinceToStringSlince(field)...)
+		arr := c.getMap(_user_key, yutil.SliceIntToStr(field)...)
 		var values []*bo.User
 		for _, v := range arr {
 			value := &bo.User{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)
@@ -198,7 +204,7 @@ func (c cache) SetArticle(values ...*bo.Article) {
 	if c.hasRedis() {
 		m := make(map[string]interface{})
 		for _, v := range values {
-			value := util.ObjToJsonStr(v)
+			value := yutil.JsonObjToStr(v)
 			m[strconv.Itoa(v.Id)] = value
 		}
 		c.setMap(_article_key, m, _ONE_WEEK)
@@ -207,11 +213,12 @@ func (c cache) SetArticle(values ...*bo.Article) {
 
 func (c cache) GetArticle(field ...int) []*bo.Article {
 	if c.hasRedis() {
-		arr := c.getMap(_article_key, util.IntSlinceToStringSlince(field)...)
+		arr := c.getMap(_article_key, yutil.SliceIntToStr(field)...)
 		var values []*bo.Article
 		for _, v := range arr {
 			value := &bo.Article{}
-			if err := util.JsonStrToObj(v, value); err != nil {
+			yutil.JsonStrToObj(v, value)
+			if value == nil {
 				continue
 			}
 			values = append(values, value)

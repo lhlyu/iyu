@@ -5,8 +5,8 @@ import "strings"
 const (
 	LV0 = iota // 游客
 	LV1        // 普通
-	LV2
-	LV3
+	LV2        // 观察者
+	LV3        // 测试者
 	LV4
 	LV5
 	LV6

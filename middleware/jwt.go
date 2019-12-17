@@ -7,7 +7,7 @@ import (
 	"github.com/lhlyu/iyu/cache"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/errcode"
-	"github.com/lhlyu/iyu/util"
+	"github.com/lhlyu/yutil"
 )
 
 /**
@@ -17,7 +17,7 @@ func Jwt() context.Handler {
 	return func(ctx iris.Context) {
 		traceId := ctx.Values().Get(common.X_TRACE).(string)
 		user := &common.XUser{}
-		user.Ip = util.RemoteIp(ctx.Request())
+		user.Ip = yutil.ClientIp(ctx.Request())
 		var err error
 		if err = jwt.New(jwt.Config{
 			ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {

@@ -16,7 +16,7 @@ func (c *cache) Record(key string, f func()) {
 }
 
 /**
-redis design
+redis design todo
 文章浏览总量: hset iyu:article:fire {id} number
             hincrby iyu:article:fire {id} count       // + 1
 文章赞总量: hset iyu:article:like {id} number

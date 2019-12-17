@@ -12,7 +12,7 @@ type Article struct {
 	IsOpen    int       `json:"isOpen"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
-	Wraper    string    `json:"wraper"`
+	Wrapper   string    `json:"wrapper"`
 	Nail      *Nail     `json:"nail"`
 	Category  *Category `json:"category"`
 	Tags      []*Tag    `json:"tags"`

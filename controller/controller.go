@@ -8,7 +8,7 @@ import (
 	"github.com/lhlyu/iyu/controller/vo"
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/service"
-	"github.com/lhlyu/iyu/util"
+	"github.com/lhlyu/yutil"
 	"gopkg.in/go-playground/validator.v9"
 	"time"
 )
@@ -141,7 +141,7 @@ func (c controller) Record(ctx iris.Context, BusinessId, BusinessKind, Action in
 		svc.Insert(param)
 		return
 	}
-	key := util.Base64EncodeObj(param)
+	key := yutil.Base64EncodeObjToStr(param)
 	// 限制
 	cache.NewCache(c.GetGUID(ctx)).Record(key, func() {
 		svc.Insert(param)

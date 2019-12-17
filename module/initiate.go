@@ -5,6 +5,7 @@ import (
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/service"
 	"github.com/lhlyu/iyu/util"
+	"github.com/lhlyu/yutil"
 	"log"
 	"time"
 )
@@ -19,6 +20,8 @@ func (initiate) seq() int {
 
 func (initiate) SetUp() {
 	log.Println("init initiate module ->")
+	// 工具包不忽略错误
+	yutil.NotIgnore()
 	// 初始化数据
 	traceId := util.GetGID()
 	che := cache.NewCache(traceId)

@@ -3,7 +3,7 @@ package vo
 type ArticleVo struct {
 	Id         int    `json:"id"`                          // 文章ID
 	UserId     int    `json:"-"`                           // 用户ID
-	Wraper     string `json:"wraper"`                      // 头背景
+	Wrapper    string `json:"wrapper"`                     // 头背景
 	Title      string `json:"title" validate:"required"`   // 标题
 	Content    string `json:"content" validate:"required"` // 内容
 	IsTop      int    `json:"isTop"`                       // 是否置顶:1-不置顶;2-置顶

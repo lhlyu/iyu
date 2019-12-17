@@ -77,10 +77,10 @@ func (d *dao) QueryArticlePage(param *vo.ArticleParam, page *common.Page) ([]int
 
 // 插入
 func (d *dao) InsertArticle(article *vo.ArticleVo) (int, error) {
-	sql1 := "INSERT INTO yu_article(user_id,wraper,title,content,is_top,category_id,nail_id,kind,is_open,is_delete,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,NOW(),NOW());"
+	sql1 := "INSERT INTO yu_article(user_id,wrapper,title,content,is_top,category_id,nail_id,kind,is_open,is_delete,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,NOW(),NOW());"
 	sql2 := "INSERT INTO yu_article_tag(article_id,tag_id)"
 	tx, _ := common.DB.Beginx()
-	rs, err := tx.Exec(sql1, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsOpen, article.IsDelete)
+	rs, err := tx.Exec(sql1, article.UserId, article.Wrapper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsOpen, article.IsDelete)
 	if err != nil {
 		d.Error(err)
 		tx.Rollback()
@@ -168,9 +168,9 @@ func (d *dao) GetArticleStat(ids ...int) ([]*po.Stat, error) {
 
 // 更新
 func (d *dao) UpdateArticle(article *po.YuArticle, articleTags []int) error {
-	sql := "UPDATE yu_article SET user_id = ?,wraper = ?,title = ?,content = ?,is_top = ?,category_id = ?,nail_id = ?,kind = ?,is_open = ?,is_delete = ?,updated_at = NOW() WHERE id = ?"
+	sql := "UPDATE yu_article SET user_id = ?,wrapper = ?,title = ?,content = ?,is_top = ?,category_id = ?,nail_id = ?,kind = ?,is_open = ?,is_delete = ?,updated_at = NOW() WHERE id = ?"
 	tx, _ := common.DB.Beginx()
-	if _, err := tx.Exec(sql, article.UserId, article.Wraper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsOpen, article.IsDelete, article.Id); err != nil {
+	if _, err := tx.Exec(sql, article.UserId, article.Wrapper, article.Title, article.Content, article.IsTop, article.CategoryId, article.NailId, article.Kind, article.IsOpen, article.IsDelete, article.Id); err != nil {
 		d.Error(err)
 		tx.Rollback()
 		return nil
