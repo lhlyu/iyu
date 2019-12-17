@@ -6,13 +6,13 @@ import (
 	"github.com/kataras/golog"
 	"github.com/kataras/pio"
 	"github.com/lhlyu/iyu/util"
-	"os"
+    "github.com/lhlyu/yutil"
+    "os"
 	"strconv"
 	"strings"
 	"time"
 )
 
-const _timeFormat = "2006-01-02 15:04:05"
 
 type ylog struct {
 	g          *golog.Logger
@@ -24,7 +24,7 @@ type ylog struct {
 func NewYlog(level, timeFormat, outFile string) *ylog {
 	g := golog.New()
 	yg := &ylog{
-		timeFormat: _timeFormat,
+		timeFormat: yutil.DEFAULT_TIME_FORMAT,
 		g:          g,
 	}
 	if level != "" {

@@ -27,11 +27,3 @@ func CurrentInfo(callerSkip int) (funcName string, fileName string, line int) {
 		return "", "", -1
 	}
 }
-
-// 获取正在运行的函数名
-func RunFuncName(skip int) string {
-	pc := make([]uintptr, 1)
-	runtime.Callers(skip, pc)
-	f := runtime.FuncForPC(pc[0])
-	return f.Name()
-}
