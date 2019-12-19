@@ -29,7 +29,10 @@ func (p *Page) SetTotal(total int) {
 	}
 	p.Total = total
 	if p.PageSize <= 0 {
-		return
+		p.PageSize = p.Total
+	}
+	if p.PageSize > 1000 {
+		p.PageSize = 1000
 	}
 	p.PageMax = int(math.Ceil(float64(p.Total) / float64(p.PageSize)))
 	p.StartRow = (p.PageNum - 1) * p.PageSize

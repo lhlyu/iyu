@@ -22,5 +22,4 @@ func NewService(traceId string) *QuantaService {
 
 func (s *QuantaService) QueryQuanta() {
 	s.Info("QuantaService")
-	s.dao.Query()
 }
