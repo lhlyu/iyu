@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/service/quanta_service"
 )
 
 type userController struct {
@@ -19,5 +20,7 @@ GitHub对博客提供的授权码进行验证，验证无误后，发放一个�
 GitHub 确认令牌无误，返回给我基本的用户信息
 */
 func (c *userController) Login(ctx iris.Context) {
+	svc := quanta_service.NewService(c.GetTraceId(ctx))
+	svc.QueryQuanta()
 	ctx.JSON("xxxx")
 }

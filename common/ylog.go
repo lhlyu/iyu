@@ -6,13 +6,12 @@ import (
 	"github.com/kataras/golog"
 	"github.com/kataras/pio"
 	"github.com/lhlyu/iyu/util"
-    "github.com/lhlyu/yutil"
-    "os"
+	"github.com/lhlyu/yutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
-
 
 type ylog struct {
 	g          *golog.Logger
@@ -77,15 +76,15 @@ func (y *ylog) Log(skip int, level, traceId, layer string, param ...interface{})
 	}
 	fname, fileName, line := util.CurrentInfo(skip)
 	m := map[string]interface{}{
-		"LEVEL":     level,
-		"TRACEID":   traceId,
-		"LAYER":     layer,
-		"FNAME":     fname,
-		"CREATEDAT": time.Now().Format(y.timeFormat),
-		"POSITION":  strings.Join([]string{fileName, strconv.Itoa(line)}, ":"),
+		"0.traceid":   traceId,
+		"1.level":     level,
+		"2.layer":     layer,
+		"3.fname":     fname,
+		"5.position":  strings.Join([]string{fileName, strconv.Itoa(line)}, ":"),
+		"6.createdat": time.Now().Format(y.timeFormat),
 	}
 	if len(param) > 0 {
-		m["PARAM"] = fmt.Sprint(param...)
+		m["4.param"] = fmt.Sprint(param...)
 	}
 	bytes, _ := json.Marshal(m)
 	y.g.Log(golog.ParseLevel(level), string(bytes))

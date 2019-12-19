@@ -13,18 +13,7 @@ import (
 var validate = validator.New()
 
 type controller struct {
-}
-
-func (s controller) Error(traceId string, err error) bool {
-	if err == nil {
-		return false
-	}
-	common.Ylog.Log(4, "error", traceId, "controller", err.Error())
-	return true
-}
-
-func (s controller) Info(traceId string, param ...interface{}) {
-	common.Ylog.Log(4, "info", traceId, "controller", param...)
+	common.BaseController
 }
 
 func (c controller) getParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {

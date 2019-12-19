@@ -3,21 +3,53 @@ package cache
 import "github.com/lhlyu/iyu/common"
 
 type Cache struct {
-	TraceId string
+	common.BaseCache
 }
 
 func NewCache(traceId string) *Cache {
-	return &Cache{traceId}
+	che := &Cache{}
+	che.SetTraceId(traceId)
+	return che
 }
 
-func (s *Cache) Error(err error) bool {
-	if err == nil {
-		return false
-	}
-	common.Ylog.Log(3, "error", s.TraceId, "cache", err.Error())
-	return true
-}
+/**
+常用元素: 网站配置 分类 标签
+type: hash
+survival: week
+named:
+  iyu:quanta   key   value
+  iyu:category id    value
+  iyu:tag      id    value
 
-func (s *Cache) Info(param ...interface{}) {
-	common.Ylog.Log(3, "info", s.TraceId, "cache", param...)
-}
+用户:
+type: hash
+survival: day
+named:
+    iyu:user  userId   value
+
+type: set
+survival: day
+
+named:
+    iyu:global:visit  userId
+    iyu:article:visit:{id}  userId
+    iyu:article:like:{id}   userId
+    iyu:cmnt:like:{id}      userId
+    iyu:reply:like:{id}     userId
+
+article
+
+type: hash
+survival: day
+
+named:
+    iyu:article  id  value
+
+
+type : string  nx
+token:
+    iyu:token:{userId}  value
+
+future:
+网站访问量 文章访问量
+*/
