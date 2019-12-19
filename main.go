@@ -23,11 +23,19 @@ func main() {
 
 	app := iris.New()
 
+	// 前置
+	app.Use(middleware.Before())
 	app.Use(recover.New())
 	app.Use(middleware.Limiter()) // 限制每秒访问数量
 	app.Use(middleware.Log())
 	app.Use(middleware.Cors())
 	app.Use(middleware.Jwt())
+
+	// 后置 Post-Middleware
+	app.Done(middleware.After())
+	app.SetExecutionRules(iris.ExecutionRules{
+		Done: iris.ExecutionOptions{Force: true},
+	})
 
 	router.SetRouter(app)
 

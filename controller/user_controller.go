@@ -1,7 +1,7 @@
 package controller
 
 import (
-    "github.com/kataras/iris"
+	"github.com/kataras/iris"
 )
 
 type userController struct {
@@ -19,7 +19,5 @@ GitHub对博客提供的授权码进行验证，验证无误后，发放一个�
 GitHub 确认令牌无误，返回给我基本的用户信息
 */
 func (c *userController) Login(ctx iris.Context) {
-
+	ctx.JSON("xxxx")
 }
-
-

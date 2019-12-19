@@ -12,21 +12,19 @@ const (
 	DELETED   // 已删除
 )
 
-// action kind
-const (
-	KIND_GLOBAL = iota
-	KIND_ARTICLE
-	KIND_CMNT
-	KIND_POST
-)
-
-// action
+// business_kind
+// 1.系统操作;2.错误日志;3.用户登录;4.全站浏览;5.文章浏览;6.文章评论;7.文章回复;8.文章赞;9.文章踩
 const (
 	_ = iota
-	ACTION_VISIT
-	ACTION_CMNT
-	ACTION_LIKE
-	ACTION_UNLIKE
+	business_system_op
+	business_error_log
+	business_user_login
+	business_global_visit
+	business_article_visit
+	business_article_comment
+	business_article_reply
+	business_article_like
+	business_article_unlike
 )
 
 // article kind
@@ -39,7 +37,7 @@ const (
 const (
 	ADMIN = "admin"
 	COLOR = "#000000"
-	ITV   = 3600 * 24
+	ITV   = 3600 * 24 // 有效时间
 )
 
 // quanta key

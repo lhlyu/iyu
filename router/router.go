@@ -3,7 +3,6 @@ package router
 import (
 	"github.com/kataras/iris"
 	"github.com/lhlyu/iyu/controller"
-	"github.com/lhlyu/iyu/middleware"
 )
 
 func SetRouter(app *iris.Application) {
@@ -15,14 +14,14 @@ func SetRouter(app *iris.Application) {
 
 	api := app.Party("/api")
 	{
-
+		api.Get("/", ctr.Login)
 	}
-	{
-		api.Use(middleware.PermissionUser())
-	}
-	api.Party("/admin", middleware.PermissionAdmin())
-	{
-
-
-	}
+	//{
+	//	api.Use(middleware.PermissionUser())
+	//}
+	//api.Party("/admin", middleware.PermissionAdmin())
+	//{
+	//
+	//
+	//}
 }

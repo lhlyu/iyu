@@ -10,5 +10,5 @@ type websiteController struct {
 }
 
 func (c *websiteController) NoFoundHandler(ctx iris.Context) {
-	c.Response(ctx, errcode.NofoundError)
+	ctx.Values().Set("resp", errcode.NofoundError)
 }
