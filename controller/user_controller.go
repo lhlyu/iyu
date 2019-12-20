@@ -2,6 +2,8 @@ package controller
 
 import (
 	"github.com/kataras/iris"
+	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/dto"
 	"github.com/lhlyu/iyu/service/quanta_service"
 )
 
@@ -21,6 +23,9 @@ GitHub 确认令牌无误，返回给我基本的用户信息
 */
 func (c *userController) Login(ctx iris.Context) {
 	svc := quanta_service.NewService(c.GetTraceId(ctx))
-	svc.QueryQuanta()
-	ctx.JSON("xxxx")
+	svc.LoadQuanta(0)
+	param := &dto.QuantaDto{
+		Page: common.NewPageAll(),
+	}
+	ctx.JSON(svc.QueryQuantaPage(param))
 }

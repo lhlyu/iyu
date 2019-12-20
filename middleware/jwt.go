@@ -1,11 +1,11 @@
 package middleware
 
 import (
-    "github.com/iris-contrib/middleware/jwt"
-    "github.com/kataras/iris"
-    "github.com/kataras/iris/context"
-    "github.com/lhlyu/iyu/common"
-    "github.com/lhlyu/yutil"
+	"github.com/iris-contrib/middleware/jwt"
+	"github.com/kataras/iris"
+	"github.com/kataras/iris/context"
+	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/yutil"
 )
 
 /**

@@ -76,15 +76,15 @@ func (y *ylog) Log(skip int, level, traceId, layer string, param ...interface{})
 	}
 	fname, fileName, line := util.CurrentInfo(skip)
 	m := map[string]interface{}{
-		"0.traceid":   traceId,
-		"1.level":     level,
-		"2.layer":     layer,
-		"3.fname":     fname,
-		"5.position":  strings.Join([]string{fileName, strconv.Itoa(line)}, ":"),
-		"6.createdat": time.Now().Format(y.timeFormat),
+		"1.traceid":   traceId,
+		"2.level":     level,
+		"3.layer":     layer,
+		"4.fname":     fname,
+		"6.position":  strings.Join([]string{fileName, strconv.Itoa(line)}, ":"),
+		"0.createdat": time.Now().Format(y.timeFormat),
 	}
 	if len(param) > 0 {
-		m["4.param"] = fmt.Sprint(param...)
+		m["5.param"] = fmt.Sprint(param...)
 	}
 	bytes, _ := json.Marshal(m)
 	y.g.Log(golog.ParseLevel(level), string(bytes))

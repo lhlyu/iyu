@@ -1,4 +1,4 @@
-package category_repository
+package tag_repository
 
 import (
 	"github.com/lhlyu/iyu/common"
@@ -16,9 +16,9 @@ func NewDao(traceId string) *Dao {
 	return dao
 }
 
-func (d *Dao) Count(whr *po.YuCategory) int {
+func (d *Dao) Count(whr *po.YuTag) int {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("select count(*) from yu_category where 1 = 1")
+	qb.Add("select count(*) from yu_tag where 1 = 1")
 	qb.AddWhrGtZero(" and id = ?", whr.Id)
 	qb.AddWhrGtZero(" and is_delete = ?", whr.IsDelete)
 	qb.AddWhrNeqEmpty(" and name = ?", whr.Name)
@@ -31,15 +31,15 @@ func (d *Dao) Count(whr *po.YuCategory) int {
 	return value
 }
 
-func (d *Dao) QueryPage(whr *po.YuCategory, page *common.Page) []*po.YuCategory {
+func (d *Dao) QueryPage(whr *po.YuTag, page *common.Page) []*po.YuTag {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("select * from yu_category where 1 = 1")
+	qb.Add("select * from yu_tag where 1 = 1")
 	qb.AddWhrGtZero(" and id = ?", whr.Id)
 	qb.AddWhrGtZero(" and is_delete = ?", whr.IsDelete)
 	qb.AddWhrNeqEmpty(" and name = ?", whr.Name)
 	qb.Add(" limit ?,?", page.StartRow, page.PageSize)
 	sql, params := qb.Build()
-	var values []*po.YuCategory
+	var values []*po.YuTag
 	if err := common.DB.Select(&values, sql, params...); err != nil {
 		d.Error(err, sql, params)
 		return nil
@@ -47,14 +47,14 @@ func (d *Dao) QueryPage(whr *po.YuCategory, page *common.Page) []*po.YuCategory 
 	return values
 }
 
-func (d *Dao) Get(whr *po.YuCategory) *po.YuCategory {
+func (d *Dao) Get(whr *po.YuTag) *po.YuTag {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("select * from yu_category where 1 = 1")
+	qb.Add("select * from yu_tag where 1 = 1")
 	qb.AddWhrGtZero(" and id = ?", whr.Id)
 	qb.AddWhrNeqEmpty(" and name = ?", whr.Name)
 	qb.Add(" limit 1")
 	sql, params := qb.Build()
-	var values []*po.YuCategory
+	var values []*po.YuTag
 	if err := common.DB.Select(&values, sql, params...); err != nil {
 		d.Error(err, sql, params)
 		return nil
@@ -65,12 +65,12 @@ func (d *Dao) Get(whr *po.YuCategory) *po.YuCategory {
 	return values[0]
 }
 
-func (d *Dao) GetByIds(ids ...int) []*po.YuCategory {
+func (d *Dao) GetByIds(ids ...int) []*po.YuTag {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("select * from yu_category where 1 = 1")
+	qb.Add("select * from yu_tag where 1 = 1")
 	qb.AddWhrIn(" and id in (%s)", yutil.ConvertIntToInterface(ids)...)
 	sql, params := qb.Build()
-	var values []*po.YuCategory
+	var values []*po.YuTag
 	if err := common.DB.Select(&values, sql, params...); err != nil {
 		d.Error(err, sql, params)
 		return nil
@@ -78,9 +78,9 @@ func (d *Dao) GetByIds(ids ...int) []*po.YuCategory {
 	return values
 }
 
-func (d *Dao) Add(whr *po.YuCategory) int {
+func (d *Dao) Add(whr *po.YuTag) int {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("insert into yu_category(name,color) values(?,?)", whr.Name, whr.Color)
+	qb.Add("insert into yu_tag(name) values(?,?)", whr.Name)
 	sql, params := qb.Build()
 	rs, err := common.DB.Exec(sql, params...)
 	if err != nil {
@@ -95,12 +95,11 @@ func (d *Dao) Add(whr *po.YuCategory) int {
 	return int(id)
 }
 
-func (d *Dao) Update(whr *po.YuCategory) bool {
+func (d *Dao) Update(whr *po.YuTag) bool {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("update yu_category set updated_at = now()")
+	qb.Add("update yu_tag set updated_at = now()")
 	qb.AddWhrGtZero(",is_delete = ?", whr.IsDelete)
 	qb.AddWhrNeqEmpty(",name = ?", whr.Name)
-	qb.AddWhrNeqEmpty(",color = ?", whr.Color)
 	qb.Add(" where id = ?", whr.Id)
 	sql, params := qb.Build()
 	_, err := common.DB.Exec(sql, params...)
@@ -109,7 +108,7 @@ func (d *Dao) Update(whr *po.YuCategory) bool {
 
 func (d *Dao) Delete(id int) bool {
 	qb := &yutil.SqlBuffer{}
-	qb.Add("delete from yu_category where id = ?", id)
+	qb.Add("delete from yu_tag where id = ?", id)
 	sql, params := qb.Build()
 	_, err := common.DB.Exec(sql, params...)
 	return !d.Error(err, sql, params)

@@ -23,11 +23,11 @@ type BaseDao struct {
 	base
 }
 
-func (s *BaseDao) Error(err error) bool {
+func (s *BaseDao) Error(err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(3, "error", s.traceId, "repository", err.Error())
+	Ylog.Log(3, "error", s.traceId, "repository", err.Error(), param)
 	return true
 }
 
@@ -40,11 +40,11 @@ type BaseService struct {
 	base
 }
 
-func (s *BaseService) Error(err error) bool {
+func (s *BaseService) Error(err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(3, "error", s.traceId, "service", err.Error())
+	Ylog.Log(3, "error", s.traceId, "service", err.Error(), param)
 	return true
 }
 
@@ -57,11 +57,11 @@ type BaseCache struct {
 	base
 }
 
-func (s *BaseCache) Error(err error) bool {
+func (s *BaseCache) Error(err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(3, "error", s.traceId, "cache", err.Error())
+	Ylog.Log(3, "error", s.traceId, "cache", err.Error(), param)
 	return true
 }
 
@@ -74,14 +74,21 @@ type BaseController struct {
 	base
 }
 
-func (s BaseController) Error(traceId string, err error) bool {
+func (s BaseController) Error(traceId string, err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(4, "error", traceId, "controller", err.Error())
+	Ylog.Log(4, "error", traceId, "controller", err.Error(), param)
 	return true
 }
 
 func (s BaseController) Info(traceId string, param ...interface{}) {
 	Ylog.Log(4, "info", traceId, "controller", param...)
 }
+
+type MSF = map[string]interface{}
+type MSS = map[string]string
+type MSI = map[string]int
+type MIF = map[int]interface{}
+type MIS = map[int]string
+type MII = map[int]int

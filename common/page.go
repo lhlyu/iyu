@@ -14,12 +14,30 @@ type Page struct {
 	Remainder   int  `json:"remainder"`                         // 剩余数据量
 	StartRow    int  `json:"-"`                                 // 记录开始行
 	StopRow     int  `json:"-"`                                 // 记录结束行
+	counter     int  `json:"-"`
 }
 
 func NewPage(pageNum, pageSize int) *Page {
 	return &Page{
 		PageNum:  pageNum,
 		PageSize: pageSize,
+		counter:  pageNum - 1,
+	}
+}
+
+func NewPageAll() *Page {
+	return &Page{
+		PageNum:  1,
+		PageSize: -1,
+		counter:  0,
+	}
+}
+
+func NewPageOne() *Page {
+	return &Page{
+		PageNum:  1,
+		PageSize: 1,
+		counter:  0,
 	}
 }
 
@@ -58,4 +76,16 @@ func (p *Page) SetTotal(total int) {
 		p.StopRow = p.Total
 	}
 	p.Remainder = p.Total - p.StopRow
+	p.counter = p.PageNum - 1
+}
+
+func (p *Page) Next() bool {
+	if p.counter < 0 {
+		p.counter = 0
+	}
+	if p.counter > p.PageMax {
+		return false
+	}
+	p.counter += 1
+	return true
 }
