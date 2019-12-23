@@ -1,6 +1,7 @@
 package article_repository
 
 import (
+	"fmt"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/controller/dto"
 	"github.com/lhlyu/iyu/repository/po"
@@ -58,4 +59,22 @@ func (d *Dao) QueryPage(whr *dto.ArticleDto, page *common.Page) []*po.YuArticle 
 		return nil
 	}
 	return values
+}
+
+func (d *Dao) QueryTagsByArticleIds(ids ...int) []*po.YuArticleTag {
+	qb := &yutil.SqlBuffer{}
+	qb.AddWhrIn("select * from yu_article_tag where article_id in (%s)", yutil.ConvertIntToInterface(ids)...)
+	sql, params := qb.Build()
+	fmt.Println(params)
+	var values []*po.YuArticleTag
+	if err := common.DB.Select(&values, sql, params...); err != nil {
+		d.Error(err, sql, params)
+		return nil
+	}
+	return values
+}
+
+func (d *Dao) QueryArticleTimeline() {
+	//sql := "select code,title,created_at from yu_article order by created_at desc"
+
 }

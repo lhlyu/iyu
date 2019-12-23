@@ -21,6 +21,8 @@ GitHub对博客提供的授权码进行验证，验证无误后，发放一个�
 博客端使用令牌，向GitHub获取用户信息
 GitHub 确认令牌无误，返回给我基本的用户信息
 */
+
+// 登录注册
 func (c *userController) Login(ctx iris.Context) {
 	svc := quanta_service.NewService(c.GetTraceId(ctx))
 	svc.LoadQuanta(0)
@@ -28,4 +30,19 @@ func (c *userController) Login(ctx iris.Context) {
 		Page: common.NewPageAll(),
 	}
 	ctx.JSON(svc.QueryQuantaPage(param))
+}
+
+// 后台获取用户列表
+func (c *userController) GetUserPage(ctx iris.Context) {
+
+}
+
+// 修改用户
+func (c *userController) UpdateUser(ctx iris.Context) {
+
+}
+
+// 获取单个用户的信息
+func (c *userController) GetUserById(ctx iris.Context) {
+
 }

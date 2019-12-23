@@ -16,7 +16,7 @@ type controller struct {
 	common.BaseController
 }
 
-func (c controller) getParams(ctx iris.Context, v interface{}, check bool) *errcode.ErrCode {
+func (c controller) getParams(ctx iris.Context, v interface{}, check bool) bool {
 	// 根据方法获取参数
 	// GET  -   query params
 	// POST/PUT/DELETE  - body param
@@ -25,7 +25,8 @@ func (c controller) getParams(ctx iris.Context, v interface{}, check bool) *errc
 	case "GET":
 		if err := ctx.ReadQuery(v); err != nil {
 			c.Error(c.GetTraceId(ctx), err)
-			return errcode.IllegalParam
+			ctx.JSON(errcode.IllegalParam)
+			return false
 		}
 	case "POST", "PUT", "DELETE":
 		contentType := ctx.GetHeader("Content-Type")
@@ -33,23 +34,26 @@ func (c controller) getParams(ctx iris.Context, v interface{}, check bool) *errc
 		case "application/json":
 			if err := ctx.ReadJSON(v); err != nil {
 				c.Error(c.GetTraceId(ctx), err)
-				return errcode.IllegalParam
+				ctx.JSON(errcode.IllegalParam)
+				return false
 			}
 		case "application/x-www-form-urlencoded":
 			if err := ctx.ReadForm(v); err != nil {
 				c.Error(c.GetTraceId(ctx), err)
-				return errcode.IllegalParam
+				ctx.JSON(errcode.IllegalParam)
+				return false
 			}
 		}
 	}
 	if !check {
-		return nil
+		return true
 	}
 	if err := validate.Struct(v); err != nil {
 		c.Error(c.GetTraceId(ctx), err)
-		return errcode.IllegalParam
+		ctx.JSON(errcode.IllegalParam)
+		return false
 	}
-	return nil
+	return true
 }
 
 /**
@@ -124,6 +128,12 @@ func (c controller) IsAdminRouter(ctx iris.Context) bool {
 }
 
 type Controller struct {
+	indexController
 	userController
-	websiteController
+	articleController
+	tagController
+	categoryController
+	quantaController
+	cmntController
+	replyController
 }

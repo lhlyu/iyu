@@ -86,7 +86,7 @@ func (s *Service) LoadTag(id int) *errcode.ErrCode {
 	return errcode.Success
 }
 
-func (s *Service) QueryTagByKeys(ids ...int) []*vo.TagVo {
+func (s *Service) QueryTagByIds(ids ...int) []*vo.TagVo {
 	items := s.che.GetTag(ids...)
 	if len(items) == 0 {
 		datas := s.dao.GetByIds(ids...)

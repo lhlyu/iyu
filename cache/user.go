@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-func (c *Cache) SetTag(items []*vo.TagVo) {
-	key := c.getKey(tagKey)
+func (c *Cache) SetUser(items []*vo.UserVo) {
+	key := c.getKey(userKey)
 	c.mutexHandler(key, func() {
 		m := make(common.MSF)
 		for _, v := range items {
@@ -18,23 +18,23 @@ func (c *Cache) SetTag(items []*vo.TagVo) {
 		if c.Error(statusCmd.Err(), key) {
 			return
 		}
-		common.Redis.Expire(key, week)
+		common.Redis.Expire(key, day)
 	})
 }
 
-func (c *Cache) GetTag(fields ...int) []*vo.TagVo {
-	key := c.getKey(tagKey)
+func (c *Cache) GetUser(fields ...int) []*vo.UserVo {
+	key := c.getKey(userKey)
 	sliceCmd := common.Redis.HMGet(key, yutil.SliceIntToStr(fields)...)
 	if c.Error(sliceCmd.Err(), key, fields) {
 		return nil
 	}
 	vals := sliceCmd.Val()
-	var items []*vo.TagVo
+	var items []*vo.UserVo
 	for _, v := range vals {
 		if v == nil {
 			continue
 		}
-		item := &vo.TagVo{}
+		item := &vo.UserVo{}
 		yutil.JsonStrToObj(v.(string), item)
 		items = append(items, item)
 	}

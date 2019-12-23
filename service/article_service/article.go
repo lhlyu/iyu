@@ -192,7 +192,33 @@ func (s *Service) getArticleTagMap(articles []int) map[int][]*vo.TagVo {
 	if len(articles) == 0 {
 		return nil
 	}
+	datas := s.dao.QueryTagsByArticleIds(articles...)
+	if len(datas) == 0 {
+		return nil
+	}
+	var tagIds []int
+	for _, v := range datas {
+		tagIds = append(tagIds, v.TagId)
+	}
+	tags := s.tagSvc.QueryTagByIds(tagIds...)
+	tagMap := make(map[int]string)
+	for _, v := range tags {
+		tagMap[v.Id] = v.Name
+	}
 	m := make(map[int][]*vo.TagVo)
-
+	for _, v := range datas {
+		w, ok := m[v.ArticleId]
+		if !ok {
+			w = make([]*vo.TagVo, 0)
+		}
+		tag := &vo.TagVo{
+			Id: v.TagId,
+		}
+		if u, ok := tagMap[v.TagId]; ok {
+			tag.Name = u
+		}
+		w = append(w, tag)
+		m[v.ArticleId] = w
+	}
 	return m
 }
