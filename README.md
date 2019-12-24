@@ -7,37 +7,36 @@ iris blog server
 
 ### 项目进度
 
-- 开发分支: develop
-
-1. 第一部分完成(2019-12-03)
-2. 第二部分内容
-
-```text
-1. 评论、审查
-2. 全局配置管理
-3. 代码优化
-```
+- 开发分支: alpha
 
 ### 项目目录结构
 
 ```
-├─cache        - 缓存
-├─common       - 公共 
-├─conf         - 配置文件
-├─controller   - 控制器
-│  └─vo        
-├─errcode      - 错误码
-├─middleware   - 中间件
-├─module       - 模块
-├─repository   - 数据访问层
+├─cache
+├─common
+├─conf
+├─controller
+│  └─dto
+├─errcode
+├─middleware
+├─module
+├─repository
+│  ├─article_repository
+│  ├─category_repository
 │  ├─po
-│  └─test
-├─router       - 路由
-├─service      - 服务
-│  └─bo
-├─test         - 测试
-│  └─api 
-└─util         - 工具
+│  ├─quanta_repository
+│  ├─tag_repository
+│  └─user_repository
+├─router
+├─service
+│  ├─article_service
+│  ├─category_service
+│  ├─quanta_service
+│  ├─tag_service
+│  ├─user_service
+│  └─vo
+└─util
+
 ```
 
 ### 运行

@@ -3,61 +3,70 @@ package router
 import (
 	"github.com/kataras/iris"
 	"github.com/lhlyu/iyu/controller"
-	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/middleware"
 )
 
 func SetRouter(app *iris.Application) {
-
 	app.AllowMethods(iris.MethodOptions)
-	app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
-		ctx.JSON(errcode.NofoundError)
-		return
-	})
 
 	ctr := &controller.Controller{}
 
+	app.OnErrorCode(iris.StatusNotFound, ctr.NoFoundHandler)
+
 	api := app.Party("/api")
+
+	// 针对游客
 	{
 		api.Get("/login", ctr.Login)
-		// article
-		api.Get("/articles", ctr.QueryArticles)
-		api.Get("/article", ctr.GetArticleById)
+		api.Get("/articles", ctr.GetHomeArticlePage)
+		api.Get("/article", ctr.GetArticleByCode)
+		api.Get("/about", ctr.GetAbout)
+		api.Get("/timeline", ctr.GetTimeline)
+		api.Get("/action", ctr.UserAction)
+		api.Get("/website", ctr.GetWebSiteOption)
+		api.Get("/cmnts", ctr.GetCmntPage)
+		api.Get("/reply", ctr.GetReplyPage)
 	}
-	admin := api.Party("/admin", middleware.Permission())
+
+	// 针对已登录的用户
+	user := api.Party("/user", middleware.PermissionUser())
 	{
-		admin.Get("/articles", ctr.QueryArticles)
+		user.Post("/cmnt", ctr.AddCmnt)
+		user.Post("/reply", ctr.AddReply)
+	}
+
+	// 针对管理员
+	admin := api.Party("/admin", middleware.PermissionAdmin())
+	{
+		admin.Get("/articles", ctr.GetAdminArticlePage)
 		admin.Get("/article", ctr.GetArticleById)
-		admin.Post("/article", ctr.InsertArticle)
+		admin.Post("/article", ctr.AddArticle)
 		admin.Put("/article", ctr.UpdateArticle)
-		admin.Delete("/article", ctr.DeleteArticle)
 
-		admin.Get("/quanta", ctr.GetQuantaAll)
-		admin.Post("/quanta", ctr.InsertQuanta)
-		admin.Put("/quanta", ctr.UpdateQuanta)
-		admin.Delete("/quanta", ctr.DeleteQuanta)
-
-		admin.Get("/nail", ctr.GetNailAll)
-		admin.Post("/nail", ctr.InsertNail)
-		admin.Put("/nail", ctr.UpdateNail)
-		admin.Delete("/nail", ctr.DeleteNail)
-
-		admin.Get("/nail", ctr.GetNailAll)
-		admin.Post("/nail", ctr.InsertNail)
-		admin.Put("/nail", ctr.UpdateNail)
-		admin.Delete("/nail", ctr.DeleteNail)
-
-		admin.Get("/category", ctr.GetCategoryAll)
-		admin.Post("/category", ctr.InsertCategory)
-		admin.Put("/category", ctr.UpdateCategory)
-		admin.Delete("/category", ctr.DeleteCategory)
-
-		admin.Get("/tag", ctr.GetTagAll)
-		admin.Post("/tag", ctr.InsertTag)
+		admin.Get("/tags", ctr.GetTagPage)
+		admin.Post("/tag", ctr.AddTag)
 		admin.Put("/tag", ctr.UpdateTag)
-		admin.Delete("/tag", ctr.DeleteTag)
+		admin.Delete("/tag", ctr.BatchDeleteTag)
 
-		admin.Get("/users", ctr.QueryUser)
-		admin.Put("/user", ctr.UpdateUser)
+		admin.Get("/categorys", ctr.GetCategoryPage)
+		admin.Post("/category", ctr.UpdateCategory)
+		admin.Put("/category", ctr.AddCategory)
+		admin.Delete("/category", ctr.BatchDeleteCategory)
+
+		admin.Get("/quantas", ctr.GetQuantaPage)
+		admin.Put("/quanta", ctr.UpdateQuanta)
+
+		admin.Get("/users", ctr.GetUserPage)
+		admin.Get("/user", ctr.GetUserById)
+		admin.Post("/user", ctr.UpdateUser)
+
+		admin.Get("/cmnt", ctr.GetCmntAndReplyPage)
+		admin.Post("/cmnt", ctr.UpdateCmnt)
+
+		admin.Post("/reply", ctr.UpdateReply)
+
+		admin.Get("/logs", ctr.GetWebSiteLog)
+
+		admin.Put("/setting", ctr.UpdateWebSiteOption)
 	}
 }

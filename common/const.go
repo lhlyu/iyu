@@ -12,21 +12,27 @@ const (
 	DELETED   // 已删除
 )
 
-// action kind
-const (
-	KIND_GLOBAL = iota
-	KIND_ARTICLE
-	KIND_CMNT
-	KIND_POST
-)
-
-// action
+// business_kind
+/**
+1.系统操作;2.错误日志;3.用户登录;4.全站浏览;5.文章浏览;6.文章赞;7.文章踩;8.文章评论;9.评论赞;10.评论踩;11.评论回复;12.回复赞;13.回复踩
+*/
 const (
 	_ = iota
-	ACTION_VISIT
-	ACTION_CMNT
-	ACTION_LIKE
-	ACTION_UNLIKE
+	business_system_op
+	business_error_log
+	business_user_login
+	business_global_visit
+	business_article_visit
+	business_article_like
+	business_article_unlike
+
+	business_article_comment
+	business_comment_like
+	business_comment_unlike
+
+	business_comment_reply
+	business_reply_like
+	business_reply_unlike
 )
 
 // article kind
@@ -39,5 +45,31 @@ const (
 const (
 	ADMIN = "admin"
 	COLOR = "#000000"
-	ITV   = 3600 * 24
+	ITV   = 3600 * 24 // 有效时间
 )
+
+// quanta key
+const (
+	KEY_1 = "admin.pass"
+	KEY_2 = "cmnt.open"
+	KEY_3 = "cmnt.check"
+)
+
+var business = map[int]string{
+	0:                       "未知",
+	business_system_op:      "系统操作",
+	business_error_log:      "错误日志",
+	business_user_login:     "用户登录",
+	business_global_visit:   "全站浏览",
+	business_article_visit:  "文章浏览",
+	business_article_like:   "文章踩",
+	business_article_unlike: "文章评论",
+
+	business_article_comment: "评论赞",
+	business_comment_like:    "评论踩",
+	business_comment_unlike:  "评论回复",
+
+	business_comment_reply: "评论回复",
+	business_reply_like:    "回复赞",
+	business_reply_unlike:  "回复踩",
+}

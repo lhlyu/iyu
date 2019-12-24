@@ -16,6 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
+	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/iris-contrib/middleware v0.0.0-20190816193017-7838277651e8
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
@@ -25,6 +26,7 @@ require (
 	github.com/klauspost/compress v1.8.6 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/lhlyu/request v1.4.0
+	github.com/lhlyu/yutil v1.0.3
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect

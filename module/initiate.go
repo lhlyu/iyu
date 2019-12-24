@@ -2,10 +2,9 @@ package module
 
 import (
 	"github.com/lhlyu/iyu/cache"
-	"github.com/lhlyu/iyu/common"
-	"github.com/lhlyu/iyu/service"
+	"github.com/lhlyu/iyu/util"
+	"github.com/lhlyu/yutil"
 	"log"
-	"time"
 )
 
 // 启动时执行
@@ -18,28 +17,18 @@ func (initiate) seq() int {
 
 func (initiate) SetUp() {
 	log.Println("init initiate module ->")
+	// 工具包不忽略错误
+	yutil.NotIgnore()
 	// 初始化数据
+	traceId := util.GetGID()
+	// 清除所有缓存
+	cache.NewCache(traceId).ClearKeys()
 
-	che := cache.NewCache()
-	keys := che.JoinSep(common.Cfg.GetString("redis_key.iyu"), "*")
-	che.ClearCache(keys)
-
-	go loadCache()
+	go loadCache(traceId)
 }
 
-func loadCache() {
-	time.AfterFunc(time.Second*5, func() {
-		log.Println("load nail datas ...")
-		service.NewNailService().Query(true)
-		log.Println("load category datas ...")
-		service.NewCategoryService().Query(true)
-		log.Println("load tag datas ...")
-		service.NewTagService().Query(true)
-		log.Println("load quanta datas ...")
-		service.NewQuantaService().Query(true)
-		log.Println("load article datas ...")
-		service.NewArticleService().Query(true)
-	})
+func loadCache(traceId string) {
+
 }
 
 var InitiateModule = initiate{}

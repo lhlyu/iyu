@@ -3,15 +3,9 @@ package po
 import "time"
 
 type YuArticleTag struct {
-	Id        int       `db:"id"`
-	ArticleId int       `db:"article_id"`
-	TagId     int       `db:"tag_id"`
-	IsDelete  int       `db:"is_delete"`  // 是否已删除:1-未删除;2-已删除
-	CreatedAt time.Time `db:"created_at"` // 创建时间
-	UpdatedAt time.Time `db:"updated_at"` // 更新时间
-}
-
-type YuArticleTagV2 struct {
-	ArticleId int    `db:"article_id"`
-	TagIds    string `db:"tags"`
+	Id        int       `json:"id"         db:"id"`
+	ArticleId int       `json:"articleId"  db:"article_id"`
+	TagId     int       `json:"tagId"      db:"tag_id"`
+	CreatedAt time.Time `json:"createdAt"  db:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt"  db:"updated_at"`
 }

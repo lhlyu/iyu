@@ -2,79 +2,82 @@ package controller
 
 import (
 	"github.com/kataras/iris"
-	"github.com/lhlyu/iyu/common"
-	"github.com/lhlyu/iyu/controller/vo"
-	"github.com/lhlyu/iyu/errcode"
-	"github.com/lhlyu/iyu/service"
-	"github.com/lhlyu/iyu/service/bo"
+	"github.com/lhlyu/iyu/controller/dto"
+	"github.com/lhlyu/iyu/service/article_service"
 )
 
 type articleController struct {
 	controller
 }
 
-func (c *articleController) QueryArticles(ctx iris.Context) {
-	article := &vo.ArticleParam{}
-	if err := c.getParams(ctx, article, true); err != nil {
+// 获取首页文章列表
+func (c *articleController) GetHomeArticlePage(ctx iris.Context) {
+	param := &dto.ArticleDto{}
+	if !c.getParams(ctx, param, true) {
+		return
+	}
+	param.IsDelete = 1
+	param.Kind = 1
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.QueryHomeArticlePage(param))
+}
+
+// 用户获取单篇文章
+func (c *articleController) GetArticleByCode(ctx iris.Context) {
+	param := &dto.ArticleDto{}
+	if !c.getParams(ctx, param, false) {
+		return
+	}
+	if err := c.checkEmpty(param.Code); err != nil {
 		ctx.JSON(err)
 		return
 	}
-	if c.IsAdminRouter(ctx) {
-		article.Kind = 0
-	} else {
-		article.Kind = common.ARTICLE_NORMAL
-		article.IsDelete = 1
-	}
-	svc := service.NewArticleService()
-	ctx.JSON(svc.QueryArticlePage(article))
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.GetArticleByCode(param.Code))
 }
 
+// 获取about文章
+func (c *articleController) GetAbout(ctx iris.Context) {
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.GetAbout())
+}
+
+// 获取时间线
+func (c *articleController) GetTimeline(ctx iris.Context) {
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.GetTimeline())
+}
+
+// 管理页获取文章列表
+func (c *articleController) GetAdminArticlePage(ctx iris.Context) {
+	param := &dto.ArticleDto{}
+	if !c.getParams(ctx, param, true) {
+		return
+	}
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.QueryAdminArticlePage(param))
+}
+
+// 管理获取单篇文章
 func (c *articleController) GetArticleById(ctx iris.Context) {
-	id := ctx.URLParamIntDefault("id", 0)
-	if id <= 0 {
-		ctx.JSON(errcode.IllegalParam)
+	param := &dto.ArticleDto{}
+	if !c.getParams(ctx, param, false) {
 		return
 	}
-	if !c.IsAdminRouter(ctx) {
-		go c.Record(ctx, id, common.KIND_ARTICLE, common.ACTION_VISIT)
-	}
-	svc := service.NewArticleService()
-	result := svc.Query(false, id)
-	if !result.IsSuccess() {
-		ctx.JSON(result)
-		return
-	}
-	datas := result.Data.([]*bo.Article)
-	ctx.JSON(errcode.Success.WithData(datas[0]))
-}
-
-func (c *articleController) InsertArticle(ctx iris.Context) {
-	article := &vo.ArticleVo{}
-	if err := c.getParams(ctx, article, true); err != nil {
+	if err := c.checkUInt(param.Id); err != nil {
 		ctx.JSON(err)
 		return
 	}
-	svc := service.NewArticleService()
-	ctx.JSON(svc.Edit(article))
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.GetArticleById(param.Id))
 }
 
-func (c *articleController) UpdateArticle(ctx iris.Context) {
-	article := &vo.ArticleVo{}
-	if err := c.getParams(ctx, article, false); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	svc := service.NewArticleService()
-	ctx.JSON(svc.Edit(article))
+// 添加文章
+func (*articleController) AddArticle(ctx iris.Context) {
+
 }
 
-func (c *articleController) DeleteArticle(ctx iris.Context) {
-	article := &vo.ArticleVo{}
-	if err := c.getParams(ctx, article, false); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	article.IsDelete = common.DELETED
-	svc := service.NewArticleService()
-	ctx.JSON(svc.Edit(article))
+// 修改文章
+func (*articleController) UpdateArticle(ctx iris.Context) {
+
 }

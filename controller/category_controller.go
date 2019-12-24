@@ -1,67 +1,27 @@
 package controller
 
-import (
-	"github.com/kataras/iris"
-	"github.com/lhlyu/iyu/common"
-	"github.com/lhlyu/iyu/controller/vo"
-	"github.com/lhlyu/iyu/service"
-)
+import "github.com/kataras/iris"
 
 type categoryController struct {
 	controller
 }
 
-func (*categoryController) GetCategoryAll(ctx iris.Context) {
-	svc := service.NewCategoryService()
-	ctx.JSON(svc.Query(false))
+// 后台获取分类列表
+func (*categoryController) GetCategoryPage(ctx iris.Context) {
+
 }
 
-func (c *categoryController) UpdateCategory(ctx iris.Context) {
-	param := &vo.CategoryVo{}
-	if err := c.getParams(ctx, param, false); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	if err := c.checkUInt(param.Id); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	if err := c.checkUInt(param.IsDelete); err != nil {
-		param.IsDelete = common.UNDELETED
-	}
-	if err := c.checkEmpty(param.Name); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	svc := service.NewCategoryService()
-	ctx.JSON(svc.Edit(param))
+// 新增标签
+func (*categoryController) AddCategory(ctx iris.Context) {
+
 }
 
-func (c *categoryController) InsertCategory(ctx iris.Context) {
-	param := &vo.CategoryVo{}
-	if err := c.getParams(ctx, param, false); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	if err := c.checkEmpty(param.Name); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	svc := service.NewCategoryService()
-	ctx.JSON(svc.Edit(param))
+// 更新
+func (*categoryController) UpdateCategory(ctx iris.Context) {
+
 }
 
-func (c *categoryController) DeleteCategory(ctx iris.Context) {
-	param := &vo.CategoryVo{}
-	if err := c.getParams(ctx, param, false); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	if err := c.checkUInt(param.Id); err != nil {
-		ctx.JSON(err)
-		return
-	}
-	param.IsDelete = common.DELETED
-	svc := service.NewCategoryService()
-	ctx.JSON(svc.Edit(param))
+// 批量删除分类
+func (*categoryController) BatchDeleteCategory(ctx iris.Context) {
+
 }

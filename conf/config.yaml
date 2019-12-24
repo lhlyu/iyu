@@ -8,15 +8,14 @@ jwt:
   itv: 86400 # jwt有效时长，单位秒
 
 server:
-  host: localhost
+  host: 0.0.0.0
   port: 8080
   limit: 15   # 每秒最多允许N个请求
 
 log:
   level: debug
-  timeFormat: 2006-01-02 15:04:05
-  outFile:          # 输出文件
-  outWay: normal    # normal  /  json
+  outFile:
+  timeformat: "2006-01-02 15:04:05"
 
 redis:
   addr: 127.0.0.1:6379
@@ -26,14 +25,18 @@ redis:
   idleTimeout: 60
 
 redis_key:
-  iyu: "iyu:"
   tag: "iyu:tag"
-  nail: "iyu:nail"
-  category: "iyu:category"
   quanta: "iyu:quanta"
-  article: "iyu:article"
+  category: "iyu:category"
   user: "iyu:user"
+  global_visit: "iyu:global:visit"
+  article_visit: "iyu:article:visit:"
+  article_like: "iyu:article:like:"
+  cmnt_like: "iyu:cmnt:like:"
+  reply_like: "iyu:reply:like:"
+  article: "iyu:article"
   token: "iyu:token:"
+  iyu: "iyu:"
 
 db:
   db_wr:

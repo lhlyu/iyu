@@ -3,18 +3,13 @@ package po
 import "time"
 
 type YuRecord struct {
-	Id           int       `db:"id"`
-	UserId       int       `db:"user_id"`
-	BusinessId   int       `db:"business_id"`   // 目标Id
-	BusinessKind int       `db:"business_kind"` // 目标类型:1-文章;2-评论;3-回复
-	Action       int       `db:"action"`        // 动作:1-浏览;2-评论;3-赞;4-踩
-	Ip           string    `db:"ip"`
-	CreatedAt    time.Time `db:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at"`
-}
-
-type Stat struct {
-	BusinessId int `db:"business_id"`
-	Action     int `db:"action"`
-	Number     int `db:"number"`
+	Id           int       `json:"id"            db:"id"`
+	UserId       int       `json:"userId"        db:"user_id"`       // 用户ID
+	BusinessId   int       `json:"businessId"    db:"business_id"`   // 目标Id
+	Content      string    `json:"content"       db:"content"`       // 内容
+	BusinessKind int       `json:"businessKind"  db:"business_kind"` // 1.系统操作;2.错误日志;3.用户登录;4.全站浏览;5.文章浏览;6.文章赞;7.文章踩;8.文章评论;9.评论赞;10.评论踩;11.评论回复;12.回复赞;13.回复踩
+	Agent        string    `json:"agent"         db:"agent"`
+	Ip           string    `json:"ip"            db:"ip"` // IP地址
+	CreatedAt    time.Time `json:"createdAt"     db:"created_at"`
+	UpdatedAt    time.Time `json:"updatedAt"     db:"updated_at"`
 }

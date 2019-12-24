@@ -2,17 +2,19 @@ package util
 
 import (
 	"bytes"
+	"github.com/iris-contrib/go.uuid"
 	"runtime"
-	"strconv"
+	"strings"
 )
 
-func GetGID() uint64 {
+func GetGID() string {
 	b := make([]byte, 64)
 	b = b[:runtime.Stack(b, false)]
 	b = bytes.TrimPrefix(b, []byte("goroutine "))
 	b = b[:bytes.IndexByte(b, ' ')]
-	n, _ := strconv.ParseUint(string(b), 10, 64)
-	return n
+	uid, _ := uuid.NewV4()
+	ns := strings.Split(uid.String(), "-")[4] + string(b)
+	return ns
 }
 
 // 获取调用栈上的函数信息(函数名、文件名、调用行数)
