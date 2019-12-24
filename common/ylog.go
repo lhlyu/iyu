@@ -88,4 +88,6 @@ func (y *ylog) Log(skip int, level, traceId, layer string, param ...interface{})
 	}
 	bytes, _ := json.Marshal(m)
 	y.g.Log(golog.ParseLevel(level), string(bytes))
+
+	// 统一处理错误日志，发送邮件
 }

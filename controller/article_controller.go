@@ -18,7 +18,6 @@ func (c *articleController) GetHomeArticlePage(ctx iris.Context) {
 	}
 	param.IsDelete = 1
 	param.Kind = 1
-	ctx.Path()
 	svc := article_service.NewService(c.GetTraceId(ctx))
 	ctx.JSON(svc.QueryHomeArticlePage(param))
 }
@@ -44,18 +43,33 @@ func (c *articleController) GetAbout(ctx iris.Context) {
 }
 
 // 获取时间线
-func (*articleController) GetTimeline(ctx iris.Context) {
-
+func (c *articleController) GetTimeline(ctx iris.Context) {
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.GetTimeline())
 }
 
 // 管理页获取文章列表
-func (*articleController) GetAdminArticlePage(ctx iris.Context) {
-
+func (c *articleController) GetAdminArticlePage(ctx iris.Context) {
+	param := &dto.ArticleDto{}
+	if !c.getParams(ctx, param, true) {
+		return
+	}
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.QueryAdminArticlePage(param))
 }
 
 // 管理获取单篇文章
-func (*articleController) GetArticleById(ctx iris.Context) {
-
+func (c *articleController) GetArticleById(ctx iris.Context) {
+	param := &dto.ArticleDto{}
+	if !c.getParams(ctx, param, false) {
+		return
+	}
+	if err := c.checkUInt(param.Id); err != nil {
+		ctx.JSON(err)
+		return
+	}
+	svc := article_service.NewService(c.GetTraceId(ctx))
+	ctx.JSON(svc.GetArticleById(param.Id))
 }
 
 // 添加文章

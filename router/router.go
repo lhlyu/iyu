@@ -29,45 +29,44 @@ func SetRouter(app *iris.Application) {
 	}
 
 	// 针对已登录的用户
-	api.Use(middleware.PermissionUser())
+	user := api.Party("/user", middleware.PermissionUser())
 	{
-		api.Post("/cmnt", ctr.AddCmnt)
-		api.Post("/reply", ctr.AddReply)
+		user.Post("/cmnt", ctr.AddCmnt)
+		user.Post("/reply", ctr.AddReply)
 	}
 
 	// 针对管理员
-	api.Use(middleware.PermissionAdmin())
-	api.Party("/admin")
+	admin := api.Party("/admin", middleware.PermissionAdmin())
 	{
-		api.Get("/articles", ctr.GetAdminArticlePage)
-		api.Get("/article", ctr.GetArticleById)
-		api.Post("/article", ctr.AddArticle)
-		api.Put("/article", ctr.UpdateArticle)
+		admin.Get("/articles", ctr.GetAdminArticlePage)
+		admin.Get("/article", ctr.GetArticleById)
+		admin.Post("/article", ctr.AddArticle)
+		admin.Put("/article", ctr.UpdateArticle)
 
-		api.Get("/tags", ctr.GetTagPage)
-		api.Post("/tag", ctr.AddTag)
-		api.Put("/tag", ctr.UpdateTag)
-		api.Delete("/tag", ctr.BatchDeleteTag)
+		admin.Get("/tags", ctr.GetTagPage)
+		admin.Post("/tag", ctr.AddTag)
+		admin.Put("/tag", ctr.UpdateTag)
+		admin.Delete("/tag", ctr.BatchDeleteTag)
 
-		api.Get("/categorys", ctr.GetCategoryPage)
-		api.Post("/category", ctr.UpdateCategory)
-		api.Put("/category", ctr.AddCategory)
-		api.Delete("/category", ctr.BatchDeleteCategory)
+		admin.Get("/categorys", ctr.GetCategoryPage)
+		admin.Post("/category", ctr.UpdateCategory)
+		admin.Put("/category", ctr.AddCategory)
+		admin.Delete("/category", ctr.BatchDeleteCategory)
 
-		api.Get("/quantas", ctr.GetQuantaPage)
-		api.Put("/quanta", ctr.UpdateQuanta)
+		admin.Get("/quantas", ctr.GetQuantaPage)
+		admin.Put("/quanta", ctr.UpdateQuanta)
 
-		api.Get("/users", ctr.GetUserPage)
-		api.Get("/user", ctr.GetUserById)
-		api.Post("/user", ctr.UpdateUser)
+		admin.Get("/users", ctr.GetUserPage)
+		admin.Get("/user", ctr.GetUserById)
+		admin.Post("/user", ctr.UpdateUser)
 
-		api.Get("/cmnt", ctr.GetCmntAndReplyPage)
-		api.Post("/cmnt", ctr.UpdateCmnt)
+		admin.Get("/cmnt", ctr.GetCmntAndReplyPage)
+		admin.Post("/cmnt", ctr.UpdateCmnt)
 
-		api.Post("/reply", ctr.UpdateReply)
+		admin.Post("/reply", ctr.UpdateReply)
 
-		api.Get("/logs", ctr.GetWebSiteLog)
+		admin.Get("/logs", ctr.GetWebSiteLog)
 
-		api.Put("/setting", ctr.UpdateWebSiteOption)
+		admin.Put("/setting", ctr.UpdateWebSiteOption)
 	}
 }

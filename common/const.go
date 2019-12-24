@@ -54,3 +54,22 @@ const (
 	KEY_2 = "cmnt.open"
 	KEY_3 = "cmnt.check"
 )
+
+var business = map[int]string{
+	0:                       "未知",
+	business_system_op:      "系统操作",
+	business_error_log:      "错误日志",
+	business_user_login:     "用户登录",
+	business_global_visit:   "全站浏览",
+	business_article_visit:  "文章浏览",
+	business_article_like:   "文章踩",
+	business_article_unlike: "文章评论",
+
+	business_article_comment: "评论赞",
+	business_comment_like:    "评论踩",
+	business_comment_unlike:  "评论回复",
+
+	business_comment_reply: "评论回复",
+	business_reply_like:    "回复赞",
+	business_reply_unlike:  "回复踩",
+}

@@ -58,13 +58,15 @@ const (
 	cmntLikeKey     = "redis_key.cmnt_like"
 	replyLikeKey    = "redis_key.reply_like"
 	articleKey      = "redis_key.article"
+	timelineKey     = "redis_key.timeline"
 	tokenKey        = "redis_key.token"
 	iyuKey          = "redis_key.iyu"
 )
 
 const (
-	week = time.Hour * 24 * 7
-	day  = time.Hour * 24
+	day   = time.Hour * 24
+	week  = day * 7
+	month = day * 30
 )
 
 /**

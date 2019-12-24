@@ -39,3 +39,22 @@ func (c *Cache) SetArticle(items []*vo.ArticleVo) {
 		common.Redis.Expire(key, week)
 	})
 }
+
+func (c *Cache) SetTimeline(items []*vo.ArticleTimeline) {
+	key := c.getKey(timelineKey)
+	c.mutexHandler(key, func() {
+		value := yutil.JsonObjToStr(items)
+		common.Redis.Set(key, value, month)
+	})
+}
+
+func (c *Cache) GetTimeline() []*vo.ArticleTimeline {
+	key := c.getKey(timelineKey)
+	val := common.Redis.Get(key).Val()
+	if val == "" {
+		return nil
+	}
+	var items []*vo.ArticleTimeline
+	yutil.JsonStrToObj(val, &items)
+	return items
+}

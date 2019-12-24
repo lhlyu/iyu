@@ -12,3 +12,18 @@ type ArticleDto struct {
 	Kind       int    `json:"-"`
 	IsDelete   int    `json:"-"`
 }
+
+type ArticleEditDto struct {
+	UserId     int    `json:"-"`
+	Wrapper    string `json:"wrapper"`
+	Title      string `json:"title"`
+	Summary    string `json:"summary"`
+	Content    string `json:"content"`
+	IsTop      int    `json:"isTop"`
+	CategoryId int    `json:"categoryId"`
+	Kind       int    `json:"kind"`
+	SortNum    int    `json:"sortNum"`
+	CmntStatus int    `json:"cmntStatus"`
+	IsDelete   int    `json:"isDelete"`
+	TagIds     []int  `json:"tagIds"`
+}

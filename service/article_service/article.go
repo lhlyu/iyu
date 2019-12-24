@@ -12,6 +12,7 @@ import (
 	"github.com/lhlyu/iyu/service/vo"
 	"github.com/lhlyu/yutil"
 	"sync"
+	"time"
 )
 
 type Service struct {
@@ -221,4 +222,15 @@ func (s *Service) getArticleTagMap(articles []int) map[int][]*vo.TagVo {
 		m[v.ArticleId] = w
 	}
 	return m
+}
+
+func (s *Service) getUniqueCode() string {
+	for i := 0; i < 20; i++ {
+		code := yutil.RandString(6)
+		count := s.dao.GetCodeCount(code)
+		if count == 0 {
+			return code
+		}
+	}
+	return time.Now().Format("02150405")
 }

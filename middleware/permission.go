@@ -22,7 +22,11 @@ func PermissionUser() context.Handler {
 // for admin
 func PermissionAdmin() context.Handler {
 	return func(ctx iris.Context) {
-		user := ctx.Values().Get(common.X_USER).(*common.XUser)
+		user, ok := ctx.Values().Get(common.X_USER).(*common.XUser)
+		if !ok || user == nil || user.Id == 0 {
+			ctx.JSON(errcode.NoLogin)
+			return
+		}
 		if user.Role < common.PERMISSION {
 			ctx.JSON(errcode.NoPermission)
 			return

@@ -42,3 +42,9 @@ type ArticleData struct {
 	Tags       []*ArticleTags   `json:"tags"`
 	Stat       *ArticleStat     `json:"stat"`
 }
+
+type ArticleTimeline struct {
+	Code      string `json:"code"`
+	Title     string `json:"title"`
+	CreatedAt int64  `json:"createdAt"`
+}
