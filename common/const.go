@@ -18,21 +18,21 @@ const (
 */
 const (
 	_ = iota
-	business_system_op
-	business_error_log
-	business_user_login
-	business_global_visit
-	business_article_visit
-	business_article_like
-	business_article_unlike
+	BUSINESS_SYSTEM_OP
+	BUSINESS_ERROR_LOG
+	BUSINESS_USER_LOGIN
+	BUSINESS_GLOBAL_VISIT
+	BUSINESS_ARTICLE_VISIT
+	BUSINESS_ARTICLE_LIKE
+	BUSINESS_ARTICLE_UNLIKE
 
-	business_article_comment
-	business_comment_like
-	business_comment_unlike
+	BUSINESS_ARTICLE_COMMENT
+	BUSINESS_COMMENT_LIKE
+	BUSINESS_COMMENT_UNLIKE
 
-	business_comment_reply
-	business_reply_like
-	business_reply_unlike
+	BUSINESS_COMMENT_REPLY
+	BUSINESS_REPLY_LIKE
+	BUSINESS_REPLY_UNLIKE
 )
 
 // article kind
@@ -57,19 +57,19 @@ const (
 
 var business = map[int]string{
 	0:                       "未知",
-	business_system_op:      "系统操作",
-	business_error_log:      "错误日志",
-	business_user_login:     "用户登录",
-	business_global_visit:   "全站浏览",
-	business_article_visit:  "文章浏览",
-	business_article_like:   "文章踩",
-	business_article_unlike: "文章评论",
+	BUSINESS_SYSTEM_OP:      "系统操作",
+	BUSINESS_ERROR_LOG:      "错误日志",
+	BUSINESS_USER_LOGIN:     "用户登录",
+	BUSINESS_GLOBAL_VISIT:   "全站浏览",
+	BUSINESS_ARTICLE_VISIT:  "文章浏览",
+	BUSINESS_ARTICLE_LIKE:   "文章踩",
+	BUSINESS_ARTICLE_UNLIKE: "文章评论",
 
-	business_article_comment: "评论赞",
-	business_comment_like:    "评论踩",
-	business_comment_unlike:  "评论回复",
+	BUSINESS_ARTICLE_COMMENT: "评论赞",
+	BUSINESS_COMMENT_LIKE:    "评论踩",
+	BUSINESS_COMMENT_UNLIKE:  "评论回复",
 
-	business_comment_reply: "评论回复",
-	business_reply_like:    "回复赞",
-	business_reply_unlike:  "回复踩",
+	BUSINESS_COMMENT_REPLY: "评论回复",
+	BUSINESS_REPLY_LIKE:    "回复赞",
+	BUSINESS_REPLY_UNLIKE:  "回复踩",
 }

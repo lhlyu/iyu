@@ -1,9 +1,8 @@
 package dto
 
-import "github.com/lhlyu/iyu/common"
-
 type ArticleDto struct {
-	*common.Page
+	PageNum    int    `json:"pageNum" validate:"required,gt=0"`  // 当前页码
+	PageSize   int    `json:"pageSize" validate:"required,gt=0"` // 每页记录条数
 	Id         int    `json:"id"`
 	Code       string `json:"code"`
 	KeyWord    string `json:"keyWord"`

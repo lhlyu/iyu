@@ -2,9 +2,6 @@ package controller
 
 import (
 	"github.com/kataras/iris"
-	"github.com/lhlyu/iyu/common"
-	"github.com/lhlyu/iyu/controller/dto"
-	"github.com/lhlyu/iyu/service/quanta_service"
 )
 
 type userController struct {
@@ -24,12 +21,7 @@ GitHub 确认令牌无误，返回给我基本的用户信息
 
 // 登录注册
 func (c *userController) Login(ctx iris.Context) {
-	svc := quanta_service.NewService(c.GetTraceId(ctx))
-	svc.LoadQuanta(0)
-	param := &dto.QuantaDto{
-		Page: common.NewPageAll(),
-	}
-	ctx.JSON(svc.QueryQuantaPage(param))
+
 }
 
 // 后台获取用户列表

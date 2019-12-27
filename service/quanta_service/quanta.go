@@ -17,16 +17,16 @@ type Service struct {
 	che *cache.Cache
 }
 
-func NewService(traceId string) *Service {
+func NewService(tracker *common.Tracker) *Service {
 	svc := &Service{}
-	svc.dao = quanta_repository.NewDao(traceId)
-	svc.che = cache.NewCache(traceId)
-	svc.SetTraceId(traceId)
+	svc.dao = quanta_repository.NewDao(tracker)
+	svc.che = cache.NewCache(tracker)
+	svc.SetTracker(tracker)
 	return svc
 }
 
 func (s *Service) QueryQuantaPage(param *dto.QuantaDto) *errcode.ErrCode {
-	page := param.Page
+	page := common.NewPage(param.PageNum, param.PageSize)
 	whr := &po.YuQuanta{
 		Id:       param.Id,
 		Key:      param.Key,

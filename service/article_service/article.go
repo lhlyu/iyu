@@ -7,6 +7,7 @@ import (
 	"github.com/lhlyu/iyu/errcode"
 	"github.com/lhlyu/iyu/repository/article_repository"
 	"github.com/lhlyu/iyu/service/category_service"
+	"github.com/lhlyu/iyu/service/record_service"
 	"github.com/lhlyu/iyu/service/tag_service"
 	"github.com/lhlyu/iyu/service/user_service"
 	"github.com/lhlyu/iyu/service/vo"
@@ -20,23 +21,25 @@ type Service struct {
 	tagSvc      *tag_service.Service
 	categorySvc *category_service.Service
 	userSvc     *user_service.Service
+	recordSvc   *record_service.Service
 	dao         *article_repository.Dao
 	che         *cache.Cache
 }
 
-func NewService(traceId string) *Service {
+func NewService(tracker *common.Tracker) *Service {
 	svc := &Service{}
-	svc.tagSvc = tag_service.NewService(traceId)
-	svc.categorySvc = category_service.NewService(traceId)
-	svc.userSvc = user_service.NewService(traceId)
-	svc.che = cache.NewCache(traceId)
-	svc.dao = article_repository.NewDao(traceId)
-	svc.SetTraceId(traceId)
+	svc.tagSvc = tag_service.NewService(tracker)
+	svc.categorySvc = category_service.NewService(tracker)
+	svc.userSvc = user_service.NewService(tracker)
+	svc.recordSvc = record_service.NewService(tracker)
+	svc.che = cache.NewCache(tracker)
+	svc.dao = article_repository.NewDao(tracker)
+	svc.SetTracker(tracker)
 	return svc
 }
 
 func (s *Service) QueryArticlePage(param *dto.ArticleDto) (*common.Page, []*vo.ArticleVo) {
-	page := param.Page
+	page := common.NewPage(param.PageNum, param.PageSize)
 	total := s.dao.Count(param)
 	page.SetTotal(total)
 	if total == 0 {
@@ -139,28 +142,30 @@ func (s *Service) QueryArticlePage(param *dto.ArticleDto) (*common.Page, []*vo.A
 func (s *Service) GetArticleByCode(code string) *errcode.ErrCode {
 	page := common.NewPageOne()
 	param := &dto.ArticleDto{
-		Page:     page,
+		PageNum:  page.PageNum,
+		PageSize: page.PageSize,
 		Code:     code,
 		IsDelete: 1,
 	}
-	_, data := s.QueryArticlePage(param)
-	if len(data) == 0 {
+	_, datas := s.QueryArticlePage(param)
+	if len(datas) == 0 {
 		return errcode.NoExsistData
 	}
-	return errcode.Success.WithData(data[0].ArticleData)
+	return errcode.Success.WithData(datas[0].ArticleData)
 }
 
 func (s *Service) GetArticleById(id int) *errcode.ErrCode {
 	page := common.NewPageOne()
 	param := &dto.ArticleDto{
-		Page: page,
-		Id:   id,
+		PageNum:  page.PageNum,
+		PageSize: page.PageSize,
+		Id:       id,
 	}
-	_, data := s.QueryArticlePage(param)
-	if len(data) == 0 {
+	_, datas := s.QueryArticlePage(param)
+	if len(datas) == 0 {
 		return errcode.NoExsistData
 	}
-	return errcode.Success.WithData(data[0])
+	return errcode.Success.WithData(datas[0])
 }
 
 /*** private ***/

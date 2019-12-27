@@ -10,9 +10,9 @@ type Dao struct {
 	common.BaseDao
 }
 
-func NewDao(traceId string) *Dao {
+func NewDao(tracker *common.Tracker) *Dao {
 	dao := &Dao{}
-	dao.SetTraceId(traceId)
+	dao.SetTracker(tracker)
 	return dao
 }
 
@@ -73,9 +73,6 @@ func (d *Dao) QueryByKeys(keys ...string) []*po.YuQuanta {
 	var values []*po.YuQuanta
 	if err := common.DB.Select(&values, sql, params...); err != nil {
 		d.Error(err, sql, params)
-		return nil
-	}
-	if len(values) == 0 {
 		return nil
 	}
 	return values

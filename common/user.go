@@ -25,6 +25,8 @@ const (
 	X_TRACE = "c"
 )
 
+const USER_AGENT = "User-Agent"
+
 type XUser struct {
 	Id   int
 	Role int

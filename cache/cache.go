@@ -9,9 +9,9 @@ type Cache struct {
 	common.BaseCache
 }
 
-func NewCache(traceId string) *Cache {
+func NewCache(tracker *common.Tracker) *Cache {
 	che := &Cache{}
-	che.SetTraceId(traceId)
+	che.SetTracker(tracker)
 	return che
 }
 

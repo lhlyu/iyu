@@ -27,9 +27,9 @@ func main() {
 	app.Use(middleware.Before())
 	app.Use(recover.New())
 	app.Use(middleware.Limiter()) // 限制每秒访问数量
-	app.Use(middleware.Log())
-	app.Use(middleware.Cors())
 	app.Use(middleware.Jwt())
+	app.Use(middleware.Cors())
+	app.Use(middleware.Log())
 
 	// 后置 Post-Middleware
 	app.Done(middleware.After())
