@@ -17,16 +17,16 @@ type Service struct {
 	che *cache.Cache
 }
 
-func NewService(traceId string) *Service {
+func NewService(tracker *common.Tracker) *Service {
 	svc := &Service{}
-	svc.dao = tag_repository.NewDao(traceId)
-	svc.che = cache.NewCache(traceId)
-	svc.SetTraceId(traceId)
+	svc.dao = tag_repository.NewDao(tracker)
+	svc.che = cache.NewCache(tracker)
+	svc.SetTracker(tracker)
 	return svc
 }
 
 func (s *Service) QueryTagPage(param *dto.TagDto) *errcode.ErrCode {
-	page := param.Page
+	page := common.NewPage(param.PageNum, param.PageSize)
 	whr := &po.YuTag{
 		Id:       param.Id,
 		Name:     param.Name,

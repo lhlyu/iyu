@@ -23,7 +23,8 @@ func (s *Service) QueryHomeArticlePage(param *dto.ArticleDto) *errcode.ErrCode {
 func (s *Service) GetAbout() *errcode.ErrCode {
 	page := common.NewPageOne()
 	param := &dto.ArticleDto{
-		Page:     page,
+		PageNum:  page.PageNum,
+		PageSize: page.PageSize,
 		IsDelete: 1,
 		Kind:     2,
 	}

@@ -4,7 +4,10 @@ import (
 	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris"
 	"github.com/lhlyu/iyu/common"
+	"github.com/lhlyu/iyu/controller/dto"
 	"github.com/lhlyu/iyu/errcode"
+	"github.com/lhlyu/iyu/service/record_service"
+	"github.com/lhlyu/yutil"
 	"gopkg.in/go-playground/validator.v9"
 	"strings"
 	"time"
@@ -112,6 +115,20 @@ func (controller) GetTraceId(ctx iris.Context) string {
 	return ctx.Values().Get(common.X_TRACE).(string)
 }
 
+// 获取日志追踪器
+func (c controller) GetTracker(ctx iris.Context) *common.Tracker {
+	user := c.GetUser(ctx)
+	startTime := ctx.Values().Get(common.X_TIME).(time.Time)
+	traceId := c.GetTraceId(ctx)
+	agent := ctx.GetHeader(common.USER_AGENT)
+	return common.NewTracker(user, startTime, traceId, agent)
+}
+
+// 获取agent
+func (controller) GetAgent(ctx iris.Context) string {
+	return ctx.GetHeader(common.USER_AGENT)
+}
+
 // 是否是管理员
 func (c controller) IsAdmin(ctx iris.Context) bool {
 	user := c.GetUser(ctx)
@@ -125,6 +142,20 @@ func (c controller) IsAdminRouter(ctx iris.Context) bool {
 		return false
 	}
 	return admin
+}
+
+func (c controller) Record(ctx iris.Context, businessKind, BusinessId int, content ...string) bool {
+	svc := record_service.NewService(c.GetTracker(ctx))
+	user := c.GetUser(ctx)
+	return svc.AddRecord(&dto.RecordDto{
+		UserId:       user.Id,
+		Ip:           user.Ip,
+		CreatedAt:    yutil.TimeNow(),
+		BusinessKind: businessKind,
+		BusinessId:   BusinessId,
+		Content:      strings.Join(content, " "),
+		Agent:        c.GetAgent(ctx),
+	})
 }
 
 type Controller struct {

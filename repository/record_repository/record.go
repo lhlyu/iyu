@@ -11,9 +11,9 @@ type Dao struct {
 	common.BaseDao
 }
 
-func NewDao(traceId string) *Dao {
+func NewDao(tracker *common.Tracker) *Dao {
 	dao := &Dao{}
-	dao.SetTraceId(traceId)
+	dao.SetTracker(tracker)
 	return dao
 }
 

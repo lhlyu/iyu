@@ -1,21 +1,11 @@
 package common
 
 type base struct {
-	traceId string
+	Tracker *Tracker
 }
 
-func (b *base) SetTraceId(traceId string) {
-	if b == nil {
-		return
-	}
-	b.traceId = traceId
-}
-
-func (b *base) GetTraceId() string {
-	if b == nil {
-		return ""
-	}
-	return b.traceId
+func (b *base) SetTracker(tracker *Tracker) {
+	b.Tracker = tracker
 }
 
 // 基础dao
@@ -27,12 +17,12 @@ func (s *BaseDao) Error(err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(3, "error", s.traceId, "repository", err.Error(), param)
+	Ylog.Log(3, "error", s.Tracker.GetTraceId(), "repository", err.Error(), param)
 	return true
 }
 
 func (s *BaseDao) Info(param ...interface{}) {
-	Ylog.Log(3, "info", s.traceId, "repository", param...)
+	Ylog.Log(3, "info", s.Tracker.GetTraceId(), "repository", param...)
 }
 
 // 基础服务
@@ -44,12 +34,12 @@ func (s *BaseService) Error(err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(3, "error", s.traceId, "service", err.Error(), param)
+	Ylog.Log(3, "error", s.Tracker.GetTraceId(), "service", err.Error(), param)
 	return true
 }
 
 func (s *BaseService) Info(param ...interface{}) {
-	Ylog.Log(3, "info", s.traceId, "service", param...)
+	Ylog.Log(3, "info", s.Tracker.GetTraceId(), "service", param...)
 }
 
 // 基础缓存
@@ -61,12 +51,12 @@ func (s *BaseCache) Error(err error, param ...interface{}) bool {
 	if err == nil {
 		return false
 	}
-	Ylog.Log(3, "error", s.traceId, "cache", err.Error(), param)
+	Ylog.Log(3, "error", s.Tracker.GetTraceId(), "cache", err.Error(), param)
 	return true
 }
 
 func (s *BaseCache) Info(param ...interface{}) {
-	Ylog.Log(3, "info", s.traceId, "cache", param...)
+	Ylog.Log(3, "info", s.Tracker.GetTraceId(), "cache", param...)
 }
 
 // 基础控制器

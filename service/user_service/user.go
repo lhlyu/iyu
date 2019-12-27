@@ -14,11 +14,11 @@ type Service struct {
 	che *cache.Cache
 }
 
-func NewService(traceId string) *Service {
+func NewService(tracker *common.Tracker) *Service {
 	svc := &Service{}
-	svc.che = cache.NewCache(traceId)
-	svc.dao = user_repository.NewDao(traceId)
-	svc.SetTraceId(traceId)
+	svc.che = cache.NewCache(tracker)
+	svc.dao = user_repository.NewDao(tracker)
+	svc.SetTracker(tracker)
 	return svc
 }
 

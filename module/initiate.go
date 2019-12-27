@@ -2,6 +2,7 @@ package module
 
 import (
 	"github.com/lhlyu/iyu/cache"
+	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/util"
 	"github.com/lhlyu/yutil"
 	"log"
@@ -21,8 +22,9 @@ func (initiate) SetUp() {
 	yutil.NotIgnore()
 	// 初始化数据
 	traceId := util.GetGID()
+	tracker := common.NewSimpleTracker(traceId)
 	// 清除所有缓存
-	cache.NewCache(traceId).ClearKeys()
+	cache.NewCache(tracker).ClearKeys()
 
 	go loadCache(traceId)
 }
