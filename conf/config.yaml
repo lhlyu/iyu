@@ -8,14 +8,13 @@ jwt:
   itv: 86400 # jwt有效时长，单位秒
 
 server:
-  host: 0.0.0.0
+  host: localhost
   port: 8080
   limit: 15   # 每秒最多允许N个请求
 
 log:
   level: debug
-  outFile:
-  timeformat: "2006-01-02 15:04:05"
+  out:
 
 redis:
   addr: 127.0.0.1:6379
@@ -25,17 +24,6 @@ redis:
   idleTimeout: 60
 
 redis_key:
-  tag: "iyu:tag"
-  quanta: "iyu:quanta"
-  category: "iyu:category"
-  user: "iyu:user"
-  global_visit: "iyu:global:visit"
-  article_visit: "iyu:article:visit:"
-  article_like: "iyu:article:like:"
-  cmnt_like: "iyu:cmnt:like:"
-  reply_like: "iyu:reply:like:"
-  article: "iyu:article"
-  token: "iyu:token:"
   iyu: "iyu:"
 
 db:
@@ -44,18 +32,11 @@ db:
     password:
     host: 127.0.0.1
     port: 3306
-    database: lhlyu_blog
+    database: demo
     charset: utf8
     parseTime: true
     maxOpenConns: 1
     maxIdleConns: 3
     connMaxLifetime: 30
+    init: false  # 是否强行初始化
 
-email:
-  host: smtp.163.com
-  port: 465
-  user: 名字
-  password: SMTP邮箱密码
-  from: 负责发送消息的邮箱
-  to: 接收消息的邮箱
-  subject: 标题

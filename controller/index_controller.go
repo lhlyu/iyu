@@ -1,33 +1,25 @@
 package controller
 
 import (
-	"github.com/kataras/iris"
-	"github.com/lhlyu/iyu/errcode"
+	"github.com/kataras/iris/v12"
+	"github.com/lhlyu/iyu/service"
 )
 
-type indexController struct {
-	controller
+type IndexController struct {
+	BaseController
 }
 
-// 获取网站信息(作者,背景图,统计...)
-func (*indexController) GetWebSiteOption(ctx iris.Context) {
-
+type HelloParam struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
 
-// 修改网站设置
-func (*indexController) UpdateWebSiteOption(ctx iris.Context) {
-
-}
-
-// 网站操作记录
-func (c *indexController) GetWebSiteLog(ctx iris.Context) {
-}
-
-// 处理请求错误
-func (c *indexController) NoFoundHandler(ctx iris.Context) {
-	ctx.JSON(errcode.NofoundError)
-}
-
-// 用户动作
-func (c *indexController) UserAction(ctx iris.Context) {
+// http://localhost:8080/index?name=tom&age=12
+func (c *IndexController) Hello(ctx iris.Context) {
+	param := &HelloParam{}
+	if !c.getParams(ctx, param, false) {
+		return
+	}
+	svc := service.NewIndexService(ctx)
+	ctx.JSON(svc.Hello(param.Name, param.Age))
 }

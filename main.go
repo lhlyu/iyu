@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/middleware/recover"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/middleware/recover"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/middleware"
 	"github.com/lhlyu/iyu/module"
@@ -10,12 +10,14 @@ import (
 )
 
 func init() {
-	module.Register(module.CfgModule, // 读取配置 <必须>
-		module.LgModule,       // 日志
-		module.DbModule,       // 连接数据库
-		module.RedisModule,    // redis
-		module.InitiateModule, // 初始化
-		module.TimerModule)    // 启用定时任务
+	// 加载所需的模块
+	module.Register(
+		module.CfgModule,      // 配置模块 <必须>
+		module.LgModule,       // 日志模块
+		module.DbModule,       // DB模块
+		module.InitiateModule, // 初始化模块
+		//module.TimerModule,    // 定时任务模块
+	)
 	module.Init()
 }
 
@@ -23,7 +25,7 @@ func main() {
 
 	app := iris.New()
 
-	// 前置
+	// 前置中间件
 	app.Use(middleware.Before())
 	app.Use(recover.New())
 	app.Use(middleware.Limiter()) // 限制每秒访问数量
