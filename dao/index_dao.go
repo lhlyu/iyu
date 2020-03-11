@@ -7,12 +7,12 @@ import (
 )
 
 type IndexDao struct {
-	trace.BaseTracker
+	BaseDao
 }
 
 func NewIndexDao(tracker trace.ITracker) *IndexDao {
 	return &IndexDao{
-		BaseTracker: trace.NewBaseTracker(tracker),
+		BaseDao: NewBaseDao(tracker),
 	}
 }
 

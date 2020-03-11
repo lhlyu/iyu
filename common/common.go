@@ -11,6 +11,5 @@ var (
 	Cfg   *viper.Viper
 	DB    *gorm.DB
 	Redis *redis.Client
-	Email *yuEmail
 	L     *logrus.Entry
 )

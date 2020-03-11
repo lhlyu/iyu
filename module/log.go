@@ -2,7 +2,7 @@ package module
 
 import (
 	"github.com/lhlyu/iyu/common"
-	"github.com/lhlyu/yutil"
+	"github.com/lhlyu/yutil/v2"
 	"github.com/sirupsen/logrus"
 	"os"
 	"path"
@@ -28,7 +28,7 @@ func NewEntry() *logrus.Entry {
 	level := common.Cfg.GetString("log.level")
 	if out != "" {
 		dir := path.Dir(out)
-		exists := yutil.FileIsExists(dir)
+		exists := yutil.File.IsExists(dir)
 		if !exists {
 			os.MkdirAll(dir, 0666)
 		}

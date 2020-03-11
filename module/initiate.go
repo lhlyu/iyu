@@ -1,7 +1,7 @@
 package module
 
 import (
-	"github.com/lhlyu/yutil"
+	"github.com/lhlyu/yutil/v2"
 	"log"
 )
 

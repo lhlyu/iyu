@@ -56,8 +56,10 @@ func (t *Tracker) Error(err error, v ...interface{}) {
 	if err == nil {
 		return
 	}
+	funcName, _, line := util.CurrentInfo(2)
 	t.entry.WithFields(logrus.Fields{
-		"error": err.Error(),
+		"error":    err.Error(),
+		"position": fmt.Sprintf("%s:%d", funcName, line),
 	}).Errorln(v...)
 }
 
