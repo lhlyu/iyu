@@ -10,7 +10,7 @@ type Plate struct {
 	Id          uint      // 主键
 	Name        string    // 名字
 	Description string    // 描述
-	State       float64   // 状态:1-开启;2-关闭
+	State       uint      // 状态:1-开启;2-关闭
 	CreatedAt   time.Time // 创建时间
 	UpdatedAt   time.Time // 更新时间
 }
