@@ -5,8 +5,6 @@ import (
 	"github.com/kataras/iris/v12/context"
 	"github.com/lhlyu/iyu/module"
 	"github.com/lhlyu/iyu/trace"
-	"github.com/lhlyu/yutil/v2"
-	"testing"
 )
 
 var ctx iris.Context
@@ -22,14 +20,4 @@ func init() {
 	module.Init()
 	ctx = context.NewContext(iris.Default())
 	ctx.Values().Set(trace.TRACKER, trace.NewTracker())
-}
-
-func TestArticleService_GetArticleByCode(t *testing.T) {
-	svc := NewArticleService(ctx)
-	t.Log(svc.GetArticleByCode("abcde"))
-}
-
-func TestArticleService_QueryArticles(t *testing.T) {
-	svc := NewArticleService(ctx)
-	t.Log(yutil.Json.Marshal(svc.QueryArticles()))
 }

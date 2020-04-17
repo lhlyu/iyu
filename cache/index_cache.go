@@ -5,12 +5,12 @@ import (
 )
 
 type IndexCache struct {
-	trace.BaseTracker
+	BaseCache
 }
 
 func NewIndexCache(tracker trace.ITracker) *IndexCache {
 	return &IndexCache{
-		BaseTracker: trace.NewBaseTracker(tracker),
+		BaseCache: NewBaseCache(tracker),
 	}
 }
 

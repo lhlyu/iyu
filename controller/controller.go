@@ -8,18 +8,46 @@ import (
 	"github.com/lhlyu/iyu/trace"
 	"gopkg.in/go-playground/validator.v9"
 	"strings"
+	"sync"
 	"time"
 )
 
-type BaseController struct {
+// 自定义上下文
+type Context struct {
+	iris.Context
+	trace.BaseTracker
 }
 
+func H(h func(*Context)) iris.Handler {
+	return func(original iris.Context) {
+		ctx := acquire(original)
+		h(ctx)
+		release(ctx)
+	}
+}
+
+var contextPool = sync.Pool{New: func() interface{} {
+	return &Context{}
+}}
+
+func acquire(original iris.Context) *Context {
+	ctx := contextPool.Get().(*Context)
+	ctx.Context = original
+	ctx.BaseTracker = trace.NewBaseTracker(ctx.Values().Get(trace.TRACKER).(*trace.Tracker))
+	return ctx
+}
+
+func release(ctx *Context) {
+	contextPool.Put(ctx)
+}
+
+// 校验
 var validate = validator.New()
 
 // v - 负责接收参数的对象
 // check - 是否校验
-func (c BaseController) getParams(ctx iris.Context, v interface{}, check bool) bool {
-	tracker := ctx.Values().Get(trace.TRACKER).(*trace.Tracker)
+func (ctx *Context) GetParams(v interface{}, check bool) bool {
+	tracker := ctx.GetTracker()
 	// 根据方法获取参数
 	// GET  -   query params
 	// POST/PUT/DELETE  - body param
@@ -67,7 +95,7 @@ nbf: 生效时间
 iat: 签发时间
 jti: 唯一身份标识
 */
-func (c BaseController) getToken(ctx iris.Context, m map[string]interface{}) string {
+func (ctx *Context) GetToken(m map[string]interface{}) string {
 	itv := common.Cfg.GetInt("jwt.itv") // 时间间隔
 	now := time.Now()
 	m["iat"] = now.Unix()
@@ -77,4 +105,8 @@ func (c BaseController) getToken(ctx iris.Context, m map[string]interface{}) str
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims(m))
 	tokenString, _ := token.SignedString([]byte(common.Cfg.GetString("jwt.secret")))
 	return tokenString
+}
+
+func (ctx *Context) GetTracker() trace.ITracker {
+	return ctx.Values().Get(trace.TRACKER).(*trace.Tracker)
 }

@@ -12,9 +12,9 @@ import (
 func init() {
 	// 加载所需的模块
 	module.Register(
-		module.CfgModule,      // 配置模块 <必须>
-		module.LgModule,       // 日志模块
-		module.DbModule,       // DB模块
+		module.CfgModule, // 配置模块 <必须>
+		module.LgModule,  // 日志模块
+		//module.DbModule,       // DB模块
 		module.InitiateModule, // 初始化模块
 		//module.TimerModule,    // 定时任务模块
 	)
@@ -38,8 +38,6 @@ func main() {
 	app.SetExecutionRules(iris.ExecutionRules{
 		Done: iris.ExecutionOptions{Force: true},
 	})
-
 	router.SetRouter(app)
-
 	app.Run(iris.Addr(common.Cfg.GetString("server.host") + ":" + common.Cfg.GetString("server.port")))
 }

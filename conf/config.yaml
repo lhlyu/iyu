@@ -24,7 +24,8 @@ redis:
   idleTimeout: 60
 
 redis_key:
-  iyu: "iyu:"
+  prefix: "iyu:"
+  category: "category:all"
 
 db:
   db_wr:

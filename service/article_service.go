@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/kataras/iris/v12"
 	"github.com/lhlyu/iyu/common"
 	"github.com/lhlyu/iyu/dao/po"
 	"github.com/lhlyu/iyu/result"
@@ -12,8 +11,7 @@ type ArticleService struct {
 	trace.BaseTracker
 }
 
-func NewArticleService(ctx iris.Context) *ArticleService {
-	tracker := ctx.Values().Get(trace.TRACKER).(*trace.Tracker)
+func NewArticleService(tracker trace.ITracker) *ArticleService {
 	return &ArticleService{
 		BaseTracker: trace.NewBaseTracker(tracker),
 	}
@@ -24,7 +22,7 @@ func (s *ArticleService) GetArticleByCode(code string) *result.R {
 	e := common.DB.Where("code = ?", code).First(article).Error
 	if e != nil {
 		s.Error(e, code)
-		return result.NoExsistData
+		return result.NotExistsData
 	}
 	return result.Success.WithData(article)
 }
@@ -37,7 +35,7 @@ func (s *ArticleService) QueryArticles() *result.R {
 		s.Error(e)
 		return result.EmptyData
 	}
-	return result.Success.WithPage(page, items)
+	return result.Success.WithPage(items, page)
 }
 
 func (s *ArticleService) AddArticle() *result.R {

@@ -5,16 +5,12 @@ import (
 	"time"
 )
 
-// 分类
 type Category struct {
-	Id          uint      // 主键
-	Name        string    // 名字
-	Description string    // 描述
-	Cover       string    // 封面
-	State       uint      // 状态:1-正常;2-已删除
-	Number      uint      // 关联文章数量
-	CreatedAt   time.Time // 创建时间
-	UpdatedAt   time.Time // 更新时间
+	Id        uint      `db:"id"`         // 自增主键
+	Name      string    `db:"name"`       // 名字
+	Count     uint      `db:"count"`      // 包含文章数量
+	CreatedAt time.Time `db:"created_at"` // 创建时间
+	UpdatedAt time.Time `db:"updated_at"` // 更新时间
 }
 
 // 获取
