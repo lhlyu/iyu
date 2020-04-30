@@ -12,7 +12,7 @@ type R struct {
 	Data interface{} `json:"data"`
 }
 
-func NewR(code int, msg string) *R {
+func New(code int, msg string) *R {
 	return &R{
 		Code: code,
 		Msg:  msg,
@@ -31,13 +31,13 @@ func (r *R) String() string {
 }
 
 func (r *R) WithData(data interface{}) *R {
-	nr := NewR(r.Code, r.Msg)
+	nr := New(r.Code, r.Msg)
 	nr.Data = data
 	return nr
 }
 
 func (r *R) WithPage(data interface{}, page *common.Page) *R {
-	nr := NewR(r.Code, r.Msg)
+	nr := New(r.Code, r.Msg)
 	nr.Data = map[string]interface{}{
 		"list": data,
 		"page": page,
@@ -46,7 +46,7 @@ func (r *R) WithPage(data interface{}, page *common.Page) *R {
 }
 
 func (r *R) WithMsg(msg ...interface{}) *R {
-	nr := NewR(r.Code, r.Msg)
+	nr := New(r.Code, r.Msg)
 	if nr.Msg == "" {
 		nr.Msg = fmt.Sprint(msg...)
 	} else {
@@ -56,17 +56,21 @@ func (r *R) WithMsg(msg ...interface{}) *R {
 }
 
 var (
-	Error   = NewR(-1, "系统异常")
-	Success = NewR(0, "成功")
-	Failure = NewR(1, "失败")
+	Error   = New(-1, "系统异常")
+	Success = New(0, "成功")
+	Failure = New(1, "失败")
 
-	EmptyData     = NewR(1000, "数据为空")
-	NotExistsData = NewR(1001, "数据不存在")
-	IllegalParam  = NewR(1002, "参数不合法")
-	CacheErr      = NewR(1003, "缓存读取异常")
+	EmptyData     = New(1000, "数据为空")
+	ExistsData    = New(1001, "数据已存在")
+	NotExistsData = New(1002, "数据不存在")
+	IllegalParam  = New(1003, "参数不合法")
+	CacheErr      = New(1004, "缓存读取异常")
+	DbErr         = New(1005, "数据读取异常")
 
-	QueryError  = NewR(10001, "查询失败")
-	InsertError = NewR(10002, "插入失败")
-	UpdateError = NewR(10003, "更新失败")
-	DeleteError = NewR(10004, "删除失败")
+	QueryError  = New(10001, "查询失败")
+	InsertError = New(10002, "插入失败")
+	UpdateError = New(10003, "更新失败")
+	DeleteError = New(10004, "删除失败")
+
+	ProhibitDeleteError = New(100001, "分类下包含文章，禁止删除！")
 )

@@ -13,8 +13,10 @@ func SetRouter(app *iris.Application) {
 	//
 	//app.Party("/api")
 
-	ctr := &controller.IndexController{}
+	categoryCtr := controller.CategoryController{}
 
-	app.Get("/index", controller.H(ctr.Hello))
+	api := app.Party("/api")
+
+	api.Get("/category", controller.H(categoryCtr.Query))
 
 }

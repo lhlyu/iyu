@@ -14,7 +14,8 @@ func init() {
 	module.Register(
 		module.CfgModule, // 配置模块 <必须>
 		module.LgModule,  // 日志模块
-		//module.DbModule,       // DB模块
+		module.RedisModule,
+		module.DbModule,       // DB模块
 		module.InitiateModule, // 初始化模块
 		//module.TimerModule,    // 定时任务模块
 	)

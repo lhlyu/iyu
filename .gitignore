@@ -17,3 +17,4 @@
 /deploy
 /html/node_modules
 /log
+go.sum
