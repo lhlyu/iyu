@@ -21,5 +21,5 @@ func NewCategoryService(tracker trace.ITracker) CategoryService {
 }
 
 func (c CategoryService) GetOne() {
-	c.Info("----------->1")
+
 }
