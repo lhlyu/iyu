@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	E_NX  = gorm.ErrRecordNotFound
+	E_NX  = errors.New("数据不存在")
 	E_ASD = errors.New("存在关联关系，禁止删除")
 	E_EX  = errors.New("数据已经存在")
 )
@@ -100,8 +100,9 @@ func (d BaseDao) Transact(fn func(tx *gorm.DB) error) error {
 	tx := common.DB.Begin()
 	if err := fn(tx); err != nil {
 		d.Error(err)
-		if err = tx.Rollback().Error; err != nil {
-			d.Error(err)
+		if err2 := tx.Rollback().Error; err2 != nil {
+			d.Error(err2)
+			return err2
 		}
 		return err
 	}

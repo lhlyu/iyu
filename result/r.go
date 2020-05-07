@@ -27,6 +27,9 @@ func (r *R) IsSuccess() bool {
 }
 
 func (r *R) String() string {
+	if r == nil {
+		return ""
+	}
 	return fmt.Sprintf("code=%d,msg=%s,data=%v", r.Code, r.Msg, r.Data)
 }
 

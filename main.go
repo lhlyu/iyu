@@ -39,6 +39,7 @@ func main() {
 	app.SetExecutionRules(iris.ExecutionRules{
 		Done: iris.ExecutionOptions{Force: true},
 	})
+
 	router.SetRouter(app)
 	app.Run(iris.Addr(common.Cfg.GetString("server.host") + ":" + common.Cfg.GetString("server.port")))
 }

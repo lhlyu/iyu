@@ -9,7 +9,7 @@ type CategoryController struct {
 
 func (c CategoryController) Query(ctx *Context) {
 	svc := service.NewCategoryService(ctx.GetTracker())
-	svc.GetOne()
+	svc.GetAll()
 	ctx.Info(">>>>>>>>>>>>")
 	ctx.JSON("")
 }
