@@ -3,17 +3,17 @@ package common
 import "math"
 
 type Page struct {
-	PageNum     int  `json:"pageNum" validate:"required,gt=0"`  // 当前页码
-	PageSize    int  `json:"pageSize" validate:"required,gt=0"` // 每页记录条数
-	Total       int  `json:"total"`                             // 记录总量
-	PageMax     int  `json:"pageMax"`                           // 最大页码
-	PrePage     int  `json:"prePage"`                           // 上一页码,如果没有为 0
-	NextPage    int  `json:"nextPage"`                          // 下一页码,如果没有为 0
-	HasPrePage  bool `json:"hasPrePage"`                        // 是否有上一页
-	HasNextPage bool `json:"hasNextPage"`                       // 是否有下一页
-	Remainder   int  `json:"remainder"`                         // 剩余数据量
-	StartRow    int  `json:"-"`                                 // 记录开始行
-	StopRow     int  `json:"-"`                                 // 记录结束行
+	PageNum     int  `json:"pageNum"`     // 当前页码
+	PageSize    int  `json:"pageSize"`    // 每页记录条数
+	Total       int  `json:"total"`       // 记录总量
+	PageMax     int  `json:"pageMax"`     // 最大页码
+	PrePage     int  `json:"prePage"`     // 上一页码,如果没有为 0
+	NextPage    int  `json:"nextPage"`    // 下一页码,如果没有为 0
+	HasPrePage  bool `json:"hasPrePage"`  // 是否有上一页
+	HasNextPage bool `json:"hasNextPage"` // 是否有下一页
+	Remainder   int  `json:"remainder"`   // 剩余数据量
+	StartRow    int  `json:"-"`           // 记录开始行
+	StopRow     int  `json:"-"`           // 记录结束行
 	counter     int  `json:"-"`
 }
 
