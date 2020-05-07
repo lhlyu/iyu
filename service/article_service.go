@@ -6,12 +6,12 @@ import (
 )
 
 type ArticleService struct {
-	trace.BaseTracker
+	BaseService
 }
 
 func NewArticleService(tracker trace.ITracker) *ArticleService {
 	return &ArticleService{
-		BaseTracker: trace.NewBaseTracker(tracker),
+		BaseService: NewBaseService(tracker),
 	}
 }
 

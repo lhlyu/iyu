@@ -9,37 +9,13 @@ import (
 )
 
 type CategoryDao struct {
-	trace.BaseTracker
+	BaseDao
 }
 
 func NewCategoryDao(tracker trace.ITracker) CategoryDao {
 	return CategoryDao{
-		BaseTracker: trace.NewBaseTracker(tracker),
+		BaseDao: NewBaseDao(tracker),
 	}
-}
-
-func (d CategoryDao) Get(id uint) (*po.Category, error) {
-	data := &po.Category{}
-	if err := common.DB.First(data, id).Error; err != nil {
-		d.Error(err, id)
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return data, nil
-}
-
-func (d CategoryDao) Query(whr string, params ...interface{}) ([]*po.Category, error) {
-	var datas []*po.Category
-	if err := common.DB.Where(whr, params...).Find(&datas).Error; err != nil {
-		d.Error(err, whr, params)
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return datas, nil
 }
 
 // 唯一
@@ -91,14 +67,6 @@ func (d CategoryDao) Del(id uint) error {
 	}
 	if err := tx.Commit().Error; err != nil {
 		d.Error(err, id, "Commit")
-		return err
-	}
-	return nil
-}
-
-func (d CategoryDao) Update(param *po.Category) error {
-	if err := common.DB.Model(param).Updates(param).Error; err != nil {
-		d.Error(err, yutil.Json.Marshal(param))
 		return err
 	}
 	return nil

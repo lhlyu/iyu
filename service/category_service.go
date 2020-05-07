@@ -7,19 +7,18 @@ import (
 )
 
 type CategoryService struct {
-	trace.BaseTracker
+	BaseService
 	dao.CategoryDao
 	cache.CategoryCache
 }
 
 func NewCategoryService(tracker trace.ITracker) CategoryService {
 	return CategoryService{
-		BaseTracker:   trace.NewBaseTracker(tracker),
+		BaseService:   NewBaseService(tracker),
 		CategoryDao:   dao.NewCategoryDao(tracker),
 		CategoryCache: cache.NewCategoryCache(tracker),
 	}
 }
 
 func (c CategoryService) GetOne() {
-
 }
