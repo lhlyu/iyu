@@ -94,6 +94,7 @@ func (c CategoryService) QueryByName(name string) ([]*vo.Category, *result.R) {
 	return items, nil
 }
 
+// add a category
 func (c CategoryService) AddOne(param *dto.Category) *result.R {
 	now := time.Now()
 	data := &po.Category{
@@ -108,6 +109,7 @@ func (c CategoryService) AddOne(param *dto.Category) *result.R {
 	return result.Success
 }
 
+// update a category
 func (c CategoryService) UpdateOne(param *dto.Category) *result.R {
 	now := time.Now()
 	data := &po.Category{
@@ -122,6 +124,7 @@ func (c CategoryService) UpdateOne(param *dto.Category) *result.R {
 	return result.Success
 }
 
+// del a category
 func (c CategoryService) DelById(param *dto.Category) *result.R {
 	if err := c.CategoryDao.Del(param.Id); err != nil {
 		return result.DeleteError.WithMsg(err.Error())

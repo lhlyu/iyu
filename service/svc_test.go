@@ -48,3 +48,12 @@ func TestCategoryService_QueryByName(t *testing.T) {
 	t.Log(yutil.Json.Marshal(datas))
 	t.Log(r.String())
 }
+
+func TestCategoryService_UpdateOne(t *testing.T) {
+	svc := NewCategoryService(trace.NewTracker())
+	r := svc.UpdateOne(&dto.Category{
+		Id:   9,
+		Name: "c++",
+	})
+	t.Log(r.String())
+}
